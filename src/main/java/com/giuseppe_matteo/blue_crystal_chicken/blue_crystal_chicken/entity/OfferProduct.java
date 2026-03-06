@@ -25,10 +25,10 @@ public class OfferProduct {
     @ManyToOne
     @MapsId("offerId")
     @JoinColumn(name = "Offer_id")
-    private Offer offer;
+    private OfferPOJO offer;
 
     @ManyToOne
     @MapsId("productId")
     @JoinColumn(name = "Product_id")
-    private Product product;
+    private ProductPOJO product;
 }

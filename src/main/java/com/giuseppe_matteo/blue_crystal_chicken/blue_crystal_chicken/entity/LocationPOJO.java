@@ -13,7 +13,7 @@ import java.util.List;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-public class Location {
+public class LocationPOJO {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)

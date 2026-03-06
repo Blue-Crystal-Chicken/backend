@@ -34,10 +34,10 @@ public class OrderProduct {
     @ManyToOne
     @MapsId("orderId")
     @JoinColumn(name = "Order_id")
-    private Order order;
+    private OrderPOJO order;
 
     @ManyToOne
     @MapsId("productId")
     @JoinColumn(name = "Product_id")
-    private Product product;
+    private ProductPOJO product;
 }

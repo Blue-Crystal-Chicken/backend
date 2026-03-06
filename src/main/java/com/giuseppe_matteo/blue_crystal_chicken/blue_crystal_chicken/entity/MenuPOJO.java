@@ -13,7 +13,7 @@ import java.util.List;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-public class Menu {
+public class MenuPOJO {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -31,7 +31,7 @@ public class Menu {
 
     // Many-to-many with Offer via OfferMenu
     @ManyToMany(mappedBy = "menus")
-    private List<Offer> offers;
+    private List<OfferPOJO> offers;
 
     // Bidirectional with MenuProduct
     @OneToMany(mappedBy = "menu", cascade = CascadeType.ALL)

@@ -13,7 +13,7 @@ import java.util.List;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-public class Offer {
+public class OfferPOJO {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -33,7 +33,7 @@ public class Offer {
         joinColumns = @JoinColumn(name = "Offer_id"),
         inverseJoinColumns = @JoinColumn(name = "Menu_id")
     )
-    private List<Menu> menus;
+    private List<MenuPOJO> menus;
 
     // Bidirectional with OfferProduct
     @OneToMany(mappedBy = "offer", cascade = CascadeType.ALL)

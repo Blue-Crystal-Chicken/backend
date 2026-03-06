@@ -13,7 +13,7 @@ import java.util.List;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-public class Ingredient {
+public class IngredientPOJO {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -34,7 +34,7 @@ public class Ingredient {
 
     // Many-to-many with Product via ProductIngredient
     @ManyToMany(mappedBy = "ingredients")
-    private List<Product> products;
+    private List<ProductPOJO> products;
 
     // Bidirectional with LocationIngredient
     @OneToMany(mappedBy = "ingredient", cascade = CascadeType.ALL)

@@ -12,7 +12,7 @@ import java.util.List;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-public class Product {
+public class ProductPOJO {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -55,7 +55,7 @@ public class Product {
         joinColumns = @JoinColumn(name = "Product_id"),
         inverseJoinColumns = @JoinColumn(name = "Ingredient_id")
     )
-    private List<Ingredient> ingredients;
+    private List<IngredientPOJO> ingredients;
 
     // Bidirectional with OrderProduct
     @OneToMany(mappedBy = "product", cascade = CascadeType.ALL)

@@ -28,10 +28,10 @@ public class MenuProduct {
     @ManyToOne
     @MapsId("menuId")
     @JoinColumn(name = "Menu_id")
-    private Menu menu;
+    private MenuPOJO menu;
 
     @ManyToOne
     @MapsId("productId")
     @JoinColumn(name = "Product_id")
-    private Product product;
+    private ProductPOJO product;
 }

@@ -16,7 +16,7 @@ import java.util.List;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-public class Order {
+public class OrderPOJO {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)

@@ -25,10 +25,10 @@ public class LocationIngredient {
     @ManyToOne
     @MapsId("locationId")
     @JoinColumn(name = "Location_id")
-    private Location location;
+    private LocationPOJO location;
 
     @ManyToOne
     @MapsId("ingredientId")
     @JoinColumn(name = "Ingredient_id")
-    private Ingredient ingredient;
+    private IngredientPOJO ingredient;
 }
