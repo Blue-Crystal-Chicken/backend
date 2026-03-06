@@ -14,7 +14,7 @@ import java.util.List;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-public class User {
+public class UserPOJO {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)

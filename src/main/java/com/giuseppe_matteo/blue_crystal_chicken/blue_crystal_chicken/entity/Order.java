@@ -57,7 +57,7 @@ public class Order {
 
     @ManyToOne
     @JoinColumn(name = "User_id")
-    private User user;
+    private UserPOJO user;
 
     // Bidirectional with OrderProduct
     @OneToMany(mappedBy = "order", cascade = CascadeType.ALL)
