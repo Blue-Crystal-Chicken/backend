@@ -1,4 +1,4 @@
-package com.giuseppe_matteo.blue_crystal_chicken.blue_crystal_chicken.models.key;
+package com.giuseppe_matteo.blue_crystal_chicken.blue_crystal_chicken.entity.key;
 
 import jakarta.persistence.*;
 import lombok.*;
