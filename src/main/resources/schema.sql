@@ -14,6 +14,7 @@ CREATE TABLE USERS (
     Password    VARCHAR(255)    NOT NULL,
     Gender      VARCHAR(50),
     Phone       VARCHAR(50),
+    Role        VARCHAR(50)     NOT NULL DEFAULT 'USER',
     Created_at  TIMESTAMP       NOT NULL DEFAULT CURRENT_TIMESTAMP,
     Updated_at  TIMESTAMP,
     CONSTRAINT pk_users PRIMARY KEY (id)

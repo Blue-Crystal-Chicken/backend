@@ -57,6 +57,10 @@ public class UserPOJO {
     @Size(min = 10, max = 10, message = "Il numero di telefono deve essere composto da 10 cifre")
     private String phone;
 
+    @Enumerated(EnumType.STRING)
+    @Column(name = "role")
+    private Role role;
+
     @Column(nullable = false, updatable = false)
     private LocalDateTime createdAt;
 
