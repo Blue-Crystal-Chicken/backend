@@ -54,6 +54,33 @@
 			<artifactId>spring-boot-starter-test</artifactId>
 			<scope>test</scope>
 		</dependency>
+
+		<!--
+            SPRING DATA JPA
+            Include Hibernate come ORM e tutta l'infrastruttura Spring Data:
+            - JpaRepository con CRUD + paginazione + sorting out-of-the-box
+            - Derived queries (findByX, findByXAndY, ...)
+            - Supporto @Query per JPQL e SQL nativo
+            - Gestione automatica delle transazioni
+        -->
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-data-jpa</artifactId>
+        </dependency>
+
+		<!--
+            SPRINGDOC OPENAPI (SWAGGER)
+            Genera automaticamente la documentazione delle REST API.
+            Accessibile a:
+              - Swagger UI:   http://localhost:8080/swagger-ui.html
+              - JSON OpenAPI: http://localhost:8080/v3/api-docs
+        -->
+        <dependency>
+            <groupId>org.springdoc</groupId>
+            <artifactId>springdoc-openapi-starter-webmvc-ui</artifactId>
+            <version>2.5.0</version>
+        </dependency>
+		
 	</dependencies>
 
 	<build>

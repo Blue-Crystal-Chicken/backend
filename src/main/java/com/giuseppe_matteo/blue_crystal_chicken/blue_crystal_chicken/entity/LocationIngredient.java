@@ -4,6 +4,7 @@ import com.giuseppe_matteo.blue_crystal_chicken.blue_crystal_chicken.entity.key.
 
 import jakarta.persistence.*;
 import lombok.*;
+import java.time.LocalDateTime;
 
 /**
  * Junction entity for Location and Ingredient with additional attributes.
@@ -11,9 +12,9 @@ import lombok.*;
 @Entity
 @Table(name = "Location_Ingredients")
 @Data
-@Builder
 @NoArgsConstructor
 @AllArgsConstructor
+@ToString(exclude = { "location", "ingredient" })
 public class LocationIngredient {
 
     @EmbeddedId
@@ -21,6 +22,12 @@ public class LocationIngredient {
 
     @Column(name = "Quantity")
     private Double quantity;
+
+    @Column(nullable = false, updatable = false)
+    private LocalDateTime createdAt;
+
+    @Column(nullable = false)
+    private LocalDateTime updatedAt;
 
     @ManyToOne
     @MapsId("locationId")
@@ -31,4 +38,15 @@ public class LocationIngredient {
     @MapsId("ingredientId")
     @JoinColumn(name = "Ingredient_id")
     private IngredientPOJO ingredient;
+
+    @PrePersist
+    protected void onCreate() {
+        createdAt = LocalDateTime.now();
+        updatedAt = LocalDateTime.now();
+    }
+
+    @PreUpdate
+    protected void onUpdate() {
+        updatedAt = LocalDateTime.now();
+    }
 }

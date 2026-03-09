@@ -1,7 +1,9 @@
 package com.giuseppe_matteo.blue_crystal_chicken.blue_crystal_chicken.entity;
 
 import jakarta.persistence.*;
+import jakarta.validation.constraints.NotBlank;
 import lombok.*;
+import java.time.LocalDateTime;
 import java.util.List;
 
 /**
@@ -10,9 +12,9 @@ import java.util.List;
 @Entity
 @Table(name = "LOCATIONS")
 @Data
-@Builder
 @NoArgsConstructor
 @AllArgsConstructor
+@ToString(exclude = "locationIngredients")
 public class LocationPOJO {
 
     @Id
@@ -21,12 +23,15 @@ public class LocationPOJO {
     private Long id;
 
     @Column(name = "Name")
+    @NotBlank(message = "Il nome è obbligatorio")
     private String name;
 
     @Column(name = "Address")
+    @NotBlank(message = "L'indirizzo è obbligatorio")
     private String address;
 
     @Column(name = "City")
+    @NotBlank(message = "La città è obbligatoria")
     private String city;
 
     @Column(name = "Phone_code")
@@ -41,7 +46,24 @@ public class LocationPOJO {
     @Column(name = "Status")
     private String status;
 
+    @Column(nullable = false, updatable = false)
+    private LocalDateTime createdAt;
+
+    @Column(nullable = false)
+    private LocalDateTime updatedAt;
+
     // Bidirectional relationship with LocationIngredient
     @OneToMany(mappedBy = "location", cascade = CascadeType.ALL)
     private List<LocationIngredient> locationIngredients;
+
+    @PrePersist
+    protected void onCreate() {
+        createdAt = LocalDateTime.now();
+        updatedAt = LocalDateTime.now();
+    }
+
+    @PreUpdate
+    protected void onUpdate() {
+        updatedAt = LocalDateTime.now();
+    }
 }

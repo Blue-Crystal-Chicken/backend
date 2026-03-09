@@ -1,7 +1,10 @@
 package com.giuseppe_matteo.blue_crystal_chicken.blue_crystal_chicken.entity;
 
 import jakarta.persistence.*;
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.Size;
 import lombok.*;
+import java.time.LocalDateTime;
 import java.util.List;
 
 /**
@@ -10,9 +13,9 @@ import java.util.List;
 @Entity
 @Table(name = "INGREDIENTS")
 @Data
-@Builder
 @NoArgsConstructor
 @AllArgsConstructor
+@ToString(exclude = { "products", "locationIngredients" })
 public class IngredientPOJO {
 
     @Id
@@ -21,9 +24,12 @@ public class IngredientPOJO {
     private Long id;
 
     @Column(name = "Name")
+    @NotBlank(message = "Il nome è obbligatorio")
+    @Size(min = 3, max = 50, message = "Il nome deve essere compreso tra 3 e 50 caratteri")
     private String name;
 
     @Column(name = "Description")
+    @Size(max = 255, message = "La descrizione non può superare i 255 caratteri")
     private String description;
 
     @Column(name = "Price")
@@ -32,6 +38,12 @@ public class IngredientPOJO {
     @Column(name = "Quantity")
     private Double quantity;
 
+    @Column(nullable = false, updatable = false)
+    private LocalDateTime createdAt;
+
+    @Column(nullable = false)
+    private LocalDateTime updatedAt;
+
     // Many-to-many with Product via ProductIngredient
     @ManyToMany(mappedBy = "ingredients")
     private List<ProductPOJO> products;
@@ -39,4 +51,15 @@ public class IngredientPOJO {
     // Bidirectional with LocationIngredient
     @OneToMany(mappedBy = "ingredient", cascade = CascadeType.ALL)
     private List<LocationIngredient> locationIngredients;
+
+    @PrePersist
+    protected void onCreate() {
+        createdAt = LocalDateTime.now();
+        updatedAt = LocalDateTime.now();
+    }
+
+    @PreUpdate
+    protected void onUpdate() {
+        updatedAt = LocalDateTime.now();
+    }
 }

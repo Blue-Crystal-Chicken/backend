@@ -4,6 +4,7 @@ import com.giuseppe_matteo.blue_crystal_chicken.blue_crystal_chicken.entity.key.
 
 import jakarta.persistence.*;
 import lombok.*;
+import java.time.LocalDateTime;
 
 /**
  * Junction entity for Order and Product with additional attributes.
@@ -11,9 +12,9 @@ import lombok.*;
 @Entity
 @Table(name = "Order_Products")
 @Data
-@Builder
 @NoArgsConstructor
 @AllArgsConstructor
+@ToString(exclude = { "order", "product" })
 public class OrderProduct {
 
     @EmbeddedId
@@ -31,6 +32,12 @@ public class OrderProduct {
     @Column(name = "Special_note")
     private String specialNote;
 
+    @Column(nullable = false, updatable = false)
+    private LocalDateTime createdAt;
+
+    @Column(nullable = false)
+    private LocalDateTime updatedAt;
+
     @ManyToOne
     @MapsId("orderId")
     @JoinColumn(name = "Order_id")
@@ -40,4 +47,15 @@ public class OrderProduct {
     @MapsId("productId")
     @JoinColumn(name = "Product_id")
     private ProductPOJO product;
+
+    @PrePersist
+    protected void onCreate() {
+        createdAt = LocalDateTime.now();
+        updatedAt = LocalDateTime.now();
+    }
+
+    @PreUpdate
+    protected void onUpdate() {
+        updatedAt = LocalDateTime.now();
+    }
 }

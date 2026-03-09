@@ -1,7 +1,9 @@
 package com.giuseppe_matteo.blue_crystal_chicken.blue_crystal_chicken.entity;
 
 import jakarta.persistence.*;
+import jakarta.validation.constraints.NotBlank;
 import lombok.*;
+import java.time.LocalDateTime;
 import java.util.List;
 
 /**
@@ -10,9 +12,9 @@ import java.util.List;
 @Entity
 @Table(name = "MENU")
 @Data
-@Builder
 @NoArgsConstructor
 @AllArgsConstructor
+@ToString(exclude = { "offers", "menuProducts" })
 public class MenuPOJO {
 
     @Id
@@ -21,6 +23,7 @@ public class MenuPOJO {
     private Long id;
 
     @Column(name = "Name")
+    @NotBlank(message = "Il nome è obbligatorio")
     private String name;
 
     @Column(name = "Price")
@@ -29,6 +32,12 @@ public class MenuPOJO {
     @Column(name = "Description")
     private String description;
 
+    @Column(nullable = false, updatable = false)
+    private LocalDateTime createdAt;
+
+    @Column(nullable = false)
+    private LocalDateTime updatedAt;
+
     // Many-to-many with Offer via OfferMenu
     @ManyToMany(mappedBy = "menus")
     private List<OfferPOJO> offers;
@@ -36,4 +45,15 @@ public class MenuPOJO {
     // Bidirectional with MenuProduct
     @OneToMany(mappedBy = "menu", cascade = CascadeType.ALL)
     private List<MenuProduct> menuProducts;
+
+    @PrePersist
+    protected void onCreate() {
+        createdAt = LocalDateTime.now();
+        updatedAt = LocalDateTime.now();
+    }
+
+    @PreUpdate
+    protected void onUpdate() {
+        updatedAt = LocalDateTime.now();
+    }
 }

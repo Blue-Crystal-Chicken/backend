@@ -1,9 +1,10 @@
 package com.giuseppe_matteo.blue_crystal_chicken.blue_crystal_chicken.entity;
 
 import jakarta.persistence.*;
+import jakarta.validation.constraints.NotBlank;
 import lombok.*;
-import org.hibernate.annotations.CreationTimestamp;
-import org.hibernate.annotations.UpdateTimestamp;
+
+import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.List;
 
@@ -13,9 +14,9 @@ import java.util.List;
 @Entity
 @Table(name = "ORDERS")
 @Data
-@Builder
 @NoArgsConstructor
 @AllArgsConstructor
+@ToString(exclude = { "user", "orderProducts" })
 public class OrderPOJO {
 
     @Id
@@ -24,12 +25,14 @@ public class OrderPOJO {
     private Long id;
 
     @Column(name = "Order_id")
+    @NotBlank(message = "L'ID ordine è obbligatorio")
     private String orderId;
 
     @Column(name = "Code")
     private String code;
 
     @Column(name = "Service_type")
+    @NotBlank(message = "Il tipo di servizio è obbligatorio")
     private String serviceType;
 
     @Column(name = "Order_type")
@@ -42,17 +45,15 @@ public class OrderPOJO {
     private String paymentType;
 
     @Column(name = "Payment_amount")
-    private Double paymentAmount;
+    private BigDecimal paymentAmount;
 
     @Column(name = "Total_at")
-    private Double totalAt;
+    private BigDecimal totalAt;
 
-    @CreationTimestamp
-    @Column(name = "Created_at")
+    @Column(name = "Created_at", nullable = false, updatable = false)
     private LocalDateTime createdAt;
 
-    @UpdateTimestamp
-    @Column(name = "Updated_at")
+    @Column(name = "Updated_at", nullable = false)
     private LocalDateTime updatedAt;
 
     @ManyToOne
@@ -62,4 +63,15 @@ public class OrderPOJO {
     // Bidirectional with OrderProduct
     @OneToMany(mappedBy = "order", cascade = CascadeType.ALL)
     private List<OrderProduct> orderProducts;
+
+    @PrePersist
+    protected void onCreate() {
+        createdAt = LocalDateTime.now();
+        updatedAt = LocalDateTime.now();
+    }
+
+    @PreUpdate
+    protected void onUpdate() {
+        updatedAt = LocalDateTime.now();
+    }
 }
