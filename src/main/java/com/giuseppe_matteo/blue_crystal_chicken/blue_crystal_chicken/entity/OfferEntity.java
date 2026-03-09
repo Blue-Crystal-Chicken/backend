@@ -15,7 +15,7 @@ import java.util.List;
 @NoArgsConstructor
 @AllArgsConstructor
 @ToString(exclude = { "menus", "offerProducts" })
-public class OfferPOJO {
+public class OfferEntity {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -38,7 +38,7 @@ public class OfferPOJO {
     // Many-to-many with Menu via OfferMenu
     @ManyToMany
     @JoinTable(name = "Offer_Menu", joinColumns = @JoinColumn(name = "Offer_id"), inverseJoinColumns = @JoinColumn(name = "Menu_id"))
-    private List<MenuPOJO> menus;
+    private List<MenuEntity> menus;
 
     // Bidirectional with OfferProduct
     @OneToMany(mappedBy = "offer", cascade = CascadeType.ALL)

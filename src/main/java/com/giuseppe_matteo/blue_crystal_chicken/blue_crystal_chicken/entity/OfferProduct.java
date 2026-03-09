@@ -32,12 +32,12 @@ public class OfferProduct {
     @ManyToOne
     @MapsId("offerId")
     @JoinColumn(name = "Offer_id")
-    private OfferPOJO offer;
+    private OfferEntity offer;
 
     @ManyToOne
     @MapsId("productId")
     @JoinColumn(name = "Product_id")
-    private ProductPOJO product;
+    private ProductEntity product;
 
     @PrePersist
     protected void onCreate() {

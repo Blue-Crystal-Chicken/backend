@@ -13,13 +13,13 @@ import java.util.List;
  * Represents a user in the Blue Crystal Kitchen system.
  */
 @Entity
-@Table(name = "USERS",uniqueConstraints = {
-    @UniqueConstraint(columnNames = "Email")
+@Table(name = "USERS", uniqueConstraints = {
+        @UniqueConstraint(columnNames = "Email")
 })
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
-public class UserPOJO {
+public class UserEntity {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -69,7 +69,7 @@ public class UserPOJO {
 
     // Bidirectional relationship with Order
     @OneToMany(mappedBy = "user", cascade = CascadeType.ALL)
-    private List<OrderPOJO> orders;
+    private List<OrderEntity> orders;
 
     @PrePersist
     protected void onCreate() {

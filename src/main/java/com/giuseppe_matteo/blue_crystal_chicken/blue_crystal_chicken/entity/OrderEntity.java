@@ -17,7 +17,7 @@ import java.util.List;
 @NoArgsConstructor
 @AllArgsConstructor
 @ToString(exclude = { "user", "orderProducts" })
-public class OrderPOJO {
+public class OrderEntity {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -58,7 +58,7 @@ public class OrderPOJO {
 
     @ManyToOne
     @JoinColumn(name = "User_id")
-    private UserPOJO user;
+    private UserEntity user;
 
     // Bidirectional with OrderProduct
     @OneToMany(mappedBy = "order", cascade = CascadeType.ALL)

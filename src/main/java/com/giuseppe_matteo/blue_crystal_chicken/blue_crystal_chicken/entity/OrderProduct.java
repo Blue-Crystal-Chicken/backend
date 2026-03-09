@@ -41,12 +41,12 @@ public class OrderProduct {
     @ManyToOne
     @MapsId("orderId")
     @JoinColumn(name = "Order_id")
-    private OrderPOJO order;
+    private OrderEntity order;
 
     @ManyToOne
     @MapsId("productId")
     @JoinColumn(name = "Product_id")
-    private ProductPOJO product;
+    private ProductEntity product;
 
     @PrePersist
     protected void onCreate() {

@@ -32,12 +32,12 @@ public class LocationIngredient {
     @ManyToOne
     @MapsId("locationId")
     @JoinColumn(name = "Location_id")
-    private LocationPOJO location;
+    private LocationEntity location;
 
     @ManyToOne
     @MapsId("ingredientId")
     @JoinColumn(name = "Ingredient_id")
-    private IngredientPOJO ingredient;
+    private IngredientEntity ingredient;
 
     @PrePersist
     protected void onCreate() {

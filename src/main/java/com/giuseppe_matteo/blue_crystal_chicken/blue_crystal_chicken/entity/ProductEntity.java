@@ -15,8 +15,8 @@ import java.util.List;
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
-@ToString(exclude = {"menuProducts", "offerProducts", "ingredients", "orderProducts"})
-public class ProductPOJO {
+@ToString(exclude = { "menuProducts", "offerProducts", "ingredients", "orderProducts" })
+public class ProductEntity {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -63,12 +63,8 @@ public class ProductPOJO {
 
     // Many-to-many with Ingredient via ProductIngredient
     @ManyToMany
-    @JoinTable(
-        name = "Product_Ingredients",
-        joinColumns = @JoinColumn(name = "Product_id"),
-        inverseJoinColumns = @JoinColumn(name = "Ingredient_id")
-    )
-    private List<IngredientPOJO> ingredients;
+    @JoinTable(name = "Product_Ingredients", joinColumns = @JoinColumn(name = "Product_id"), inverseJoinColumns = @JoinColumn(name = "Ingredient_id"))
+    private List<IngredientEntity> ingredients;
 
     // Bidirectional with OrderProduct
     @OneToMany(mappedBy = "product", cascade = CascadeType.ALL)

@@ -35,12 +35,12 @@ public class MenuProduct {
     @ManyToOne
     @MapsId("menuId")
     @JoinColumn(name = "Menu_id")
-    private MenuPOJO menu;
+    private MenuEntity menu;
 
     @ManyToOne
     @MapsId("productId")
     @JoinColumn(name = "Product_id")
-    private ProductPOJO product;
+    private ProductEntity product;
 
     @PrePersist
     protected void onCreate() {
