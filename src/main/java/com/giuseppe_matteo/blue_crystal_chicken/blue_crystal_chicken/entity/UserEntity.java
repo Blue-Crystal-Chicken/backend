@@ -4,6 +4,7 @@ import jakarta.persistence.*;
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Size;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.*;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
@@ -47,6 +48,7 @@ public class UserEntity {
     @Column(name = "Password")
     @NotBlank(message = "La password è obbligatoria")
     @Size(min = 6, max = 20, message = "La password deve essere compresa tra 6 e 20 caratteri")
+    @JsonIgnore
     private String password;
 
     @Column(name = "Gender")

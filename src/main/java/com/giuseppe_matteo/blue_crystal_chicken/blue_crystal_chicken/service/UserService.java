@@ -11,6 +11,7 @@ import com.giuseppe_matteo.blue_crystal_chicken.blue_crystal_chicken.exception.E
 import com.giuseppe_matteo.blue_crystal_chicken.blue_crystal_chicken.exception.EmailNotFoundException;
 import com.giuseppe_matteo.blue_crystal_chicken.blue_crystal_chicken.exception.UserNotFoundException;
 import com.giuseppe_matteo.blue_crystal_chicken.blue_crystal_chicken.repository.UserRepository;
+import com.giuseppe_matteo.blue_crystal_chicken.blue_crystal_chicken.utils.PasswordHasher;
 
 @Service
 public class UserService {
@@ -23,7 +24,9 @@ public class UserService {
         if (userRepository.existsByEmail(user.getEmail())) {
             throw new EmailAlreadyExistsException();
         }
-        return userRepository.save(user);
+        UserEntity save = user;
+        save.setPassword(PasswordHasher.hash(save.getPassword()));
+        return userRepository.save(save);
     }
 
     @Transactional(readOnly = true)
@@ -54,5 +57,14 @@ public class UserService {
         return userRepository.findById(id).orElseThrow(() -> new UserNotFoundException());
     }
 
+    @Transactional(readOnly = true)
+    public UserEntity login(UserEntity user){
+        if (!userRepository.existsByEmail(user.getEmail())) {
+            throw new EmailNotFoundException();
+        }else if(!PasswordHasher.check(user.getPassword(), userRepository.findByEmail(user.getEmail()).get().getPassword())){
+            throw new UserNotFoundException();
+        }
+        return userRepository.findByEmail(user.getEmail()).get();
+    }
     
 }
