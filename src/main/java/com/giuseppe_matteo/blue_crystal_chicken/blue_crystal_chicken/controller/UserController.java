@@ -30,43 +30,19 @@ import com.giuseppe_matteo.blue_crystal_chicken.blue_crystal_chicken.service.Use
 @Slf4j
 @RestController
 @RequestMapping("/api/users")
-@RequiredArgsConstructor
 @Tag(name = "User API", description = "API REST per la gestione degli utenti")
 public class UserController {
 
-    private UserService userService;
+    private final UserService userService;
 
-    @PostMapping("/v1/login")
-    @Operation(summary = "Login utente", description = "Endpoint per il login dell'utente")
-    @ResponseStatus(HttpStatus.CREATED)
-    @ApiResponses(value = {
-            @ApiResponse(responseCode = "201", description = "Utente loggato con successo", content = @Content(mediaType = "application/json", schema = @Schema(implementation = UserEntity.class))),
-            @ApiResponse(responseCode = "400", description = "Richiesta non valida", content = @Content(mediaType = "application/json", schema = @Schema(implementation = ErrorResponse.class))),
-            @ApiResponse(responseCode = "401", description = "Non autorizzato", content = @Content(mediaType = "application/json", schema = @Schema(implementation = ErrorResponse.class))),
-            @ApiResponse(responseCode = "404", description = "Utente non trovato", content = @Content(mediaType = "application/json", schema = @Schema(implementation = ErrorResponse.class))),
-            @ApiResponse(responseCode = "500", description = "Errore del server", content = @Content(mediaType = "application/json", schema = @Schema(implementation = ErrorResponse.class)))
-    })
-    public UserEntity login(@RequestBody UserEntity user) {
-        return userService.login(user);
-    }
-
-    @PostMapping("/v1/register")
-    @Operation(summary = "Registrazione utente", description = "Endpoint per la registrazione dell'utente")
-    @ResponseStatus(HttpStatus.CREATED)
-    @ApiResponses(value = {
-            @ApiResponse(responseCode = "201", description = "Utente registrato con successo", content = @Content(mediaType = "application/json", schema = @Schema(implementation = UserEntity.class))),
-            @ApiResponse(responseCode = "400", description = "Richiesta non valida", content = @Content(mediaType = "application/json", schema = @Schema(implementation = ErrorResponse.class))),
-            @ApiResponse(responseCode = "401", description = "Non autorizzato", content = @Content(mediaType = "application/json", schema = @Schema(implementation = ErrorResponse.class))),
-            @ApiResponse(responseCode = "404", description = "Utente non trovato", content = @Content(mediaType = "application/json", schema = @Schema(implementation = ErrorResponse.class))),
-            @ApiResponse(responseCode = "500", description = "Errore del server", content = @Content(mediaType = "application/json", schema = @Schema(implementation = ErrorResponse.class)))
-    })
-    public UserEntity register(@RequestBody UserEntity user) {
-        return userService.registerUser(user);
+    public UserController(UserService userService) {
+        this.userService = userService;
     }
 
     @GetMapping("/v1/users")
     @Operation(summary = "Lista utenti", description = "Endpoint per la lista degli utenti")
     @ResponseStatus(HttpStatus.OK)
+    @PreAuthorize("hasRole('ADMIN')")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "Lista utenti", content = @Content(mediaType = "application/json", schema = @Schema(implementation = UserEntity.class))),
             @ApiResponse(responseCode = "400", description = "Richiesta non valida", content = @Content(mediaType = "application/json", schema = @Schema(implementation = ErrorResponse.class))),
@@ -74,13 +50,18 @@ public class UserController {
             @ApiResponse(responseCode = "404", description = "Utente non trovato", content = @Content(mediaType = "application/json", schema = @Schema(implementation = ErrorResponse.class))),
             @ApiResponse(responseCode = "500", description = "Errore del server", content = @Content(mediaType = "application/json", schema = @Schema(implementation = ErrorResponse.class)))
     })
-    public List<UserEntity> getAllUsers() {
-        return userService.getAllUsers();
+    public ResponseEntity<?> getAllUsers() {
+        try {
+            return ResponseEntity.ok(userService.getAllUsers());
+        } catch (Exception e) {
+            return ResponseEntity.badRequest().body(e.getMessage());
+        }
     }
 
     @GetMapping("/v1/users/{id}")
     @Operation(summary = "Lista utenti", description = "Endpoint per la lista degli utenti")
     @ResponseStatus(HttpStatus.OK)
+    @PreAuthorize("hasRole('ADMIN')")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "Lista utenti", content = @Content(mediaType = "application/json", schema = @Schema(implementation = UserEntity.class))),
             @ApiResponse(responseCode = "400", description = "Richiesta non valida", content = @Content(mediaType = "application/json", schema = @Schema(implementation = ErrorResponse.class))),
@@ -88,13 +69,18 @@ public class UserController {
             @ApiResponse(responseCode = "404", description = "Utente non trovato", content = @Content(mediaType = "application/json", schema = @Schema(implementation = ErrorResponse.class))),
             @ApiResponse(responseCode = "500", description = "Errore del server", content = @Content(mediaType = "application/json", schema = @Schema(implementation = ErrorResponse.class)))
     })
-    public UserEntity getUserById(@PathVariable Long id) {
-        return userService.getUserById(id);
+    public ResponseEntity<?> getUserById(@PathVariable Long id) {
+        try {
+            return ResponseEntity.ok(userService.getUserById(id));
+        } catch (Exception e) {
+            return ResponseEntity.badRequest().body(e.getMessage());
+        }
     }
 
     @PutMapping("/v1/users/{id}")
     @Operation(summary = "Aggiorna utente", description = "Endpoint per aggiornare un utente")
     @ResponseStatus(HttpStatus.OK)
+    @PreAuthorize("hasRole('ADMIN')")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "Utente aggiornato con successo", content = @Content(mediaType = "application/json", schema = @Schema(implementation = UserEntity.class))),
             @ApiResponse(responseCode = "400", description = "Richiesta non valida", content = @Content(mediaType = "application/json", schema = @Schema(implementation = ErrorResponse.class))),
@@ -102,13 +88,18 @@ public class UserController {
             @ApiResponse(responseCode = "404", description = "Utente non trovato", content = @Content(mediaType = "application/json", schema = @Schema(implementation = ErrorResponse.class))),
             @ApiResponse(responseCode = "500", description = "Errore del server", content = @Content(mediaType = "application/json", schema = @Schema(implementation = ErrorResponse.class)))
     })
-    public UserEntity updateUser(@PathVariable Long id, @RequestBody UserEntity user) {
-        return userService.updateUser(id, user);
+    public ResponseEntity<?> updateUser(@PathVariable Long id, @RequestBody UserEntity user) {
+        try {
+            return ResponseEntity.ok(userService.updateUser(id, user));
+        } catch (Exception e) {
+            return ResponseEntity.badRequest().body(e.getMessage());
+        }
     }
 
     @DeleteMapping("/v1/users/{id}")
     @Operation(summary = "Elimina utente", description = "Endpoint per eliminare un utente")
     @ResponseStatus(HttpStatus.OK)
+    @PreAuthorize("hasRole('ADMIN')")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "Utente eliminato con successo", content = @Content(mediaType = "application/json", schema = @Schema(implementation = UserEntity.class))),
             @ApiResponse(responseCode = "400", description = "Richiesta non valida", content = @Content(mediaType = "application/json", schema = @Schema(implementation = ErrorResponse.class))),
@@ -116,7 +107,12 @@ public class UserController {
             @ApiResponse(responseCode = "404", description = "Utente non trovato", content = @Content(mediaType = "application/json", schema = @Schema(implementation = ErrorResponse.class))),
             @ApiResponse(responseCode = "500", description = "Errore del server", content = @Content(mediaType = "application/json", schema = @Schema(implementation = ErrorResponse.class)))
     })
-    public void deleteUser(@PathVariable Long id) {
-        userService.deleteUser(id);
+    public ResponseEntity<?> deleteUser(@PathVariable Long id) {
+        try {
+            userService.deleteUser(id);
+            return ResponseEntity.ok().build();
+        } catch (Exception e) {
+            return ResponseEntity.badRequest().body(e.getMessage());
+        }
     }
 }

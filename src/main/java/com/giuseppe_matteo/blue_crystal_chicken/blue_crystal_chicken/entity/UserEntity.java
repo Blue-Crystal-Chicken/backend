@@ -4,7 +4,8 @@ import jakarta.persistence.*;
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Size;
-import com.fasterxml.jackson.annotation.JsonIgnore;
+import org.hibernate.annotations.ColumnDefault;
+import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.*;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
@@ -47,8 +48,7 @@ public class UserEntity {
 
     @Column(name = "Password")
     @NotBlank(message = "La password è obbligatoria")
-    @Size(min = 6, max = 20, message = "La password deve essere compresa tra 6 e 20 caratteri")
-    @JsonIgnore
+    @JsonProperty(access = JsonProperty.Access.WRITE_ONLY)
     private String password;
 
     @Column(name = "Gender")
@@ -61,6 +61,7 @@ public class UserEntity {
 
     @Enumerated(EnumType.STRING)
     @Column(name = "role")
+    @ColumnDefault("USER")
     private Role role;
 
     @Column(nullable = false, updatable = false)
