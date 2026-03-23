@@ -9,8 +9,8 @@ import org.springframework.web.bind.annotation.RestController;
 
 import jakarta.validation.Valid;
 
-import com.giuseppe_matteo.blue_crystal_chicken.blue_crystal_chicken.payload.request.LoginRequest;
-import com.giuseppe_matteo.blue_crystal_chicken.blue_crystal_chicken.payload.request.RegisterRequest;
+import com.giuseppe_matteo.blue_crystal_chicken.blue_crystal_chicken.dto.request.Login;
+import com.giuseppe_matteo.blue_crystal_chicken.blue_crystal_chicken.dto.request.Register;
 import com.giuseppe_matteo.blue_crystal_chicken.blue_crystal_chicken.service.UserService;
 
 
@@ -22,7 +22,7 @@ public class UserAuthController {
     private UserService userService;
     
     @PostMapping("/login")
-    public ResponseEntity<?> login(@Valid @RequestBody LoginRequest user) {
+    public ResponseEntity<?> login(@Valid @RequestBody Login user) {
         try {
             return ResponseEntity.ok(userService.login(user));
         } catch (Exception e) {
@@ -31,7 +31,7 @@ public class UserAuthController {
     }
     
     @PostMapping("/register")
-    public ResponseEntity<?> register(@Valid @RequestBody RegisterRequest user) {
+    public ResponseEntity<?> register(@Valid @RequestBody Register user) {
         try {
             return ResponseEntity.ok(userService.registerUser(user));
         } catch (Exception e) {

@@ -10,26 +10,55 @@ import org.springframework.security.core.userdetails.UserDetails;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.giuseppe_matteo.blue_crystal_chicken.blue_crystal_chicken.entity.UserEntity;
 
+import lombok.Data;
+
+@Data
 public class UserDetailsImpl implements UserDetails {
     private Long id;
 
-    private String username;
+    private String email;
+
+    private String name;
+
+    private String surname;
+
+    private String phone;
+
+    private String gender;
+
+    private String birthday;
 
     @JsonIgnore
     private String password;
 
     private Collection<? extends GrantedAuthority> authorities;
 
-    public UserDetailsImpl(Long id, String username, String password, Collection<? extends GrantedAuthority> authorities) {
+    public UserDetailsImpl(Long id, String email, String password, 
+                           String name, String surname, String phone, String gender, String birthday,
+                           Collection<? extends GrantedAuthority> authorities) {
         this.id = id;
-        this.username = username;
+        this.email = email;
         this.password = password;
+        this.name = name;
+        this.surname = surname;
+        this.phone = phone;
+        this.gender = gender;
+        this.birthday = birthday;
         this.authorities = authorities;
     }
 
     public static UserDetailsImpl build(UserEntity user) {
         List<GrantedAuthority> authorities = List.of(new SimpleGrantedAuthority(user.getRole().name()));
-        return new UserDetailsImpl(user.getId(), user.getEmail(), user.getPassword(), authorities);
+        return new UserDetailsImpl(
+                user.getId(), 
+                user.getEmail(), 
+                user.getPassword(),
+                user.getName(),
+                user.getSurname(),
+                user.getPhone(),
+                user.getGender(),
+                user.getBirthday() != null ? user.getBirthday().toString() : null,
+                authorities);
     }
 
     @Override
@@ -44,7 +73,7 @@ public class UserDetailsImpl implements UserDetails {
 
     @Override
     public String getUsername() {
-        return username;
+        return email;
     }
 
     @Override

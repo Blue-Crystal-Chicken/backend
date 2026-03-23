@@ -16,16 +16,16 @@ import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
-import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-
-import java.util.List;
 
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.ResponseStatus;
 
 import com.giuseppe_matteo.blue_crystal_chicken.blue_crystal_chicken.entity.UserEntity;
 import com.giuseppe_matteo.blue_crystal_chicken.blue_crystal_chicken.service.UserService;
+import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.http.ResponseEntity;
+
 
 @Slf4j
 @RestController
@@ -38,6 +38,7 @@ public class UserController {
     public UserController(UserService userService) {
         this.userService = userService;
     }
+
 
     @GetMapping("/v1/users")
     @Operation(summary = "Lista utenti", description = "Endpoint per la lista degli utenti")

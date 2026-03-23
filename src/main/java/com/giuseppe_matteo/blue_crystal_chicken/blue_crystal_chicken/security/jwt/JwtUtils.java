@@ -1,14 +1,19 @@
 package com.giuseppe_matteo.blue_crystal_chicken.blue_crystal_chicken.security.jwt;
 
-import java.security.Key;
 import java.util.Date;
+
+import javax.crypto.SecretKey;
 
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Component;
 
+import com.giuseppe_matteo.blue_crystal_chicken.blue_crystal_chicken.security.servicies.UserDetailsImpl;
+
+import io.jsonwebtoken.ExpiredJwtException;
 import io.jsonwebtoken.Jwts;
-import io.jsonwebtoken.SignatureAlgorithm;
+import io.jsonwebtoken.MalformedJwtException;
+import io.jsonwebtoken.UnsupportedJwtException;
 import io.jsonwebtoken.io.Decoders;
 import io.jsonwebtoken.security.Keys;
 import lombok.extern.slf4j.Slf4j;
@@ -16,43 +21,43 @@ import lombok.extern.slf4j.Slf4j;
 @Component
 @Slf4j
 public class JwtUtils {
+
     @Value("${be.app.jwtSecret}")
     private String jwtSecret;
 
     @Value("${be.app.jwtExpirationMs}")
     private int jwtExpirationMs;
 
-    private Key getSecretKey() {
+    private SecretKey getSecretKey() {
         return Keys.hmacShaKeyFor(Decoders.BASE64.decode(jwtSecret));
     }
 
     public String generateJwtToken(Authentication authentication) {
-
         UserDetailsImpl userPrincipal = (UserDetailsImpl) authentication.getPrincipal();
 
         return Jwts.builder()
-                .setSubject((userPrincipal.getUsername()))
-                .setIssuedAt(new Date())
-                .setExpiration(new Date(System.currentTimeMillis() + jwtExpirationMs))
-                .signWith(getSecretKey(), SignatureAlgorithm.HS512)
+                .subject(userPrincipal.getUsername())        // era .setSubject()
+                .issuedAt(new Date())                        // era .setIssuedAt()
+                .expiration(new Date(System.currentTimeMillis() + jwtExpirationMs)) // era .setExpiration()
+                .signWith(getSecretKey())                    // era .signWith(key, algo) — l'algo ora è implicito
                 .compact();
     }
 
     public String getUserNameFromJwtToken(String token) {
-        return Jwts.parserBuilder()
-                .setSigningKey(getSecretKey())
+        return Jwts.parser()                                 // era .parserBuilder()
+                .verifyWith(getSecretKey())                  // era .setSigningKey()
                 .build()
-                .parseClaimsJws(token)
-                .getBody()
+                .parseSignedClaims(token)                    // era .parseClaimsJws()
+                .getPayload()                                // era .getBody()
                 .getSubject();
     }
 
     public boolean validateJwtToken(String authToken) {
         try {
-            Jwts.parserBuilder()
-                    .setSigningKey(getSecretKey())
+            Jwts.parser()
+                    .verifyWith(getSecretKey())
                     .build()
-                    .parseClaimsJws(authToken);
+                    .parseSignedClaims(authToken);
             return true;
         } catch (io.jsonwebtoken.security.SecurityException e) {
             log.error("Invalid JWT signature: {}", e.getMessage());

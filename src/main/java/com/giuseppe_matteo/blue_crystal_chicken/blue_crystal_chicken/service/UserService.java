@@ -6,13 +6,31 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import com.giuseppe_matteo.blue_crystal_chicken.blue_crystal_chicken.dto.request.Login;
+import com.giuseppe_matteo.blue_crystal_chicken.blue_crystal_chicken.dto.request.Register;
+import com.giuseppe_matteo.blue_crystal_chicken.blue_crystal_chicken.dto.response.JwtResponse;
 import com.giuseppe_matteo.blue_crystal_chicken.blue_crystal_chicken.entity.Role;
 import com.giuseppe_matteo.blue_crystal_chicken.blue_crystal_chicken.entity.UserEntity;
 import com.giuseppe_matteo.blue_crystal_chicken.blue_crystal_chicken.exception.EmailAlreadyExistsException;
 import com.giuseppe_matteo.blue_crystal_chicken.blue_crystal_chicken.exception.EmailNotFoundException;
 import com.giuseppe_matteo.blue_crystal_chicken.blue_crystal_chicken.exception.UserNotFoundException;
 import com.giuseppe_matteo.blue_crystal_chicken.blue_crystal_chicken.repository.UserRepository;
+import com.giuseppe_matteo.blue_crystal_chicken.blue_crystal_chicken.security.jwt.JwtUtils;
+import com.giuseppe_matteo.blue_crystal_chicken.blue_crystal_chicken.security.servicies.UserDetailsImpl;
 import com.giuseppe_matteo.blue_crystal_chicken.blue_crystal_chicken.utils.PasswordHasher;
+import com.giuseppe_matteo.blue_crystal_chicken.blue_crystal_chicken.utils.DateConverter;
+
+import java.util.stream.Collectors;
+
+import org.springframework.http.ResponseEntity;
+import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.GrantedAuthority;
+import org.springframework.security.core.context.SecurityContextHolder;
+
+import java.time.LocalDate;
+
 
 @Service
 public class UserService {
@@ -25,9 +43,10 @@ public class UserService {
 
     @Autowired
     private JwtUtils jwtUtils; 
+    
 
     @Transactional(readOnly = true)
-    public ResponseEntity<?> login(LoginRequest request) {
+    public ResponseEntity<?> login(Login request) {
         Authentication authentication = authenticationManager.authenticate(
                 new UsernamePasswordAuthenticationToken(request.getEmail(), request.getPassword()));
 
@@ -41,24 +60,30 @@ public class UserService {
 
         return ResponseEntity.ok(new JwtResponse(jwt, 
                 userDetails.getId(), 
-                userDetails.getUsername(), 
+                userDetails.getEmail(), 
+                userDetails.getName(),
+                userDetails.getSurname(),
+                userDetails.getPhone(),
+                userDetails.getGender(),
+                userDetails.getBirthday(),
                 roles));
     }
 
     @Transactional
-    public ResponseEntity<?> registerUser(RegisterRequest request) {
+    public ResponseEntity<?> registerUser(Register request) {
         if (userRepository.existsByEmail(request.getEmail())) {
             return ResponseEntity.badRequest().body("Email already exists");
         }
 
         UserEntity user = new UserEntity();
-        user.setFirstName(request.getFirstName());
-        user.setLastName(request.getLastName());
+        user.setName(request.getName());
+        user.setSurname(request.getSurname());
         user.setEmail(request.getEmail());
-        user.setPassword(PasswordHasher.hashPassword(request.getPassword()));
+        user.setPassword(PasswordHasher.hash(request.getPassword()));
         user.setPhone(request.getPhone());
-        user.setAddress(request.getAddress());
         user.setRole(request.getRole());
+        user.setGender(request.getGender());
+        user.setBirthday(LocalDate.parse(request.getBirthday()));
 
         userRepository.save(user);
 
@@ -84,7 +109,11 @@ public class UserService {
     public ResponseEntity<?> updateUser(Long id, UserEntity user) {
         UserEntity existingUser = userRepository.findById(id).orElseThrow(() -> new UserNotFoundException());
         existingUser.setEmail(user.getEmail());
-        existingUser.setPassword(PasswordHasher.hashPassword(user.getPassword()));
+        existingUser.setPassword(PasswordHasher.hash(user.getPassword()));
+        existingUser.setPhone(user.getPhone());
+        existingUser.setGender(user.getGender());
+        existingUser.setBirthday(user.getBirthday());
+        existingUser.setRole(user.getRole());
         return ResponseEntity.ok(userRepository.save(existingUser));
     }
 

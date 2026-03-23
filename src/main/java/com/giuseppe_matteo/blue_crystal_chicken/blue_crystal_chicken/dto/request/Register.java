@@ -5,6 +5,8 @@ import jakarta.validation.constraints.NotBlank;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import com.giuseppe_matteo.blue_crystal_chicken.blue_crystal_chicken.entity.Role;
+
 
 @Data
 @AllArgsConstructor
