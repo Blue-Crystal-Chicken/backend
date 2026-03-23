@@ -60,6 +60,10 @@ public class OrderEntity {
     @JoinColumn(name = "User_id")
     private UserEntity user;
 
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "Location_id")
+    private LocationEntity location;
+
     // Bidirectional with OrderProduct
     @OneToMany(mappedBy = "order", cascade = CascadeType.ALL)
     private List<OrderProduct> orderProducts;
