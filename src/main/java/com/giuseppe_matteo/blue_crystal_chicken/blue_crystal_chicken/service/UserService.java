@@ -9,16 +9,13 @@ import org.springframework.transaction.annotation.Transactional;
 import com.giuseppe_matteo.blue_crystal_chicken.blue_crystal_chicken.dto.request.Login;
 import com.giuseppe_matteo.blue_crystal_chicken.blue_crystal_chicken.dto.request.Register;
 import com.giuseppe_matteo.blue_crystal_chicken.blue_crystal_chicken.dto.response.JwtResponse;
-import com.giuseppe_matteo.blue_crystal_chicken.blue_crystal_chicken.entity.Role;
 import com.giuseppe_matteo.blue_crystal_chicken.blue_crystal_chicken.entity.UserEntity;
-import com.giuseppe_matteo.blue_crystal_chicken.blue_crystal_chicken.exception.EmailAlreadyExistsException;
 import com.giuseppe_matteo.blue_crystal_chicken.blue_crystal_chicken.exception.EmailNotFoundException;
 import com.giuseppe_matteo.blue_crystal_chicken.blue_crystal_chicken.exception.UserNotFoundException;
 import com.giuseppe_matteo.blue_crystal_chicken.blue_crystal_chicken.repository.UserRepository;
 import com.giuseppe_matteo.blue_crystal_chicken.blue_crystal_chicken.security.jwt.JwtUtils;
 import com.giuseppe_matteo.blue_crystal_chicken.blue_crystal_chicken.security.servicies.UserDetailsImpl;
 import com.giuseppe_matteo.blue_crystal_chicken.blue_crystal_chicken.utils.PasswordHasher;
-import com.giuseppe_matteo.blue_crystal_chicken.blue_crystal_chicken.utils.DateConverter;
 
 import java.util.stream.Collectors;
 
