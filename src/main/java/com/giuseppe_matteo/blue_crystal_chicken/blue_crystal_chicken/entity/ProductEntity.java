@@ -30,7 +30,8 @@ public class ProductEntity {
 
     @Column(name = "Category")
     @NotBlank(message = "La categoria è obbligatoria")
-    private String category;
+    @ManyToOne
+    private Category category;
 
     @Column(name = "Size")
     private String size;
