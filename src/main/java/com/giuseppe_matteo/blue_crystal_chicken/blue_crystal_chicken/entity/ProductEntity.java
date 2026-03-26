@@ -46,6 +46,9 @@ public class ProductEntity {
     @Column(name = "Price")
     private Double price;
 
+    @Column(name = "Image")
+    private String img_path;
+
     @Column(name = "Nutritional_info")
     private String nutritionalInfo;
 

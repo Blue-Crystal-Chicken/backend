@@ -14,5 +14,6 @@ public class ProductResponse {
     private Double additions;
     private Double price;
     private String nutritionalInfo;
+    private String img_path;
     private List<IngredientResponse> ingredients;
-}
+}

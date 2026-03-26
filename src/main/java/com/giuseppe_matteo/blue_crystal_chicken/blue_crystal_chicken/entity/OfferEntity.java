@@ -29,6 +29,12 @@ public class OfferEntity {
     @Column(name = "Description")
     private String description;
 
+    @Column(name = "Image")
+    private String img_path;
+
+    @Column(name = "Price")
+    private Double price;
+
     @Column(nullable = false, updatable = false)
     private LocalDateTime createdAt;
 
