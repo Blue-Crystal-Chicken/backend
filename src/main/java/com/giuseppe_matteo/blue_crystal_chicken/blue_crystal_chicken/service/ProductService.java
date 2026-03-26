@@ -17,7 +17,6 @@ import com.giuseppe_matteo.blue_crystal_chicken.blue_crystal_chicken.exception.P
 
 import java.util.Collections;
 
-
 import lombok.extern.slf4j.Slf4j;
 
 @Service
@@ -28,14 +27,13 @@ public class ProductService {
     private final IngredientRepository ingredientRepository;
     private final ProductMapper productMapper;
 
-    public ProductService(ProductRepository productRepository, 
-                          IngredientRepository ingredientRepository,
-                          ProductMapper productMapper) {
+    public ProductService(ProductRepository productRepository,
+            IngredientRepository ingredientRepository,
+            ProductMapper productMapper) {
         this.productRepository = productRepository;
         this.ingredientRepository = ingredientRepository;
         this.productMapper = productMapper;
     }
-
 
     // -------------------------------------------------------------------------
     // GET ALL
@@ -64,6 +62,12 @@ public class ProductService {
         return productMapper.toResponse(product);
     }
 
+    // Add this method to ProductService.java
+    public ProductEntity findById(Long id) {
+        return productRepository.findById(id)
+                .orElseThrow(() -> new ProductNotFoundException("Prodotto non trovato con id: " + id));
+    }
+
     // -------------------------------------------------------------------------
     // CREATE
     // -------------------------------------------------------------------------
@@ -78,7 +82,7 @@ public class ProductService {
         }
 
         ProductEntity entity = productMapper.toEntity(request);
-        
+
         if (request.getIngredientIds() != null && !request.getIngredientIds().isEmpty()) {
             List<IngredientEntity> ingredients = ingredientRepository.findAllById(request.getIngredientIds());
             entity.setIngredients(ingredients);
@@ -109,7 +113,7 @@ public class ProductService {
         product.setAdditions(request.getAdditions());
         product.setPrice(request.getPrice());
         product.setNutritionalInfo(request.getNutritionalInfo());
-        
+
         if (request.getIngredientIds() != null) {
             List<IngredientEntity> ingredients = ingredientRepository.findAllById(request.getIngredientIds());
             product.setIngredients(ingredients);
