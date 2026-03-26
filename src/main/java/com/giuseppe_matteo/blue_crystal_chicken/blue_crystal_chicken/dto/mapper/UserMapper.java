@@ -4,7 +4,6 @@ import com.giuseppe_matteo.blue_crystal_chicken.blue_crystal_chicken.dto.request
 import com.giuseppe_matteo.blue_crystal_chicken.blue_crystal_chicken.dto.response.UserResponse;
 import com.giuseppe_matteo.blue_crystal_chicken.blue_crystal_chicken.entity.UserEntity;
 
-import com.giuseppe_matteo.blue_crystal_chicken.blue_crystal_chicken.entity.UserEntity;
 
 public interface UserMapper {
 

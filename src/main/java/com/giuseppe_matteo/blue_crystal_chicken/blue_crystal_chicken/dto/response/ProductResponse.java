@@ -1,5 +1,6 @@
 package com.giuseppe_matteo.blue_crystal_chicken.blue_crystal_chicken.dto.response;
 
+import java.time.LocalDateTime;
 import java.util.List;
 
 import lombok.Data;
@@ -16,4 +17,5 @@ public class ProductResponse {
     private String nutritionalInfo;
     private String img_path;
     private List<IngredientResponse> ingredients;
+    private LocalDateTime updatedAt;
 }

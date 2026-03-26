@@ -4,16 +4,18 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
-import org.springframework.web.multipart.MultipartFile;
 
 import com.giuseppe_matteo.blue_crystal_chicken.blue_crystal_chicken.dto.request.CategoryRequest;
 import com.giuseppe_matteo.blue_crystal_chicken.blue_crystal_chicken.dto.request.ProductRequest;
+import com.giuseppe_matteo.blue_crystal_chicken.blue_crystal_chicken.dto.request.Register;
 import com.giuseppe_matteo.blue_crystal_chicken.blue_crystal_chicken.entity.Category;
 import com.giuseppe_matteo.blue_crystal_chicken.blue_crystal_chicken.entity.CategoryName;
+import com.giuseppe_matteo.blue_crystal_chicken.blue_crystal_chicken.entity.Role;
 import com.giuseppe_matteo.blue_crystal_chicken.blue_crystal_chicken.exception.ProductAlreadyExistsException;
 import com.giuseppe_matteo.blue_crystal_chicken.blue_crystal_chicken.repository.CategoryRepository;
 import com.giuseppe_matteo.blue_crystal_chicken.blue_crystal_chicken.service.CategoryService;
 import com.giuseppe_matteo.blue_crystal_chicken.blue_crystal_chicken.service.ProductService;
+import com.giuseppe_matteo.blue_crystal_chicken.blue_crystal_chicken.service.UserService;
 
 import lombok.extern.slf4j.Slf4j;
 
@@ -31,10 +33,15 @@ public class DataLoader implements CommandLineRunner {
     @Autowired
     private ProductService productService;
 
+    @Autowired
+    private UserService userService;
+
+
     @Override
     public void run(String... args) throws Exception {
         createCategory();
         createProducts();
+        createUsers();
     }
 
     // -----------------------------------------------------------------------
@@ -61,6 +68,8 @@ public class DataLoader implements CommandLineRunner {
         // --- HAMBURGER ---------------------------------------------------
         Category hamburger = getCategory(CategoryName.HAMBURGER);
 
+        Category wrap = getCategory(CategoryName.WRAP);
+
         saveProduct("Classic Blue Burger",
                 hamburger,
                 5.90,
@@ -76,7 +85,7 @@ public class DataLoader implements CommandLineRunner {
             );
 
         saveProduct("Mountain Wrap",
-                hamburger,
+                wrap,
                 6.20,
                 "Pollo grigliato, bacon croccante e salsa BBQ in un bun brioche.",
                 "images/prodotti/mountain_wrap.jpg"    
@@ -190,6 +199,20 @@ public class DataLoader implements CommandLineRunner {
         } catch (ProductAlreadyExistsException e) {
             log.debug("Product already exists, skipping: {}", name);
         }
+    }
+
+    private void createUsers() {
+
+        Register userRequest = new Register();
+        userRequest.setName("Giuseppe");
+        userRequest.setSurname("Tesse");
+        userRequest.setEmail("gspptesse@gmail.com");
+        userRequest.setPassword("123456");
+        userRequest.setPhone("3333333333");
+        userRequest.setGender("Male");
+        userRequest.setBirthday("2004-12-11");
+        userRequest.setRole(Role.USER);
+        userService.registerUser(userRequest);
     }
 }
 
