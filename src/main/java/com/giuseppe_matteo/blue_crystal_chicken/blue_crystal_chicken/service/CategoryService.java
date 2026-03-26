@@ -14,13 +14,13 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.http.ResponseEntity;
 import com.giuseppe_matteo.blue_crystal_chicken.blue_crystal_chicken.dto.mapper.CategoryMapper;
 import com.giuseppe_matteo.blue_crystal_chicken.blue_crystal_chicken.entity.Category;
-
+import com.giuseppe_matteo.blue_crystal_chicken.blue_crystal_chicken.entity.CategoryName;
 
 @Service
 @Transactional
 @Slf4j
 public class CategoryService {
-    
+
     @Autowired
     private CategoryRepository categoryRepository;
 
@@ -29,6 +29,11 @@ public class CategoryService {
 
     @Transactional
     public ResponseEntity<?> save(CategoryRequest request) {
+        if (categoryRepository.existsByName(CategoryName.valueOf(request.getName()))) {
+            log.info("Category {} already exists, skipping...", request.getName());
+            return ResponseEntity.ok("Category already exists");
+        }
+
         log.info("Creating category: {}", request);
         try {
             Category category = categoryMapper.toCategory(request);
@@ -39,9 +44,9 @@ public class CategoryService {
         }
     }
 
-    public List<CategoryResponse> findAll(){
+    public List<CategoryResponse> findAll() {
         List<Category> categories = categoryRepository.findAll();
         return categories.stream().map(categoryMapper::toCategoryResponse).collect(Collectors.toList());
     }
-    
+
 }

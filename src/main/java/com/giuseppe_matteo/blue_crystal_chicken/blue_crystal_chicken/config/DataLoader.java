@@ -3,14 +3,12 @@ package com.giuseppe_matteo.blue_crystal_chicken.blue_crystal_chicken.config;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.stereotype.Component;
-import org.springframework.transaction.annotation.Transactional;
 
 import com.giuseppe_matteo.blue_crystal_chicken.blue_crystal_chicken.dto.request.CategoryRequest;
 import com.giuseppe_matteo.blue_crystal_chicken.blue_crystal_chicken.entity.CategoryName;
 import com.giuseppe_matteo.blue_crystal_chicken.blue_crystal_chicken.service.CategoryService;
 
 @Component
-@Transactional
 public class DataLoader implements CommandLineRunner {
 
     @Autowired
@@ -21,10 +19,10 @@ public class DataLoader implements CommandLineRunner {
         createCategory();
     }
 
-    private void createCategory(){
-        for(CategoryName categoryName : CategoryName.values()){
+    private void createCategory() {
+        for (CategoryName categoryName : CategoryName.values()) {
             categoryService.save(new CategoryRequest(categoryName.name()));
         }
     }
-    
+
 }

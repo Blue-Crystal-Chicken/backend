@@ -10,5 +10,7 @@ import com.giuseppe_matteo.blue_crystal_chicken.blue_crystal_chicken.entity.Cate
 public interface CategoryRepository extends JpaRepository<Category, Long> {
 
     Optional<Category> findByName(CategoryName name);
-    
+
+    boolean existsByName(CategoryName name);
+
 }
