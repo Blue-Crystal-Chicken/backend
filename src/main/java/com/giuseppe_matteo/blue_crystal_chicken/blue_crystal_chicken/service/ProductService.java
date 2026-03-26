@@ -8,6 +8,7 @@ import org.springframework.stereotype.Service;
 import com.giuseppe_matteo.blue_crystal_chicken.blue_crystal_chicken.dto.mapper.ProductMapper;
 import com.giuseppe_matteo.blue_crystal_chicken.blue_crystal_chicken.dto.request.ProductRequest;
 import com.giuseppe_matteo.blue_crystal_chicken.blue_crystal_chicken.dto.response.ProductResponse;
+import com.giuseppe_matteo.blue_crystal_chicken.blue_crystal_chicken.entity.CategoryName;
 import com.giuseppe_matteo.blue_crystal_chicken.blue_crystal_chicken.entity.IngredientEntity;
 import com.giuseppe_matteo.blue_crystal_chicken.blue_crystal_chicken.entity.ProductEntity;
 import com.giuseppe_matteo.blue_crystal_chicken.blue_crystal_chicken.repository.IngredientRepository;
@@ -63,6 +64,43 @@ public class ProductService {
                 });
         return productMapper.toResponse(product);
     }
+
+    // -------------------------------------------------------------------------
+    // GET BY CATEGORY ID
+    // -------------------------------------------------------------------------
+
+    public List<ProductResponse> getProductsByCategoryId(Long categoryId) {
+        log.info("Fetching products with category id: {}", categoryId);
+        if (categoryId == 0) {
+            return getAllProducts();
+        }
+        List<ProductEntity> products = productRepository.findByCategoryId(categoryId);
+        log.info("Found {} products", products.size());
+        return products.stream()
+                .map(productMapper::toResponse)
+                .collect(Collectors.toList());
+    }
+
+    // -------------------------------------------------------------------------
+    // GET BY CATEGORY NAME
+    // -------------------------------------------------------------------------
+
+    public List<ProductResponse> getProductsByCategoryName(String name){
+        log.info("Fetching products with category name: {}",name);
+        if(name.equals("ALL")){
+            log.info("Fetching all products");
+            return getAllProducts();
+        }
+        log.info("Converting category name to enum");
+        CategoryName categoryName = CategoryName.valueOf(name);
+        log.info("Fetching products with category name: {}",categoryName);
+        List<ProductEntity> products = productRepository.findByCategoryName(categoryName);
+        log.info("Found {} products", products.size());
+        return products.stream()
+                .map(productMapper::toResponse)
+                .collect(Collectors.toList());
+    }
+
 
     // -------------------------------------------------------------------------
     // CREATE
