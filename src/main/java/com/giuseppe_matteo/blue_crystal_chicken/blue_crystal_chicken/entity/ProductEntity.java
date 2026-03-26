@@ -2,6 +2,7 @@ package com.giuseppe_matteo.blue_crystal_chicken.blue_crystal_chicken.entity;
 
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
 import lombok.*;
 import java.time.LocalDateTime;
@@ -28,8 +29,8 @@ public class ProductEntity {
     @Size(min = 3, max = 50, message = "Il nome deve essere compreso tra 3 e 50 caratteri")
     private String name;
 
-    @Column(name = "Category")
-    @NotBlank(message = "La categoria è obbligatoria")
+    @JoinColumn(name = "category_id")
+    @NotNull(message = "La categoria è obbligatoria")
     @ManyToOne
     private Category category;
 

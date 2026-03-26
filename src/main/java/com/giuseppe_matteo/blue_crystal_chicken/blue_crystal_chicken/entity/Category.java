@@ -1,7 +1,6 @@
 package com.giuseppe_matteo.blue_crystal_chicken.blue_crystal_chicken.entity;
 
-import org.springframework.data.annotation.Id;
-
+import jakarta.persistence.Id;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EnumType;
@@ -27,4 +26,9 @@ public class Category {
     @Column(name = "name", nullable = false, unique = true)
     @Enumerated(EnumType.STRING)
     private CategoryName name;
+
+    public Category(CategoryName name){
+        this.name = name;
+    }
+    
 }
