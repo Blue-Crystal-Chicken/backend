@@ -4,7 +4,6 @@ import org.springframework.web.ErrorResponse;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -26,7 +25,6 @@ import com.giuseppe_matteo.blue_crystal_chicken.blue_crystal_chicken.service.Use
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.http.ResponseEntity;
 
-
 @Slf4j
 @RestController
 @RequestMapping("/api/users")
@@ -38,7 +36,6 @@ public class UserController {
     public UserController(UserService userService) {
         this.userService = userService;
     }
-
 
     @GetMapping("/v1/users")
     @Operation(summary = "Lista utenti", description = "Endpoint per la lista degli utenti")

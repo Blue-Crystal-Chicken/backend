@@ -1,6 +1,6 @@
 {
     "info": {
-        "name": "Blue Crystal Chicken - Manager API",
+        "name": "Blue Crystal Chicken - API",
         "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
     },
     "variable": [
@@ -9,26 +9,16 @@
             "value": "http://localhost:8080"
         },
         {
-            "key": "accessToken",
-            "value": "eyJhbGciOiJIUzM4NCJ9.eyJzdWIiOiJhZG1pbkBleGFtcGxlLmNvbSIsImlhdCI6MTc3NDU0MjQ4MCwiZXhwIjoxNzc0NjI4ODgwfQ.TvdqBWf3rIGEbxNJS_bFCKtQtLXojpdd2HrnjYH8nc6JtKQ9FB-JxmViGAT2gaSb"
+            "key": "token",
+            "value": ""
         }
     ],
-    "auth": {
-        "type": "bearer",
-        "bearer": [
-            {
-                "key": "token",
-                "value": "{{accessToken}}",
-                "type": "string"
-            }
-        ]
-    },
     "item": [
         {
             "name": "Auth",
             "item": [
                 {
-                    "name": "1. REGISTER",
+                    "name": "Login",
                     "request": {
                         "method": "POST",
                         "header": [
@@ -37,52 +27,6 @@
                                 "value": "application/json"
                             }
                         ],
-                        "body": {
-                            "mode": "raw",
-                            "raw": "{\n  \"name\": \"Admin\",\n  \"surname\": \"User\",\n  \"email\": \"admin@example.com\",\n  \"phone\": \"1234567890\",\n  \"gender\": \"M\",\n  \"birthday\": \"1980-01-01\",\n  \"password\": \"admin123\",\n  \"role\": \"ADMIN\"\n}"
-                        },
-                        "url": {
-                            "raw": "{{baseUrl}}/api/auth/register",
-                            "host": [
-                                "{{baseUrl}}"
-                            ],
-                            "path": [
-                                "api",
-                                "auth",
-                                "register"
-                            ]
-                        }
-                    }
-                },
-                {
-                    "name": "2. LOGIN",
-                    "event": [
-                        {
-                            "listen": "test",
-                            "script": {
-                                "exec": [
-                                    "var jsonData = pm.response.json();",
-                                    "if (jsonData.accessToken) {",
-                                    "    pm.collectionVariables.set(\"accessToken\", jsonData.accessToken);",
-                                    "    console.log(\"Token salvato con successo!\");",
-                                    "}"
-                                ],
-                                "type": "text/javascript"
-                            }
-                        }
-                    ],
-                    "request": {
-                        "method": "POST",
-                        "header": [
-                            {
-                                "key": "Content-Type",
-                                "value": "application/json"
-                            }
-                        ],
-                        "body": {
-                            "mode": "raw",
-                            "raw": "{\n  \"email\": \"admin@example.com\",\n  \"password\": \"admin123\"\n}"
-                        },
                         "url": {
                             "raw": "{{baseUrl}}/api/auth/login",
                             "host": [
@@ -93,16 +37,15 @@
                                 "auth",
                                 "login"
                             ]
+                        },
+                        "body": {
+                            "mode": "raw",
+                            "raw": "{\n  \"email\": \"mario.rossi@email.com\",\n  \"password\": \"password123\"\n}"
                         }
                     }
-                }
-            ]
-        },
-        {
-            "name": "Products",
-            "item": [
+                },
                 {
-                    "name": "1. CREATE product",
+                    "name": "Register",
                     "request": {
                         "method": "POST",
                         "header": [
@@ -112,48 +55,105 @@
                             }
                         ],
                         "url": {
-                            "raw": "{{baseUrl}}/api/products",
+                            "raw": "{{baseUrl}}/api/auth/register",
                             "host": [
                                 "{{baseUrl}}"
                             ],
                             "path": [
                                 "api",
-                                "products"
+                                "auth",
+                                "register"
                             ]
                         },
                         "body": {
                             "mode": "raw",
-                            "raw": "{\n  \"name\": \"Chicken Burger\",\n  \"category\": \"Burger\",\n  \"size\": \"M\",\n  \"quantity\": 100,\n  \"additions\": 0.5,\n  \"price\": 8.99,\n  \"nutritionalInfo\": \"500 kcal\"\n}"
+                            "raw": "{\n  \"name\": \"Mario\",\n  \"surname\": \"Rossi\",\n  \"birthday\": \"1990-05-15\",\n  \"email\": \"mario.rossi@email.com\",\n  \"password\": \"password123\",\n  \"gender\": \"male\",\n  \"phone\": \"3331234567\",\n  \"role\": \"USER\"\n}"
                         }
                     }
-                },
+                }
+            ]
+        },
+        {
+            "name": "Categories",
+            "item": [
                 {
-                    "name": "2. READ all products",
+                    "name": "1. GET all categories",
                     "request": {
                         "method": "GET",
                         "url": {
-                            "raw": "{{baseUrl}}/api/products",
+                            "raw": "{{baseUrl}}/api/categories",
                             "host": [
                                 "{{baseUrl}}"
                             ],
                             "path": [
                                 "api",
+                                "categories"
+                            ]
+                        }
+                    }
+                },
+                {
+                    "name": "2. CREATE category",
+                    "request": {
+                        "method": "POST",
+                        "header": [
+                            {
+                                "key": "Content-Type",
+                                "value": "application/json"
+                            }
+                        ],
+                        "url": {
+                            "raw": "{{baseUrl}}/api/categories",
+                            "host": [
+                                "{{baseUrl}}"
+                            ],
+                            "path": [
+                                "api",
+                                "categories"
+                            ]
+                        },
+                        "body": {
+                            "mode": "raw",
+                            "raw": "{\n  \"name\": \"Burger\"\n}"
+                        }
+                    }
+                }
+            ]
+        },
+        {
+            "name": "Products",
+            "item": [
+                {
+                    "name": "1. GET all products",
+                    "request": {
+                        "method": "GET",
+                        "url": {
+                            "raw": "{{baseUrl}}/api/products/v1/products",
+                            "host": [
+                                "{{baseUrl}}"
+                            ],
+                            "path": [
+                                "api",
+                                "products",
+                                "v1",
                                 "products"
                             ]
                         }
                     }
                 },
                 {
-                    "name": "3. READ product by id",
+                    "name": "2. GET product by id",
                     "request": {
                         "method": "GET",
                         "url": {
-                            "raw": "{{baseUrl}}/api/products/1",
+                            "raw": "{{baseUrl}}/api/products/v1/products/1",
                             "host": [
                                 "{{baseUrl}}"
                             ],
                             "path": [
                                 "api",
+                                "products",
+                                "v1",
                                 "products",
                                 "1"
                             ]
@@ -161,17 +161,18 @@
                     }
                 },
                 {
-                    "name": "4. READ products by category",
+                    "name": "3. GET products by category",
                     "request": {
                         "method": "GET",
                         "url": {
-                            "raw": "{{baseUrl}}/api/products/category/Burger",
+                            "raw": "{{baseUrl}}/api/products/v1/category/Burger",
                             "host": [
                                 "{{baseUrl}}"
                             ],
                             "path": [
                                 "api",
                                 "products",
+                                "v1",
                                 "category",
                                 "Burger"
                             ]
@@ -179,57 +180,35 @@
                     }
                 },
                 {
-                    "name": "5. READ products search by name",
+                    "name": "4. CREATE product",
                     "request": {
-                        "method": "GET",
+                        "method": "POST",
+                        "header": [
+                            {
+                                "key": "Content-Type",
+                                "value": "application/json"
+                            }
+                        ],
                         "url": {
-                            "raw": "{{baseUrl}}/api/products/search?name=chicken",
+                            "raw": "{{baseUrl}}/api/products/v1/products",
                             "host": [
                                 "{{baseUrl}}"
                             ],
                             "path": [
                                 "api",
                                 "products",
-                                "search"
-                            ],
-                            "query": [
-                                {
-                                    "key": "name",
-                                    "value": "chicken"
-                                }
+                                "v1",
+                                "products"
                             ]
+                        },
+                        "body": {
+                            "mode": "raw",
+                            "raw": "{\n  \"name\": \"Chicken Burger\",\n  \"categoryName\": \"BURGER\",\n  \"price\": 8.99\n}"
                         }
                     }
                 },
                 {
-                    "name": "6. READ products by price range",
-                    "request": {
-                        "method": "GET",
-                        "url": {
-                            "raw": "{{baseUrl}}/api/products/price?min=5&max=15",
-                            "host": [
-                                "{{baseUrl}}"
-                            ],
-                            "path": [
-                                "api",
-                                "products",
-                                "price"
-                            ],
-                            "query": [
-                                {
-                                    "key": "min",
-                                    "value": "5"
-                                },
-                                {
-                                    "key": "max",
-                                    "value": "15"
-                                }
-                            ]
-                        }
-                    }
-                },
-                {
-                    "name": "7. UPDATE product",
+                    "name": "5. UPDATE product",
                     "request": {
                         "method": "PUT",
                         "header": [
@@ -239,33 +218,37 @@
                             }
                         ],
                         "url": {
-                            "raw": "{{baseUrl}}/api/products/1",
+                            "raw": "{{baseUrl}}/api/products/v1/products/1",
                             "host": [
                                 "{{baseUrl}}"
                             ],
                             "path": [
                                 "api",
                                 "products",
+                                "v1",
+                                "products",
                                 "1"
                             ]
                         },
                         "body": {
                             "mode": "raw",
-                            "raw": "{\n  \"name\": \"Chicken Burger XL\",\n  \"category\": \"Burger\",\n  \"size\": \"XL\",\n  \"quantity\": 150,\n  \"additions\": 1.0,\n  \"price\": 10.99,\n  \"nutritionalInfo\": \"650 kcal\"\n}"
+                            "raw": "{\n  \"name\": \"Chicken Burger XL\",\n  \"categoryName\": \"BURGER\",\n  \"price\": 10.99\n}"
                         }
                     }
                 },
                 {
-                    "name": "8. DELETE product",
+                    "name": "6. DELETE product",
                     "request": {
                         "method": "DELETE",
                         "url": {
-                            "raw": "{{baseUrl}}/api/products/1",
+                            "raw": "{{baseUrl}}/api/products/v1/products/1",
                             "host": [
                                 "{{baseUrl}}"
                             ],
                             "path": [
                                 "api",
+                                "products",
+                                "v1",
                                 "products",
                                 "1"
                             ]
@@ -278,7 +261,122 @@
             "name": "Ingredients",
             "item": [
                 {
-                    "name": "1. CREATE ingredient",
+                    "name": "1. GET all ingredients",
+                    "request": {
+                        "method": "GET",
+                        "url": {
+                            "raw": "{{baseUrl}}/api/ingredients",
+                            "host": [
+                                "{{baseUrl}}"
+                            ],
+                            "path": [
+                                "api",
+                                "ingredients"
+                            ]
+                        }
+                    }
+                },
+                {
+                    "name": "2. GET ingredient by id",
+                    "request": {
+                        "method": "GET",
+                        "url": {
+                            "raw": "{{baseUrl}}/api/ingredients/1",
+                            "host": [
+                                "{{baseUrl}}"
+                            ],
+                            "path": [
+                                "api",
+                                "ingredients",
+                                "1"
+                            ]
+                        }
+                    }
+                },
+                {
+                    "name": "3. GET ingredients search by name",
+                    "request": {
+                        "method": "GET",
+                        "url": {
+                            "raw": "{{baseUrl}}/api/ingredients/search?name=pollo",
+                            "host": [
+                                "{{baseUrl}}"
+                            ],
+                            "path": [
+                                "api",
+                                "ingredients",
+                                "search"
+                            ],
+                            "query": [
+                                {
+                                    "key": "name",
+                                    "value": "pollo"
+                                }
+                            ]
+                        }
+                    }
+                },
+                {
+                    "name": "4. GET ingredients low stock",
+                    "request": {
+                        "method": "GET",
+                        "url": {
+                            "raw": "{{baseUrl}}/api/ingredients/low-stock?threshold=10",
+                            "host": [
+                                "{{baseUrl}}"
+                            ],
+                            "path": [
+                                "api",
+                                "ingredients",
+                                "low-stock"
+                            ],
+                            "query": [
+                                {
+                                    "key": "threshold",
+                                    "value": "10"
+                                }
+                            ]
+                        }
+                    }
+                },
+                {
+                    "name": "5. GET ingredients by location",
+                    "request": {
+                        "method": "GET",
+                        "url": {
+                            "raw": "{{baseUrl}}/api/ingredients/by-location/1",
+                            "host": [
+                                "{{baseUrl}}"
+                            ],
+                            "path": [
+                                "api",
+                                "ingredients",
+                                "by-location",
+                                "1"
+                            ]
+                        }
+                    }
+                },
+                {
+                    "name": "6. GET ingredients by product",
+                    "request": {
+                        "method": "GET",
+                        "url": {
+                            "raw": "{{baseUrl}}/api/ingredients/by-product/1",
+                            "host": [
+                                "{{baseUrl}}"
+                            ],
+                            "path": [
+                                "api",
+                                "ingredients",
+                                "by-product",
+                                "1"
+                            ]
+                        }
+                    }
+                },
+                {
+                    "name": "7. CREATE ingredient",
                     "request": {
                         "method": "POST",
                         "header": [
@@ -304,104 +402,7 @@
                     }
                 },
                 {
-                    "name": "2. READ all ingredients",
-                    "request": {
-                        "method": "GET",
-                        "url": {
-                            "raw": "{{baseUrl}}/api/ingredients",
-                            "host": [
-                                "{{baseUrl}}"
-                            ],
-                            "path": [
-                                "api",
-                                "ingredients"
-                            ]
-                        }
-                    }
-                },
-                {
-                    "name": "3. READ ingredient by id",
-                    "request": {
-                        "method": "GET",
-                        "url": {
-                            "raw": "{{baseUrl}}/api/ingredients/1",
-                            "host": [
-                                "{{baseUrl}}"
-                            ],
-                            "path": [
-                                "api",
-                                "ingredients",
-                                "1"
-                            ]
-                        }
-                    }
-                },
-                {
-                    "name": "4. READ ingredients search by name",
-                    "request": {
-                        "method": "GET",
-                        "url": {
-                            "raw": "{{baseUrl}}/api/ingredients/search?name=pollo",
-                            "host": [
-                                "{{baseUrl}}"
-                            ],
-                            "path": [
-                                "api",
-                                "ingredients",
-                                "search"
-                            ],
-                            "query": [
-                                {
-                                    "key": "name",
-                                    "value": "pollo"
-                                }
-                            ]
-                        }
-                    }
-                },
-                {
-                    "name": "5. READ ingredients low stock",
-                    "request": {
-                        "method": "GET",
-                        "url": {
-                            "raw": "{{baseUrl}}/api/ingredients/low-stock?threshold=10",
-                            "host": [
-                                "{{baseUrl}}"
-                            ],
-                            "path": [
-                                "api",
-                                "ingredients",
-                                "low-stock"
-                            ],
-                            "query": [
-                                {
-                                    "key": "threshold",
-                                    "value": "10"
-                                }
-                            ]
-                        }
-                    }
-                },
-                {
-                    "name": "6. READ ingredients by location",
-                    "request": {
-                        "method": "GET",
-                        "url": {
-                            "raw": "{{baseUrl}}/api/ingredients/by-location/1",
-                            "host": [
-                                "{{baseUrl}}"
-                            ],
-                            "path": [
-                                "api",
-                                "ingredients",
-                                "by-location",
-                                "1"
-                            ]
-                        }
-                    }
-                },
-                {
-                    "name": "7. UPDATE ingredient",
+                    "name": "8. UPDATE ingredient",
                     "request": {
                         "method": "PUT",
                         "header": [
@@ -423,12 +424,12 @@
                         },
                         "body": {
                             "mode": "raw",
-                            "raw": "{\n  \"name\": \"Petto di Pollo Bio\",\n  \"description\": \"Petto di pollo biologico certificato\",\n  \"price\": 3.50,\n  \"quantity\": 80.0\n}"
+                            "raw": "{\n  \"name\": \"Petto di Pollo Bio\",\n  \"description\": \"Petto di pollo biologico\",\n  \"price\": 3.50,\n  \"quantity\": 80.0\n}"
                         }
                     }
                 },
                 {
-                    "name": "8. DELETE ingredient",
+                    "name": "9. DELETE ingredient",
                     "request": {
                         "method": "DELETE",
                         "url": {
@@ -450,7 +451,76 @@
             "name": "Locations",
             "item": [
                 {
-                    "name": "1. CREATE location",
+                    "name": "1. GET all locations",
+                    "request": {
+                        "method": "GET",
+                        "url": {
+                            "raw": "{{baseUrl}}/api/locations",
+                            "host": [
+                                "{{baseUrl}}"
+                            ],
+                            "path": [
+                                "api",
+                                "locations"
+                            ]
+                        }
+                    }
+                },
+                {
+                    "name": "2. GET location by id",
+                    "request": {
+                        "method": "GET",
+                        "url": {
+                            "raw": "{{baseUrl}}/api/locations/1",
+                            "host": [
+                                "{{baseUrl}}"
+                            ],
+                            "path": [
+                                "api",
+                                "locations",
+                                "1"
+                            ]
+                        }
+                    }
+                },
+                {
+                    "name": "3. GET locations by city",
+                    "request": {
+                        "method": "GET",
+                        "url": {
+                            "raw": "{{baseUrl}}/api/locations/city/Torino",
+                            "host": [
+                                "{{baseUrl}}"
+                            ],
+                            "path": [
+                                "api",
+                                "locations",
+                                "city",
+                                "Torino"
+                            ]
+                        }
+                    }
+                },
+                {
+                    "name": "4. GET locations by status",
+                    "request": {
+                        "method": "GET",
+                        "url": {
+                            "raw": "{{baseUrl}}/api/locations/status/OPEN",
+                            "host": [
+                                "{{baseUrl}}"
+                            ],
+                            "path": [
+                                "api",
+                                "locations",
+                                "status",
+                                "OPEN"
+                            ]
+                        }
+                    }
+                },
+                {
+                    "name": "5. CREATE location",
                     "request": {
                         "method": "POST",
                         "header": [
@@ -472,75 +542,6 @@
                         "body": {
                             "mode": "raw",
                             "raw": "{\n  \"name\": \"Blue Crystal Torino Centro\",\n  \"address\": \"Via Roma 1\",\n  \"city\": \"Torino\",\n  \"phoneCode\": \"+39\",\n  \"phoneNumber\": \"0110000001\",\n  \"openingHours\": \"10:00-23:00\",\n  \"status\": \"OPEN\"\n}"
-                        }
-                    }
-                },
-                {
-                    "name": "2. READ all locations",
-                    "request": {
-                        "method": "GET",
-                        "url": {
-                            "raw": "{{baseUrl}}/api/locations",
-                            "host": [
-                                "{{baseUrl}}"
-                            ],
-                            "path": [
-                                "api",
-                                "locations"
-                            ]
-                        }
-                    }
-                },
-                {
-                    "name": "3. READ location by id",
-                    "request": {
-                        "method": "GET",
-                        "url": {
-                            "raw": "{{baseUrl}}/api/locations/1",
-                            "host": [
-                                "{{baseUrl}}"
-                            ],
-                            "path": [
-                                "api",
-                                "locations",
-                                "1"
-                            ]
-                        }
-                    }
-                },
-                {
-                    "name": "4. READ locations by city",
-                    "request": {
-                        "method": "GET",
-                        "url": {
-                            "raw": "{{baseUrl}}/api/locations/city/Torino",
-                            "host": [
-                                "{{baseUrl}}"
-                            ],
-                            "path": [
-                                "api",
-                                "locations",
-                                "city",
-                                "Torino"
-                            ]
-                        }
-                    }
-                },
-                {
-                    "name": "5. READ locations by status",
-                    "request": {
-                        "method": "GET",
-                        "url": {
-                            "raw": "{{baseUrl}}/api/locations/status/OPEN",
-                            "host": [
-                                "{{baseUrl}}"
-                            ],
-                            "path": [
-                                "api",
-                                "locations",
-                                "status",
-                                "OPEN"
-                            ]
                         }
                     }
                 },
@@ -592,7 +593,50 @@
                     "name": "── STOCK ──",
                     "item": [
                         {
-                            "name": "8. CREATE stock (add ingredient to location)",
+                            "name": "8. GET all stock of location",
+                            "request": {
+                                "method": "GET",
+                                "url": {
+                                    "raw": "{{baseUrl}}/api/locations/1/stock",
+                                    "host": [
+                                        "{{baseUrl}}"
+                                    ],
+                                    "path": [
+                                        "api",
+                                        "locations",
+                                        "1",
+                                        "stock"
+                                    ]
+                                }
+                            }
+                        },
+                        {
+                            "name": "9. GET low stock of location",
+                            "request": {
+                                "method": "GET",
+                                "url": {
+                                    "raw": "{{baseUrl}}/api/locations/1/stock/low?threshold=10",
+                                    "host": [
+                                        "{{baseUrl}}"
+                                    ],
+                                    "path": [
+                                        "api",
+                                        "locations",
+                                        "1",
+                                        "stock",
+                                        "low"
+                                    ],
+                                    "query": [
+                                        {
+                                            "key": "threshold",
+                                            "value": "10"
+                                        }
+                                    ]
+                                }
+                            }
+                        },
+                        {
+                            "name": "10. CREATE stock (add ingredient to location)",
                             "request": {
                                 "method": "POST",
                                 "header": [
@@ -617,49 +661,6 @@
                                 "body": {
                                     "mode": "raw",
                                     "raw": "{\n  \"quantity\": 50.0\n}"
-                                }
-                            }
-                        },
-                        {
-                            "name": "9. READ all stock of location",
-                            "request": {
-                                "method": "GET",
-                                "url": {
-                                    "raw": "{{baseUrl}}/api/locations/1/stock",
-                                    "host": [
-                                        "{{baseUrl}}"
-                                    ],
-                                    "path": [
-                                        "api",
-                                        "locations",
-                                        "1",
-                                        "stock"
-                                    ]
-                                }
-                            }
-                        },
-                        {
-                            "name": "10. READ low stock of location",
-                            "request": {
-                                "method": "GET",
-                                "url": {
-                                    "raw": "{{baseUrl}}/api/locations/1/stock/low?threshold=10",
-                                    "host": [
-                                        "{{baseUrl}}"
-                                    ],
-                                    "path": [
-                                        "api",
-                                        "locations",
-                                        "1",
-                                        "stock",
-                                        "low"
-                                    ],
-                                    "query": [
-                                        {
-                                            "key": "threshold",
-                                            "value": "10"
-                                        }
-                                    ]
                                 }
                             }
                         },
@@ -719,33 +720,7 @@
             "name": "Menus",
             "item": [
                 {
-                    "name": "1. CREATE menu",
-                    "request": {
-                        "method": "POST",
-                        "header": [
-                            {
-                                "key": "Content-Type",
-                                "value": "application/json"
-                            }
-                        ],
-                        "url": {
-                            "raw": "{{baseUrl}}/api/menus",
-                            "host": [
-                                "{{baseUrl}}"
-                            ],
-                            "path": [
-                                "api",
-                                "menus"
-                            ]
-                        },
-                        "body": {
-                            "mode": "raw",
-                            "raw": "{\n  \"name\": \"Menu Classic\",\n  \"price\": 12.99,\n  \"description\": \"Burger + patatine + bibita\"\n}"
-                        }
-                    }
-                },
-                {
-                    "name": "2. READ all menus",
+                    "name": "1. GET all menus",
                     "request": {
                         "method": "GET",
                         "url": {
@@ -761,7 +736,7 @@
                     }
                 },
                 {
-                    "name": "3. READ menu by id",
+                    "name": "2. GET menu by id",
                     "request": {
                         "method": "GET",
                         "url": {
@@ -778,7 +753,7 @@
                     }
                 },
                 {
-                    "name": "4. READ menus search by name",
+                    "name": "3. GET menus search by name",
                     "request": {
                         "method": "GET",
                         "url": {
@@ -801,7 +776,7 @@
                     }
                 },
                 {
-                    "name": "5. READ menus by price range",
+                    "name": "4. GET menus by price range",
                     "request": {
                         "method": "GET",
                         "url": {
@@ -828,7 +803,25 @@
                     }
                 },
                 {
-                    "name": "6. READ products of menu",
+                    "name": "5. GET menus by offer",
+                    "request": {
+                        "method": "GET",
+                        "url": {
+                            "raw": "{{baseUrl}}/api/menus/by-offer/1",
+                            "host": [
+                                "{{baseUrl}}"
+                            ],
+                            "path": [
+                                "api",
+                                "menus",
+                                "by-offer",
+                                "1"
+                            ]
+                        }
+                    }
+                },
+                {
+                    "name": "6. GET products of menu",
                     "request": {
                         "method": "GET",
                         "url": {
@@ -846,7 +839,7 @@
                     }
                 },
                 {
-                    "name": "7. READ obligatory products of menu",
+                    "name": "7. GET obligatory products of menu",
                     "request": {
                         "method": "GET",
                         "url": {
@@ -865,7 +858,33 @@
                     }
                 },
                 {
-                    "name": "8. UPDATE menu",
+                    "name": "8. CREATE menu",
+                    "request": {
+                        "method": "POST",
+                        "header": [
+                            {
+                                "key": "Content-Type",
+                                "value": "application/json"
+                            }
+                        ],
+                        "url": {
+                            "raw": "{{baseUrl}}/api/menus",
+                            "host": [
+                                "{{baseUrl}}"
+                            ],
+                            "path": [
+                                "api",
+                                "menus"
+                            ]
+                        },
+                        "body": {
+                            "mode": "raw",
+                            "raw": "{\n  \"name\": \"Menu Classic\",\n  \"price\": 12.99,\n  \"description\": \"Burger + patatine + bibita\"\n}"
+                        }
+                    }
+                },
+                {
+                    "name": "9. UPDATE menu",
                     "request": {
                         "method": "PUT",
                         "header": [
@@ -892,7 +911,7 @@
                     }
                 },
                 {
-                    "name": "9. ADD product to menu",
+                    "name": "10. ADD product to menu",
                     "request": {
                         "method": "POST",
                         "header": [
@@ -921,7 +940,7 @@
                     }
                 },
                 {
-                    "name": "10. REMOVE product from menu",
+                    "name": "11. REMOVE product from menu",
                     "request": {
                         "method": "DELETE",
                         "url": {
@@ -940,7 +959,7 @@
                     }
                 },
                 {
-                    "name": "11. DELETE menu",
+                    "name": "12. DELETE menu",
                     "request": {
                         "method": "DELETE",
                         "url": {
@@ -962,7 +981,117 @@
             "name": "Offers",
             "item": [
                 {
-                    "name": "1. CREATE offer",
+                    "name": "1. GET all offers",
+                    "request": {
+                        "method": "GET",
+                        "url": {
+                            "raw": "{{baseUrl}}/api/offers",
+                            "host": [
+                                "{{baseUrl}}"
+                            ],
+                            "path": [
+                                "api",
+                                "offers"
+                            ]
+                        }
+                    }
+                },
+                {
+                    "name": "2. GET offer by id",
+                    "request": {
+                        "method": "GET",
+                        "url": {
+                            "raw": "{{baseUrl}}/api/offers/1",
+                            "host": [
+                                "{{baseUrl}}"
+                            ],
+                            "path": [
+                                "api",
+                                "offers",
+                                "1"
+                            ]
+                        }
+                    }
+                },
+                {
+                    "name": "3. GET offers search by name",
+                    "request": {
+                        "method": "GET",
+                        "url": {
+                            "raw": "{{baseUrl}}/api/offers/search?name=pranzo",
+                            "host": [
+                                "{{baseUrl}}"
+                            ],
+                            "path": [
+                                "api",
+                                "offers",
+                                "search"
+                            ],
+                            "query": [
+                                {
+                                    "key": "name",
+                                    "value": "pranzo"
+                                }
+                            ]
+                        }
+                    }
+                },
+                {
+                    "name": "4. GET offers by menu",
+                    "request": {
+                        "method": "GET",
+                        "url": {
+                            "raw": "{{baseUrl}}/api/offers/by-menu/1",
+                            "host": [
+                                "{{baseUrl}}"
+                            ],
+                            "path": [
+                                "api",
+                                "offers",
+                                "by-menu",
+                                "1"
+                            ]
+                        }
+                    }
+                },
+                {
+                    "name": "5. GET offers by product",
+                    "request": {
+                        "method": "GET",
+                        "url": {
+                            "raw": "{{baseUrl}}/api/offers/by-product/1",
+                            "host": [
+                                "{{baseUrl}}"
+                            ],
+                            "path": [
+                                "api",
+                                "offers",
+                                "by-product",
+                                "1"
+                            ]
+                        }
+                    }
+                },
+                {
+                    "name": "6. GET products of offer",
+                    "request": {
+                        "method": "GET",
+                        "url": {
+                            "raw": "{{baseUrl}}/api/offers/1/products",
+                            "host": [
+                                "{{baseUrl}}"
+                            ],
+                            "path": [
+                                "api",
+                                "offers",
+                                "1",
+                                "products"
+                            ]
+                        }
+                    }
+                },
+                {
+                    "name": "7. CREATE offer",
                     "request": {
                         "method": "POST",
                         "header": [
@@ -988,81 +1117,7 @@
                     }
                 },
                 {
-                    "name": "2. READ all offers",
-                    "request": {
-                        "method": "GET",
-                        "url": {
-                            "raw": "{{baseUrl}}/api/offers",
-                            "host": [
-                                "{{baseUrl}}"
-                            ],
-                            "path": [
-                                "api",
-                                "offers"
-                            ]
-                        }
-                    }
-                },
-                {
-                    "name": "3. READ offer by id",
-                    "request": {
-                        "method": "GET",
-                        "url": {
-                            "raw": "{{baseUrl}}/api/offers/1",
-                            "host": [
-                                "{{baseUrl}}"
-                            ],
-                            "path": [
-                                "api",
-                                "offers",
-                                "1"
-                            ]
-                        }
-                    }
-                },
-                {
-                    "name": "4. READ offers search by name",
-                    "request": {
-                        "method": "GET",
-                        "url": {
-                            "raw": "{{baseUrl}}/api/offers/search?name=pranzo",
-                            "host": [
-                                "{{baseUrl}}"
-                            ],
-                            "path": [
-                                "api",
-                                "offers",
-                                "search"
-                            ],
-                            "query": [
-                                {
-                                    "key": "name",
-                                    "value": "pranzo"
-                                }
-                            ]
-                        }
-                    }
-                },
-                {
-                    "name": "5. READ products of offer",
-                    "request": {
-                        "method": "GET",
-                        "url": {
-                            "raw": "{{baseUrl}}/api/offers/1/products",
-                            "host": [
-                                "{{baseUrl}}"
-                            ],
-                            "path": [
-                                "api",
-                                "offers",
-                                "1",
-                                "products"
-                            ]
-                        }
-                    }
-                },
-                {
-                    "name": "6. UPDATE offer",
+                    "name": "8. UPDATE offer",
                     "request": {
                         "method": "PUT",
                         "header": [
@@ -1089,7 +1144,7 @@
                     }
                 },
                 {
-                    "name": "7. ADD product to offer",
+                    "name": "9. ADD product to offer",
                     "request": {
                         "method": "POST",
                         "header": [
@@ -1118,7 +1173,7 @@
                     }
                 },
                 {
-                    "name": "8. ADD menu to offer",
+                    "name": "10. ADD menu to offer",
                     "request": {
                         "method": "POST",
                         "url": {
@@ -1137,7 +1192,7 @@
                     }
                 },
                 {
-                    "name": "9. REMOVE product from offer",
+                    "name": "11. REMOVE product from offer",
                     "request": {
                         "method": "DELETE",
                         "url": {
@@ -1156,7 +1211,7 @@
                     }
                 },
                 {
-                    "name": "10. DELETE offer",
+                    "name": "12. DELETE offer",
                     "request": {
                         "method": "DELETE",
                         "url": {
@@ -1178,33 +1233,7 @@
             "name": "Orders",
             "item": [
                 {
-                    "name": "1. CREATE order",
-                    "request": {
-                        "method": "POST",
-                        "header": [
-                            {
-                                "key": "Content-Type",
-                                "value": "application/json"
-                            }
-                        ],
-                        "url": {
-                            "raw": "{{baseUrl}}/api/orders",
-                            "host": [
-                                "{{baseUrl}}"
-                            ],
-                            "path": [
-                                "api",
-                                "orders"
-                            ]
-                        },
-                        "body": {
-                            "mode": "raw",
-                            "raw": "{\n  \"orderId\": \"ORD-2024-001\",\n  \"code\": \"A01\",\n  \"serviceType\": \"TABLE\",\n  \"orderType\": \"STANDARD\",\n  \"tableNumber\": \"5\",\n  \"paymentType\": \"CARD\",\n  \"paymentAmount\": 25.98,\n  \"totalAt\": 25.98,\n  \"user\": { \"id\": 1 }\n}"
-                        }
-                    }
-                },
-                {
-                    "name": "2. READ all orders",
+                    "name": "1. GET all orders",
                     "request": {
                         "method": "GET",
                         "url": {
@@ -1220,7 +1249,7 @@
                     }
                 },
                 {
-                    "name": "3. READ order by id",
+                    "name": "2. GET order by id",
                     "request": {
                         "method": "GET",
                         "url": {
@@ -1237,7 +1266,7 @@
                     }
                 },
                 {
-                    "name": "4. READ order by code",
+                    "name": "3. GET order by code",
                     "request": {
                         "method": "GET",
                         "url": {
@@ -1255,7 +1284,25 @@
                     }
                 },
                 {
-                    "name": "5. READ orders by service type",
+                    "name": "4. GET orders by user",
+                    "request": {
+                        "method": "GET",
+                        "url": {
+                            "raw": "{{baseUrl}}/api/orders/user/1",
+                            "host": [
+                                "{{baseUrl}}"
+                            ],
+                            "path": [
+                                "api",
+                                "orders",
+                                "user",
+                                "1"
+                            ]
+                        }
+                    }
+                },
+                {
+                    "name": "5. GET orders by service type",
                     "request": {
                         "method": "GET",
                         "url": {
@@ -1273,7 +1320,7 @@
                     }
                 },
                 {
-                    "name": "6. READ orders by date range",
+                    "name": "6. GET orders by date range",
                     "request": {
                         "method": "GET",
                         "url": {
@@ -1300,7 +1347,7 @@
                     }
                 },
                 {
-                    "name": "7. READ total revenue in period",
+                    "name": "7. GET total revenue in period",
                     "request": {
                         "method": "GET",
                         "url": {
@@ -1327,7 +1374,7 @@
                     }
                 },
                 {
-                    "name": "8. READ products of order",
+                    "name": "8. GET products of order",
                     "request": {
                         "method": "GET",
                         "url": {
@@ -1345,7 +1392,7 @@
                     }
                 },
                 {
-                    "name": "9. READ product order count",
+                    "name": "9. GET product order count",
                     "request": {
                         "method": "GET",
                         "url": {
@@ -1363,7 +1410,33 @@
                     }
                 },
                 {
-                    "name": "10. UPDATE order",
+                    "name": "10. CREATE order",
+                    "request": {
+                        "method": "POST",
+                        "header": [
+                            {
+                                "key": "Content-Type",
+                                "value": "application/json"
+                            }
+                        ],
+                        "url": {
+                            "raw": "{{baseUrl}}/api/orders",
+                            "host": [
+                                "{{baseUrl}}"
+                            ],
+                            "path": [
+                                "api",
+                                "orders"
+                            ]
+                        },
+                        "body": {
+                            "mode": "raw",
+                            "raw": "{\n  \"orderId\": \"ORD-2024-001\",\n  \"code\": \"A01\",\n  \"serviceType\": \"TABLE\",\n  \"orderType\": \"STANDARD\",\n  \"tableNumber\": \"5\",\n  \"paymentType\": \"CARD\",\n  \"paymentAmount\": 25.98,\n  \"totalAt\": 25.98,\n  \"user\": { \"id\": 1 }\n}"
+                        }
+                    }
+                },
+                {
+                    "name": "11. UPDATE order",
                     "request": {
                         "method": "PUT",
                         "header": [
@@ -1390,7 +1463,7 @@
                     }
                 },
                 {
-                    "name": "11. DELETE order",
+                    "name": "12. DELETE order",
                     "request": {
                         "method": "DELETE",
                         "url": {
@@ -1412,58 +1485,48 @@
             "name": "Users",
             "item": [
                 {
-                    "name": "1. CREATE user",
+                    "name": "1. GET all users",
                     "request": {
-                        "method": "POST",
+                        "method": "GET",
                         "header": [
                             {
-                                "key": "Content-Type",
-                                "value": "application/json"
+                                "key": "Authorization",
+                                "value": "Bearer {{token}}"
                             }
                         ],
                         "url": {
-                            "raw": "{{baseUrl}}/api/users",
+                            "raw": "{{baseUrl}}/api/users/v1/users",
                             "host": [
                                 "{{baseUrl}}"
                             ],
                             "path": [
                                 "api",
-                                "users"
-                            ]
-                        },
-                        "body": {
-                            "mode": "raw",
-                            "raw": "{\n  \"name\": \"Mario\",\n  \"surname\": \"Rossi\",\n  \"birthday\": \"1990-05-15\",\n  \"email\": \"mario.rossi@email.com\",\n  \"password\": \"password123\",\n  \"gender\": \"M\",\n  \"phone\": \"3331234567\",\n  \"role\": \"USER\"\n}"
-                        }
-                    }
-                },
-                {
-                    "name": "2. READ all users",
-                    "request": {
-                        "method": "GET",
-                        "url": {
-                            "raw": "{{baseUrl}}/api/users",
-                            "host": [
-                                "{{baseUrl}}"
-                            ],
-                            "path": [
-                                "api",
+                                "users",
+                                "v1",
                                 "users"
                             ]
                         }
                     }
                 },
                 {
-                    "name": "3. READ user by id",
+                    "name": "2. GET user by id",
                     "request": {
                         "method": "GET",
+                        "header": [
+                            {
+                                "key": "Authorization",
+                                "value": "Bearer {{token}}"
+                            }
+                        ],
                         "url": {
-                            "raw": "{{baseUrl}}/api/users/1",
+                            "raw": "{{baseUrl}}/api/users/v1/users/1",
                             "host": [
                                 "{{baseUrl}}"
                             ],
                             "path": [
                                 "api",
+                                "users",
+                                "v1",
                                 "users",
                                 "1"
                             ]
@@ -1471,81 +1534,28 @@
                     }
                 },
                 {
-                    "name": "4. READ user by email",
-                    "request": {
-                        "method": "GET",
-                        "url": {
-                            "raw": "{{baseUrl}}/api/users/email/mario.rossi@email.com",
-                            "host": [
-                                "{{baseUrl}}"
-                            ],
-                            "path": [
-                                "api",
-                                "users",
-                                "email",
-                                "mario.rossi@email.com"
-                            ]
-                        }
-                    }
-                },
-                {
-                    "name": "5. READ users search by name",
-                    "request": {
-                        "method": "GET",
-                        "url": {
-                            "raw": "{{baseUrl}}/api/users/search?q=mario",
-                            "host": [
-                                "{{baseUrl}}"
-                            ],
-                            "path": [
-                                "api",
-                                "users",
-                                "search"
-                            ],
-                            "query": [
-                                {
-                                    "key": "q",
-                                    "value": "mario"
-                                }
-                            ]
-                        }
-                    }
-                },
-                {
-                    "name": "6. READ users by role",
-                    "request": {
-                        "method": "GET",
-                        "url": {
-                            "raw": "{{baseUrl}}/api/users/role/USER",
-                            "host": [
-                                "{{baseUrl}}"
-                            ],
-                            "path": [
-                                "api",
-                                "users",
-                                "role",
-                                "USER"
-                            ]
-                        }
-                    }
-                },
-                {
-                    "name": "7. UPDATE user",
+                    "name": "3. UPDATE user",
                     "request": {
                         "method": "PUT",
                         "header": [
                             {
                                 "key": "Content-Type",
                                 "value": "application/json"
+                            },
+                            {
+                                "key": "Authorization",
+                                "value": "Bearer {{token}}"
                             }
                         ],
                         "url": {
-                            "raw": "{{baseUrl}}/api/users/1",
+                            "raw": "{{baseUrl}}/api/users/v1/users/1",
                             "host": [
                                 "{{baseUrl}}"
                             ],
                             "path": [
                                 "api",
+                                "users",
+                                "v1",
                                 "users",
                                 "1"
                             ]
@@ -1557,44 +1567,24 @@
                     }
                 },
                 {
-                    "name": "8. UPDATE user role",
+                    "name": "4. DELETE user",
                     "request": {
-                        "method": "PATCH",
+                        "method": "DELETE",
                         "header": [
                             {
-                                "key": "Content-Type",
-                                "value": "application/json"
+                                "key": "Authorization",
+                                "value": "Bearer {{token}}"
                             }
                         ],
                         "url": {
-                            "raw": "{{baseUrl}}/api/users/1/role",
+                            "raw": "{{baseUrl}}/api/users/v1/users/1",
                             "host": [
                                 "{{baseUrl}}"
                             ],
                             "path": [
                                 "api",
                                 "users",
-                                "1",
-                                "role"
-                            ]
-                        },
-                        "body": {
-                            "mode": "raw",
-                            "raw": "{\n  \"role\": \"CASHIER\"\n}"
-                        }
-                    }
-                },
-                {
-                    "name": "9. DELETE user",
-                    "request": {
-                        "method": "DELETE",
-                        "url": {
-                            "raw": "{{baseUrl}}/api/users/1",
-                            "host": [
-                                "{{baseUrl}}"
-                            ],
-                            "path": [
-                                "api",
+                                "v1",
                                 "users",
                                 "1"
                             ]

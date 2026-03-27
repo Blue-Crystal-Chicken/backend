@@ -18,7 +18,6 @@ import com.giuseppe_matteo.blue_crystal_chicken.blue_crystal_chicken.dto.request
 import com.giuseppe_matteo.blue_crystal_chicken.blue_crystal_chicken.dto.response.ProductResponse;
 import com.giuseppe_matteo.blue_crystal_chicken.blue_crystal_chicken.service.ProductService;
 
-
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
@@ -38,7 +37,7 @@ public class ProductController {
     public ProductController(ProductService productService) {
         this.productService = productService;
     }
-    
+
     @GetMapping("/v1/products")
     @Operation(summary = "Lista prodotti", description = "Endpoint per la lista dei prodotti")
     @ResponseStatus(HttpStatus.OK)
@@ -90,9 +89,9 @@ public class ProductController {
             @ApiResponse(responseCode = "404", description = "Prodotto non trovato", content = @Content(mediaType = "application/json", schema = @Schema(implementation = ErrorResponse.class))),
             @ApiResponse(responseCode = "500", description = "Errore del server", content = @Content(mediaType = "application/json", schema = @Schema(implementation = ErrorResponse.class)))
     })
-    public ResponseEntity<?> getProductsByCategoryName(@PathVariable String category){
+    public ResponseEntity<?> getProductsByCategoryName(@PathVariable String category) {
         log.info("GET /api/products/v1/category/{}", category);
-        try {   
+        try {
             return ResponseEntity.ok(productService.getProductsByCategoryName(category.trim().toUpperCase()));
         } catch (Exception e) {
             log.error("GET /api/products/v1/category/{} - ERROR: {}", category, e.getMessage());
