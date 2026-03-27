@@ -61,7 +61,6 @@ public class ProductController {
     @GetMapping("/v1/products/{id}")
     @Operation(summary = "Lista prodotti", description = "Endpoint per la lista dei prodotti")
     @ResponseStatus(HttpStatus.OK)
-    @PreAuthorize("hasRole('ADMIN')")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "Lista prodotti", content = @Content(mediaType = "application/json", schema = @Schema(implementation = ProductResponse.class))),
             @ApiResponse(responseCode = "400", description = "Richiesta non valida", content = @Content(mediaType = "application/json", schema = @Schema(implementation = ErrorResponse.class))),

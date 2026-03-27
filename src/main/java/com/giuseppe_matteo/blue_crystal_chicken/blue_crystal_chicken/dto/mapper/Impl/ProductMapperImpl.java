@@ -34,7 +34,7 @@ public class ProductMapperImpl implements ProductMapper {
         } else {
             response.setIngredients(Collections.emptyList());
         }
-        
+        response.setUpdatedAt(product.getUpdatedAt());
         return response;
     }
 
