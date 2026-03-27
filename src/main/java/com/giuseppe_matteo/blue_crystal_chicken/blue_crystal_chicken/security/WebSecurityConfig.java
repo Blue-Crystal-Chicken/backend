@@ -62,10 +62,6 @@ public class WebSecurityConfig {
                 auth.requestMatchers("/api/auth/**", "/error", "/favicon.ico", "/images/**").permitAll()
                     .requestMatchers(HttpMethod.GET, "/api/categories/**").permitAll()
                     .requestMatchers(HttpMethod.GET, "/api/products/**").permitAll()
-                    .requestMatchers(HttpMethod.POST, "/api/products/**").hasRole("ADMIN")
-                    .requestMatchers(HttpMethod.PUT, "/api/products/**").hasRole("ADMIN")
-                    .requestMatchers(HttpMethod.DELETE, "/api/products/**").hasRole("ADMIN")
-                    .requestMatchers(HttpMethod.POST, "/api/categories/**").hasRole("ADMIN")
                     .anyRequest().authenticated()
             );
         http.authenticationProvider(authenticationProvider());
