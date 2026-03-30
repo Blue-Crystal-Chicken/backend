@@ -5,6 +5,7 @@ import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
 import lombok.*;
+
 import java.time.LocalDateTime;
 import java.util.List;
 
@@ -21,59 +22,111 @@ public class ProductEntity {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "id")
     private Long id;
+
+    // ==================== BASIC INFO ====================
 
     @Column(name = "Name")
     @NotBlank(message = "Il nome è obbligatorio")
     @Size(min = 3, max = 50, message = "Il nome deve essere compreso tra 3 e 50 caratteri")
     private String name;
 
+    @Column(name = "Description")
+    private String description;
+
     @JoinColumn(name = "category_id")
     @NotNull(message = "La categoria è obbligatoria")
     @ManyToOne
     private Category category;
 
-    @Column(name = "Size")
-    private String size;
-
-    @Column(name = "Quantity")
-    private Integer quantity;
-
-    @Column(name = "Additions")
-    private Double additions;
-
     @Column(name = "Price")
     private Double price;
 
     @Column(name = "Image")
-    private String img_path;
+    private String imgPath;
+
+    @Column(name = "Available")
+    private Boolean available = true;
+
+    // ==================== CATEGORY-SPECIFIC ====================
+
+    // FRIES
+    @Column(name = "Size")
+    private String size;
+
+    // SNACK
+    @Column(name = "Quantity")
+    private Integer quantity;
+
+    // DRINK
+    @Column(name = "Liters")
+    private Double liters;
+
+    @Column(name = "IsCarbonated")
+    private Boolean isCarbonated;
+
+    @Column(name = "Temperature")
+    private String temperature; // cold / hot
+
+    // SHARED ATTRIBUTES
+
+    @Column(name = "Weight")
+    private Double weight; // grammi
+
+    @Column(name = "IsSpicy")
+    private Boolean isSpicy;
+
+    @Column(name = "Flavor")
+    private String flavor;
+
+    // ==================== DIETARY INFO ====================
+
+    @Column(name = "Calories")
+    private Integer calories;
+
+    @Column(name = "IsVegetarian")
+    private Boolean isVegetarian;
+
+    @Column(name = "IsVegan")
+    private Boolean isVegan;
+
+    @Column(name = "IsGlutenFree")
+    private Boolean isGlutenFree;
 
     @Column(name = "Nutritional_info")
     private String nutritionalInfo;
+
+    // ==================== EXTRA ====================
+
+    @Column(name = "Additions")
+    private Double additions;
+
+    // ==================== RELATIONSHIPS ====================
+
+    @OneToMany(mappedBy = "product", cascade = CascadeType.ALL)
+    private List<MenuProduct> menuProducts;
+
+    @OneToMany(mappedBy = "product", cascade = CascadeType.ALL)
+    private List<OfferProduct> offerProducts;
+
+    @ManyToMany
+    @JoinTable(
+        name = "Product_Ingredients",
+        joinColumns = @JoinColumn(name = "Product_id"),
+        inverseJoinColumns = @JoinColumn(name = "Ingredient_id")
+    )
+    private List<IngredientEntity> ingredients;
+
+    @OneToMany(mappedBy = "product", cascade = CascadeType.ALL)
+    private List<OrderProduct> orderProducts;
+
+    // ==================== TIMESTAMPS ====================
 
     @Column(nullable = false, updatable = false)
     private LocalDateTime createdAt;
 
     @Column(nullable = false)
     private LocalDateTime updatedAt;
-
-    // Bidirectional with MenuProduct
-    @OneToMany(mappedBy = "product", cascade = CascadeType.ALL)
-    private List<MenuProduct> menuProducts;
-
-    // Bidirectional with OfferProduct
-    @OneToMany(mappedBy = "product", cascade = CascadeType.ALL)
-    private List<OfferProduct> offerProducts;
-
-    // Many-to-many with Ingredient via ProductIngredient
-    @ManyToMany
-    @JoinTable(name = "Product_Ingredients", joinColumns = @JoinColumn(name = "Product_id"), inverseJoinColumns = @JoinColumn(name = "Ingredient_id"))
-    private List<IngredientEntity> ingredients;
-
-    // Bidirectional with OrderProduct
-    @OneToMany(mappedBy = "product", cascade = CascadeType.ALL)
-    private List<OrderProduct> orderProducts;
 
     @PrePersist
     protected void onCreate() {

@@ -8,11 +8,9 @@ import org.springframework.transaction.annotation.Transactional;
 import com.giuseppe_matteo.blue_crystal_chicken.blue_crystal_chicken.dto.request.CategoryRequest;
 import com.giuseppe_matteo.blue_crystal_chicken.blue_crystal_chicken.dto.request.ProductRequest;
 import com.giuseppe_matteo.blue_crystal_chicken.blue_crystal_chicken.dto.request.Register;
-import com.giuseppe_matteo.blue_crystal_chicken.blue_crystal_chicken.entity.Category;
 import com.giuseppe_matteo.blue_crystal_chicken.blue_crystal_chicken.entity.CategoryName;
 import com.giuseppe_matteo.blue_crystal_chicken.blue_crystal_chicken.entity.Role;
 import com.giuseppe_matteo.blue_crystal_chicken.blue_crystal_chicken.exception.ProductAlreadyExistsException;
-import com.giuseppe_matteo.blue_crystal_chicken.blue_crystal_chicken.repository.CategoryRepository;
 import com.giuseppe_matteo.blue_crystal_chicken.blue_crystal_chicken.service.CategoryService;
 import com.giuseppe_matteo.blue_crystal_chicken.blue_crystal_chicken.service.ProductService;
 import com.giuseppe_matteo.blue_crystal_chicken.blue_crystal_chicken.service.UserService;
@@ -26,9 +24,6 @@ public class DataLoader implements CommandLineRunner {
 
         @Autowired
         private CategoryService categoryService;
-
-        @Autowired
-        private CategoryRepository categoryRepository;
 
         @Autowired
         private ProductService productService;
@@ -64,129 +59,191 @@ public class DataLoader implements CommandLineRunner {
          */
         private void createProducts() {
 
-                // --- HAMBURGER ---------------------------------------------------
-                Category hamburger = getCategory(CategoryName.HAMBURGER);
+                // --------------------------------------------------
+                // 🍔 HAMBURGER
+                // --------------------------------------------------
 
-                Category wrap = getCategory(CategoryName.WRAP);
+                ProductRequest burger = new ProductRequest();
+                burger.setName("Classic Blue Burger");
+                burger.setCategoryName("HAMBURGER");
+                burger.setPrice(5.90);
+                burger.setDescription("Pollo fritto croccante, lattuga, pomodoro e maionese speciale.");
+                burger.setCalories(650);
+                burger.setWeight(250.0);
+                burger.setIsSpicy(false);
+                burger.setIsVegetarian(false);
+                burger.setIsVegan(false);
+                burger.setIsGlutenFree(false);
+                burger.setImagePath("images/prodotti/classic_blue_burger.jpg");
+                saveProduct(burger);
 
-                saveProduct("Classic Blue Burger",
-                                hamburger,
-                                5.90,
-                                "Pollo fritto croccante, lattuga, pomodoro e maionese speciale.",
-                                "images/prodotti/classic_blue_burger.jpg");
+                ProductRequest spicyBurger = new ProductRequest();
+                spicyBurger.setName("The Crystal Spicy");
+                spicyBurger.setCategoryName("HAMBURGER");
+                spicyBurger.setPrice(6.50);
+                spicyBurger.setDescription("Pollo piccante, jalapeños e cheddar.");
+                spicyBurger.setCalories(720);
+                spicyBurger.setWeight(270.0);
+                spicyBurger.setIsSpicy(true);
+                spicyBurger.setIsVegetarian(false);
+                spicyBurger.setIsVegan(false);
+                spicyBurger.setIsGlutenFree(false);
+                spicyBurger.setImagePath("images/prodotti/the_crystal_spicy.jpg");
+                saveProduct(spicyBurger);
 
-                saveProduct("The Crystal Spicy",
-                                hamburger,
-                                6.50,
-                                "Petto di pollo piccante, jalapeños, cheddar fuso e cipolla caramellata.",
-                                "images/prodotti/the_crystal_spicy.jpg");
+                // --------------------------------------------------
+                // 🌯 WRAP
+                // --------------------------------------------------
 
-                saveProduct("Mountain Wrap",
-                                wrap,
-                                6.20,
-                                "Pollo grigliato, bacon croccante e salsa BBQ in un bun brioche.",
-                                "images/prodotti/mountain_wrap.jpg");
+                ProductRequest wrapProd = new ProductRequest();
+                wrapProd.setName("Mountain Wrap");
+                wrapProd.setCategoryName("WRAP");
+                wrapProd.setPrice(6.20);
+                wrapProd.setDescription("Pollo grigliato, bacon e salsa BBQ.");
+                wrapProd.setCalories(550);
+                wrapProd.setWeight(220.0);
+                wrapProd.setIsSpicy(false);
+                wrapProd.setImagePath("images/prodotti/mountain_wrap.jpg");
+                saveProduct(wrapProd);
 
-                // --- FRIES -------------------------------------------------------
-                Category fries = getCategory(CategoryName.FRIES);
+                // --------------------------------------------------
+                // 🍟 FRIES
+                // --------------------------------------------------
 
-                saveProduct("Diamond Fries",
-                                fries,
-                                2.50,
-                                "Patatine classiche dal taglio a diamante, extra croccanti.",
-                                "images/prodotti/diamond_fries.jpg");
+                ProductRequest friesProd = new ProductRequest();
+                friesProd.setName("Diamond Fries");
+                friesProd.setCategoryName("FRIES");
+                friesProd.setPrice(2.50);
+                friesProd.setDescription("Patatine croccanti.");
+                friesProd.setCalories(300);
+                friesProd.setWeight(120.0);
+                friesProd.setIsVegetarian(true);
+                friesProd.setIsVegan(true);
+                friesProd.setIsGlutenFree(true);
+                friesProd.setImagePath("images/prodotti/diamond_fries.jpg");
+                saveProduct(friesProd);
 
-                saveProduct("Cheesy Blue Fries",
-                                fries,
-                                3.20,
-                                "Patatine fritte ricoperte di salsa al formaggio e granella di bacon.",
-                                "images/prodotti/cheesy_blue_fries.jpg");
+                ProductRequest cheesyFries = new ProductRequest();
+                cheesyFries.setName("Cheesy Blue Fries");
+                cheesyFries.setCategoryName("FRIES");
+                cheesyFries.setPrice(3.20);
+                cheesyFries.setDescription("Patatine con formaggio e bacon.");
+                cheesyFries.setCalories(450);
+                cheesyFries.setWeight(150.0);
+                cheesyFries.setIsVegetarian(false);
+                cheesyFries.setIsVegan(false);
+                cheesyFries.setImagePath("images/prodotti/cheesy_blue_fries.jpg");
+                saveProduct(cheesyFries);
 
-                // --- SNACK -------------------------------------------------------
-                Category snack = getCategory(CategoryName.SNACK);
+                // --------------------------------------------------
+                // 🍗 SNACK
+                // --------------------------------------------------
 
-                saveProduct("Crystal Nuggets",
-                                snack,
-                                3.50,
-                                "Pepite di pollo con panatura ai cereali.",
-                                "images/prodotti/crystal_nuggets.jpg");
+                ProductRequest nuggets = new ProductRequest();
+                nuggets.setName("Crystal Nuggets");
+                nuggets.setCategoryName("SNACK");
+                nuggets.setPrice(3.50);
+                nuggets.setDescription("Pepite di pollo croccanti.");
+                nuggets.setCalories(400);
+                nuggets.setQuantity(6);
+                nuggets.setIsSpicy(false);
+                nuggets.setImagePath("images/prodotti/crystal_nuggets.jpg");
+                saveProduct(nuggets);
 
-                saveProduct("Spicy Wings",
-                                snack,
-                                4.50,
-                                "Alette di pollo marinate in salsa piccante (6 o 12 pezzi).",
-                                "images/prodotti/spicy_wings.jpg");
+                ProductRequest wings = new ProductRequest();
+                wings.setName("Spicy Wings");
+                wings.setCategoryName("SNACK");
+                wings.setPrice(4.50);
+                wings.setDescription("Alette di pollo piccanti.");
+                wings.setCalories(500);
+                wings.setQuantity(6);
+                wings.setIsSpicy(true);
+                wings.setImagePath("images/prodotti/spicy_wings.jpg");
+                saveProduct(wings);
 
-                // --- DRINK -------------------------------------------------------
-                Category drink = getCategory(CategoryName.DRINK);
+                // --------------------------------------------------
+                // 🥤 DRINK
+                // --------------------------------------------------
 
-                saveProduct("Blue Lagoon Soda",
-                                drink,
-                                2.20,
-                                "Soda rinfrescante ai frutti blu e limone.",
-                                "images/prodotti/blue_lagoon_soda.jpg");
+                ProductRequest drink1 = new ProductRequest();
+                drink1.setName("Blue Lagoon Soda");
+                drink1.setCategoryName("DRINK");
+                drink1.setPrice(2.20);
+                drink1.setDescription("Soda ai frutti blu.");
+                drink1.setCalories(120);
+                drink1.setLiters(0.33);
+                drink1.setIsCarbonated(true);
+                drink1.setTemperature("cold");
+                drink1.setImagePath("images/prodotti/blue_lagoon_soda.jpg");
+                saveProduct(drink1);
 
-                saveProduct("Iced Tea",
-                                drink,
-                                2.00,
-                                "Tè freddo alla pesca o al limone fatto in casa.",
-                                "images/prodotti/iced_tea.jpg");
+                ProductRequest tea = new ProductRequest();
+                tea.setName("Iced Tea");
+                tea.setCategoryName("DRINK");
+                tea.setPrice(2.00);
+                tea.setDescription("Tè freddo pesca/limone.");
+                tea.setCalories(90);
+                tea.setLiters(0.33);
+                tea.setIsCarbonated(false);
+                tea.setTemperature("cold");
+                tea.setImagePath("images/prodotti/iced_tea.jpg");
+                saveProduct(tea);
 
-                // --- SAUCE -------------------------------------------------------
-                Category sauce = getCategory(CategoryName.SAUCE);
+                // --------------------------------------------------
+                // 🧂 SAUCE
+                // --------------------------------------------------
 
-                saveProduct("Crystal Mayo",
-                                sauce,
-                                0.50,
-                                "Maionese all'aglio ed erbe fini.",
-                                "images/prodotti/crystal_mayo.jpg");
+                ProductRequest mayo = new ProductRequest();
+                mayo.setName("Crystal Mayo");
+                mayo.setCategoryName("SAUCE");
+                mayo.setPrice(0.50);
+                mayo.setDescription("Maionese speciale.");
+                mayo.setCalories(150);
+                mayo.setQuantity(1);
+                mayo.setIsVegetarian(true);
+                mayo.setImagePath("images/prodotti/crystal_mayo.jpg");
+                saveProduct(mayo);
 
-                saveProduct("Blue BBQ",
-                                sauce,
-                                0.50,
-                                "Salsa barbecue con un tocco segreto di affumicatura.",
-                                "images/prodotti/blue_bbq.jpg");
+                ProductRequest bbq = new ProductRequest();
+                bbq.setName("Blue BBQ");
+                bbq.setCategoryName("SAUCE");
+                bbq.setPrice(0.50);
+                bbq.setDescription("Salsa BBQ affumicata.");
+                bbq.setCalories(130);
+                bbq.setQuantity(1);
+                bbq.setIsVegetarian(true);
+                bbq.setIsVegan(true);
+                bbq.setImagePath("images/prodotti/blue_bbq.jpg");
+                saveProduct(bbq);
 
-                // --- DESSERT -----------------------------------------------------
-                Category dessert = getCategory(CategoryName.DESSERT);
+                // --------------------------------------------------
+                // 🍰 DESSERT
+                // --------------------------------------------------
 
-                saveProduct("Frozen Crystal Brownie",
-                                dessert,
-                                3.80,
-                                "Brownie caldo al cioccolato servito con una pallina di gelato alla vaniglia.",
-                                "images/prodotti/frozen_crystal_brownie.jpg");
-        }
-
-        // -----------------------------------------------------------------------
+                ProductRequest brownie = new ProductRequest();
+                brownie.setName("Frozen Crystal Brownie");
+                brownie.setCategoryName("DESSERT");
+                brownie.setPrice(3.80);
+                brownie.setDescription("Brownie con gelato.");
+                brownie.setCalories(600);
+                brownie.setWeight(180.0);
+                brownie.setTemperature("hot/cold");
+                brownie.setImagePath("images/prodotti/frozen_crystal_brownie.jpg");
+                saveProduct(brownie);
+                }   // -----------------------------------------------------------------------
         // HELPERS
         // -----------------------------------------------------------------------
 
-        /**
-         * Fetches a Category by name; throws IllegalStateException if not found
-         * (should never happen since createCategory() runs first).
-         */
-        private Category getCategory(CategoryName name) {
-                return categoryRepository.findByName(name)
-                                .orElseThrow(() -> new IllegalStateException("Category not found: " + name));
+                /**
+                 * Builds and persists a ProductRequest. Silently skips on duplicates.
+                 */
+                private void saveProduct(ProductRequest request) {
+        try {
+                productService.createProduct(request);
+                log.info("Product created: {}", request.getName());
+        } catch (ProductAlreadyExistsException e) {
+                log.debug("Product already exists, skipping: {}", request.getName());
         }
-
-        /**
-         * Builds and persists a ProductRequest. Silently skips on duplicates.
-         */
-        private void saveProduct(String name, Category category, Double price, String nutritionalInfo,
-                        String img_path) {
-                try {
-                        ProductRequest request = new ProductRequest();
-                        request.setName(name);
-                        request.setCategory(category);
-                        request.setPrice(price);
-                        request.setNutritionalInfo(nutritionalInfo);
-                        request.setImagePath(img_path);
-                        productService.createProduct(request);
-                        log.info("Product created: {}", name);
-                } catch (ProductAlreadyExistsException e) {
-                        log.debug("Product already exists, skipping: {}", name);
-                }
         }
 
         private void createUsers() {
@@ -199,7 +256,7 @@ public class DataLoader implements CommandLineRunner {
                 userRequest.setPhone("3333333333");
                 userRequest.setGender("Male");
                 userRequest.setBirthday("2004-12-11");
-                userRequest.setRole(Role.USER);
+                userRequest.setRole(Role.ADMIN);
                 userService.registerUser(userRequest);
         }
 }

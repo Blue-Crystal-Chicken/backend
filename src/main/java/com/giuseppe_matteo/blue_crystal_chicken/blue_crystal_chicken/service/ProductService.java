@@ -17,9 +17,11 @@ import com.giuseppe_matteo.blue_crystal_chicken.blue_crystal_chicken.dto.mapper.
 import com.giuseppe_matteo.blue_crystal_chicken.blue_crystal_chicken.dto.request.ProductRequest;
 import com.giuseppe_matteo.blue_crystal_chicken.blue_crystal_chicken.dto.response.ProductResponse;
 import com.giuseppe_matteo.blue_crystal_chicken.blue_crystal_chicken.entity.CategoryName;
+import com.giuseppe_matteo.blue_crystal_chicken.blue_crystal_chicken.entity.Category;
 import com.giuseppe_matteo.blue_crystal_chicken.blue_crystal_chicken.entity.IngredientEntity;
 import com.giuseppe_matteo.blue_crystal_chicken.blue_crystal_chicken.entity.ProductEntity;
 import com.giuseppe_matteo.blue_crystal_chicken.blue_crystal_chicken.repository.IngredientRepository;
+import com.giuseppe_matteo.blue_crystal_chicken.blue_crystal_chicken.repository.CategoryRepository;
 import com.giuseppe_matteo.blue_crystal_chicken.blue_crystal_chicken.repository.ProductRepository;
 import com.giuseppe_matteo.blue_crystal_chicken.blue_crystal_chicken.exception.ProductNotFoundException;
 import com.giuseppe_matteo.blue_crystal_chicken.blue_crystal_chicken.exception.ProductAlreadyExistsException;
@@ -36,16 +38,19 @@ public class ProductService {
     private final ProductRepository productRepository;
     private final IngredientRepository ingredientRepository;
     private final ProductMapper productMapper;
+    private final CategoryRepository categoryRepository;
 
     @Value("${app.upload.dir}")
     private String uploadDir;
 
     public ProductService(ProductRepository productRepository,
             IngredientRepository ingredientRepository,
-            ProductMapper productMapper) {
+            ProductMapper productMapper,
+            CategoryRepository categoryRepository) {
         this.productRepository = productRepository;
         this.ingredientRepository = ingredientRepository;
         this.productMapper = productMapper;
+        this.categoryRepository = categoryRepository;
     }
 
     // -------------------------------------------------------------------------
@@ -133,6 +138,16 @@ public class ProductService {
 
         ProductEntity entity = productMapper.toEntity(request);
 
+        // ------------------------
+        // CATEGORY (FIX)
+        // ------------------------
+        if (request.getCategoryName() != null) {
+            CategoryName categoryName = CategoryName.valueOf(request.getCategoryName().toUpperCase());
+            Category category = categoryRepository.findByName(categoryName)
+                    .orElseThrow(() -> new RuntimeException("Categoria non trovata: " + categoryName));
+            entity.setCategory(category);
+        }
+
         if (request.getIngredientIds() != null && !request.getIngredientIds().isEmpty()) {
             List<IngredientEntity> ingredients = ingredientRepository.findAllById(request.getIngredientIds());
             entity.setIngredients(ingredients);
@@ -141,16 +156,16 @@ public class ProductService {
         // Gestione immagine: MultipartFile (API admin) oppure path diretto (DataLoader)
         if (request.getImage() != null) {
             try {
-                entity.setImg_path(saveImage(request.getImage()));
+                entity.setImgPath(saveImage(request.getImage()));
             } catch (IOException e) {
                 log.error("Failed to save image for product: {}", request.getName(), e);
                 throw new RuntimeException("Errore nel salvataggio dell'immagine: " + e.getMessage(), e);
             }
         } else if (request.getImagePath() != null) {
-            entity.setImg_path(request.getImagePath());
+            entity.setImgPath(request.getImagePath());
         } else {
             log.warn("No image provided for product: {}", request.getName());
-            entity.setImg_path(null);
+            entity.setImgPath(null);
         }
 
         ProductEntity saved = productRepository.save(entity);
@@ -185,25 +200,73 @@ public class ProductService {
                     log.warn("Product not found with id: {}", id);
                     return new ProductNotFoundException("Prodotto non trovato con id: " + id);
                 });
+
+        // ------------------------
+        // CATEGORY (FIX IMPORTANTE)
+        // ------------------------
+        CategoryName categoryName = CategoryName.valueOf(request.getCategoryName().toUpperCase());
+        Category category = categoryRepository.findByName(categoryName)
+        .orElseThrow(() -> new RuntimeException("Categoria non trovata"));
+        product.setCategory(category);
+
+        // ------------------------
+        // BASIC INFO
+        // ------------------------
         product.setName(request.getName());
-        product.setCategory(request.getCategory());
+        product.setDescription(request.getDescription());
+
+        // ------------------------
+        // GENERIC ATTRIBUTES
+        // ------------------------
         product.setSize(request.getSize());
         product.setQuantity(request.getQuantity());
+        product.setWeight(request.getWeight());
+        product.setLiters(request.getLiters());
+
+        // ------------------------
+        // FOOD PROPERTIES
+        // ------------------------
+        product.setIsSpicy(request.getIsSpicy());
+        product.setFlavor(request.getFlavor());
+        product.setTemperature(request.getTemperature());
+        product.setIsCarbonated(request.getIsCarbonated());
+
+        // ------------------------
+        // NUTRITION
+        // ------------------------
+        product.setCalories(request.getCalories());
+        product.setIsVegetarian(request.getIsVegetarian());
+        product.setIsVegan(request.getIsVegan());
+        product.setIsGlutenFree(request.getIsGlutenFree());
+
+        // ------------------------
+        // PRICE
+        // ------------------------
         product.setAdditions(request.getAdditions());
         product.setPrice(request.getPrice());
-        product.setNutritionalInfo(request.getNutritionalInfo());
 
+        // ------------------------
+        // MEDIA
+        // ------------------------
+        if (request.getImagePath() != null) {
+            product.setImgPath(request.getImagePath());
+        }
+
+        // ------------------------
+        // INGREDIENTS
+        // ------------------------
         if (request.getIngredientIds() != null) {
             List<IngredientEntity> ingredients = ingredientRepository.findAllById(request.getIngredientIds());
             product.setIngredients(ingredients);
-        } else {
-            product.setIngredients(Collections.emptyList());
         }
 
+        // ------------------------
+        // SAVE
+        // ------------------------
         ProductEntity updated = productRepository.save(product);
         log.info("Product updated with id: {}", updated.getId());
-        return productMapper.toResponse(updated);
 
+        return productMapper.toResponse(updated);
     }
 
     // -------------------------------------------------------------------------

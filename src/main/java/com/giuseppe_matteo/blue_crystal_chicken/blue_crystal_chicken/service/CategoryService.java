@@ -29,15 +29,19 @@ public class CategoryService {
 
     @Transactional
     public ResponseEntity<?> save(CategoryRequest request) {
-        if (categoryRepository.existsByName(CategoryName.valueOf(request.getName()))) {
-            log.info("Category {} already exists, skipping...", request.getName());
-            return ResponseEntity.ok("Category already exists");
-        }
-
-        log.info("Creating category: {}", request);
         try {
+            CategoryName categoryName = CategoryName.valueOf(request.getName().toUpperCase());
+            if (categoryRepository.existsByName(categoryName)) {
+                log.info("Category {} already exists, skipping...", request.getName());
+                return ResponseEntity.ok("Category already exists");
+            }
+
+            log.info("Creating category: {}", request);
             Category category = categoryMapper.toCategory(request);
             return ResponseEntity.ok(categoryRepository.save(category));
+        } catch (IllegalArgumentException e) {
+            log.error("Invalid category name: {}", request.getName());
+            return ResponseEntity.badRequest().body("Invalid category name: " + request.getName());
         } catch (Exception e) {
             log.error("Error creating category: {}", e.getMessage());
             return ResponseEntity.badRequest().body(e.getMessage());
