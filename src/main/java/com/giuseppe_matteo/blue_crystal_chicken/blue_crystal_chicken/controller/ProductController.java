@@ -13,6 +13,9 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.web.bind.annotation.RequestParam;
 
 import com.giuseppe_matteo.blue_crystal_chicken.blue_crystal_chicken.dto.request.ProductRequest;
 import com.giuseppe_matteo.blue_crystal_chicken.blue_crystal_chicken.dto.response.ProductResponse;
@@ -160,4 +163,27 @@ public class ProductController {
             return ResponseEntity.badRequest().body(e.getMessage());
         }
     }
+
+    @GetMapping("/v1/best_selling")
+    @Operation(summary = "Lista prodotti", description = "Endpoint per la lista dei prodotti con limit 5")
+    @ResponseStatus(HttpStatus.OK)
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Lista prodotti", content = @Content(mediaType = "application/json", schema = @Schema(implementation = ProductResponse.class))),
+            @ApiResponse(responseCode = "400", description = "Richiesta non valida", content = @Content(mediaType = "application/json", schema = @Schema(implementation = ErrorResponse.class))),
+            @ApiResponse(responseCode = "401", description = "Non autorizzato", content = @Content(mediaType = "application/json", schema = @Schema(implementation = ErrorResponse.class))),
+            @ApiResponse(responseCode = "404", description = "Prodotto non trovato", content = @Content(mediaType = "application/json", schema = @Schema(implementation = ErrorResponse.class))),
+            @ApiResponse(responseCode = "500", description = "Errore del server", content = @Content(mediaType = "application/json", schema = @Schema(implementation = ErrorResponse.class)))
+    })
+    public ResponseEntity<?> getBestSelling(@RequestParam(defaultValue = "5") int limit) {
+    log.info("GET /api/products/v1/best_selling - limit: {}", limit);
+    log.info("GET /api/products/v1/best_selling");
+    try {
+        Pageable pageable = PageRequest.of(0, limit);
+        log.info("Pageable size: {}", pageable.getPageSize());
+        return ResponseEntity.ok(productService.getAllProducts(pageable));
+    } catch (Exception e) {
+        log.error("GET /api/products/v1/best_selling - ERROR: {}", e.getMessage());
+        return ResponseEntity.badRequest().body(e.getMessage());
+    }
+}
 }

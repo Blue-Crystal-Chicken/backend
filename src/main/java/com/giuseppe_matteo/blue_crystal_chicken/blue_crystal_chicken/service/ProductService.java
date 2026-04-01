@@ -25,8 +25,8 @@ import com.giuseppe_matteo.blue_crystal_chicken.blue_crystal_chicken.repository.
 import com.giuseppe_matteo.blue_crystal_chicken.blue_crystal_chicken.repository.ProductRepository;
 import com.giuseppe_matteo.blue_crystal_chicken.blue_crystal_chicken.exception.ProductNotFoundException;
 import com.giuseppe_matteo.blue_crystal_chicken.blue_crystal_chicken.exception.ProductAlreadyExistsException;
-
-import java.util.Collections;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Page;
 
 import org.springframework.beans.factory.annotation.Value;
 import lombok.extern.slf4j.Slf4j;
@@ -60,6 +60,16 @@ public class ProductService {
     public List<ProductResponse> getAllProducts() {
         log.info("Fetching all products");
         List<ProductEntity> products = productRepository.findAll();
+        log.info("Found {} products", products.size());
+        return products.stream()
+                .map(productMapper::toResponse)
+                .collect(Collectors.toList());
+    }
+
+    public List<ProductResponse> getAllProducts(Pageable pageable) {
+        log.info("Fetching all products");
+        Page<ProductEntity> page = productRepository.findAll(pageable);
+        List<ProductEntity> products = page.getContent();
         log.info("Found {} products", products.size());
         return products.stream()
                 .map(productMapper::toResponse)
