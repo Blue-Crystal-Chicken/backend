@@ -27,7 +27,7 @@ import com.giuseppe_matteo.blue_crystal_chicken.blue_crystal_chicken.exception.P
 import com.giuseppe_matteo.blue_crystal_chicken.blue_crystal_chicken.exception.ProductAlreadyExistsException;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Page;
-
+import org.springframework.data.domain.PageRequest;
 import org.springframework.beans.factory.annotation.Value;
 import lombok.extern.slf4j.Slf4j;
 
@@ -70,6 +70,15 @@ public class ProductService {
         log.info("Fetching all products");
         Page<ProductEntity> page = productRepository.findAll(pageable);
         List<ProductEntity> products = page.getContent();
+        log.info("Found {} products", products.size());
+        return products.stream()
+                .map(productMapper::toResponse)
+                .collect(Collectors.toList());
+    }
+
+    public List<ProductResponse> getTopProduct(Pageable pageable) {
+        log.info("Fetching top products");
+        List<ProductEntity> products = productRepository.findTop5MostOrderedProducts(pageable);
         log.info("Found {} products", products.size());
         return products.stream()
                 .map(productMapper::toResponse)

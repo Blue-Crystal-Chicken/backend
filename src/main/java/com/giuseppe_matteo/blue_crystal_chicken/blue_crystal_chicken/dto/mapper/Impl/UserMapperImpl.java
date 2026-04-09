@@ -45,4 +45,12 @@ public class UserMapperImpl implements UserMapper {
         
         return response;
     }
+
+    @Override
+    public UserEntity toUser(Long userId) {
+        if (userId == null) return null;
+        UserEntity user = new UserEntity();
+        user.setId(userId);
+        return user;
+    }
 }

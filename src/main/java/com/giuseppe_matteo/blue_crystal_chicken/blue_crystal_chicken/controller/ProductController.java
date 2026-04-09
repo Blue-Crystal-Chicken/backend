@@ -180,7 +180,7 @@ public class ProductController {
     try {
         Pageable pageable = PageRequest.of(0, limit);
         log.info("Pageable size: {}", pageable.getPageSize());
-        return ResponseEntity.ok(productService.getAllProducts(pageable));
+        return ResponseEntity.ok(productService.getTopProduct(pageable));
     } catch (Exception e) {
         log.error("GET /api/products/v1/best_selling - ERROR: {}", e.getMessage());
         return ResponseEntity.badRequest().body(e.getMessage());

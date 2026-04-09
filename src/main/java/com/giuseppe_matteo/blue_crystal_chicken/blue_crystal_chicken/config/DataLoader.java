@@ -6,16 +6,27 @@ import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 
 import com.giuseppe_matteo.blue_crystal_chicken.blue_crystal_chicken.dto.request.CategoryRequest;
+import com.giuseppe_matteo.blue_crystal_chicken.blue_crystal_chicken.dto.request.OrderItemRequest;
+import com.giuseppe_matteo.blue_crystal_chicken.blue_crystal_chicken.dto.request.OrderRequest;
 import com.giuseppe_matteo.blue_crystal_chicken.blue_crystal_chicken.dto.request.ProductRequest;
 import com.giuseppe_matteo.blue_crystal_chicken.blue_crystal_chicken.dto.request.Register;
 import com.giuseppe_matteo.blue_crystal_chicken.blue_crystal_chicken.entity.CategoryName;
+import com.giuseppe_matteo.blue_crystal_chicken.blue_crystal_chicken.entity.ProductEntity;
 import com.giuseppe_matteo.blue_crystal_chicken.blue_crystal_chicken.entity.Role;
+import com.giuseppe_matteo.blue_crystal_chicken.blue_crystal_chicken.entity.UserEntity;
 import com.giuseppe_matteo.blue_crystal_chicken.blue_crystal_chicken.exception.ProductAlreadyExistsException;
+import com.giuseppe_matteo.blue_crystal_chicken.blue_crystal_chicken.repository.ProductRepository;
+import com.giuseppe_matteo.blue_crystal_chicken.blue_crystal_chicken.repository.UserRepository;
 import com.giuseppe_matteo.blue_crystal_chicken.blue_crystal_chicken.service.CategoryService;
+import com.giuseppe_matteo.blue_crystal_chicken.blue_crystal_chicken.service.OrderService;
 import com.giuseppe_matteo.blue_crystal_chicken.blue_crystal_chicken.service.ProductService;
 import com.giuseppe_matteo.blue_crystal_chicken.blue_crystal_chicken.service.UserService;
 
 import lombok.extern.slf4j.Slf4j;
+
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 @Component
 @Transactional
@@ -31,11 +42,21 @@ public class DataLoader implements CommandLineRunner {
         @Autowired
         private UserService userService;
 
+        @Autowired
+        private OrderService orderService;
+
+        @Autowired
+        private ProductRepository productRepository;
+
+        @Autowired
+        private UserRepository userRepository;
+
         @Override
         public void run(String... args) throws Exception {
                 createCategory();
                 createProducts();
                 createUsers();
+                createOrders();
         }
 
         // -----------------------------------------------------------------------
@@ -230,24 +251,13 @@ public class DataLoader implements CommandLineRunner {
                 brownie.setTemperature("hot/cold");
                 brownie.setImagePath("images/prodotti/frozen_crystal_brownie.jpg");
                 saveProduct(brownie);
-                }   // -----------------------------------------------------------------------
-        // HELPERS
+        }
+
+        // -----------------------------------------------------------------------
+        // USERS
         // -----------------------------------------------------------------------
 
-                /**
-                 * Builds and persists a ProductRequest. Silently skips on duplicates.
-                 */
-                private void saveProduct(ProductRequest request) {
-        try {
-                productService.createProduct(request);
-                log.info("Product created: {}", request.getName());
-        } catch (ProductAlreadyExistsException e) {
-                log.debug("Product already exists, skipping: {}", request.getName());
-        }
-        }
-
         private void createUsers() {
-
                 Register userRequest = new Register();
                 userRequest.setName("Giuseppe");
                 userRequest.setSurname("Tesse");
@@ -258,5 +268,120 @@ public class DataLoader implements CommandLineRunner {
                 userRequest.setBirthday("2004-12-11");
                 userRequest.setRole(Role.ADMIN);
                 userService.registerUser(userRequest);
+        }
+
+        // -----------------------------------------------------------------------
+        // ORDERS
+        // -----------------------------------------------------------------------
+
+        /**
+         * Seeds 5 test orders with varied products, service types, and payment methods.
+         * Skips order creation if orders already exist in the database.
+         */
+        private void createOrders() {
+                if (!orderService.findAll().isEmpty()) {
+                        log.debug("Orders already exist, skipping order creation");
+                        return;
+                }
+
+                UserEntity user = userRepository.findByEmail("gspptesse@gmail.com").orElse(null);
+                if (user == null) {
+                        log.warn("Test user not found, skipping order creation");
+                        return;
+                }
+
+                // Build product name → ID map
+                Map<String, Long> p = new HashMap<>();
+                productRepository.findAll().forEach(prod -> p.put(prod.getName(), prod.getId()));
+
+                // ── ORDER 1: Dine-in, Card, Table T-05 ──────────────────────────
+                // Classic Blue Burger + Diamond Fries + Blue Lagoon Soda
+                OrderRequest o1 = new OrderRequest();
+                o1.setUserId(user.getId());
+                o1.setServiceType("DINE_IN");
+                o1.setOrderType("STANDARD");
+                o1.setTableNumber("T-05");
+                o1.setPaymentType("CARD");
+                o1.setItems(List.of(
+                        new OrderItemRequest(p.get("Classic Blue Burger"), 1, null),
+                        new OrderItemRequest(p.get("Diamond Fries"), 1, null),
+                        new OrderItemRequest(p.get("Blue Lagoon Soda"), 1, null)));
+                saveOrder(o1);
+
+                // ── ORDER 2: Takeaway, Cash ──────────────────────────────────────
+                // The Crystal Spicy + Cheesy Blue Fries + Iced Tea
+                OrderRequest o2 = new OrderRequest();
+                o2.setUserId(user.getId());
+                o2.setServiceType("TAKEAWAY");
+                o2.setOrderType("STANDARD");
+                o2.setPaymentType("CASH");
+                o2.setItems(List.of(
+                        new OrderItemRequest(p.get("The Crystal Spicy"), 1, null),
+                        new OrderItemRequest(p.get("Cheesy Blue Fries"), 1, null),
+                        new OrderItemRequest(p.get("Iced Tea"), 1, null)));
+                saveOrder(o2);
+
+                // ── ORDER 3: Delivery, Card ──────────────────────────────────────
+                // Crystal Nuggets x2 + Spicy Wings + Blue BBQ
+                OrderRequest o3 = new OrderRequest();
+                o3.setUserId(user.getId());
+                o3.setServiceType("DELIVERY");
+                o3.setOrderType("STANDARD");
+                o3.setPaymentType("CARD");
+                o3.setItems(List.of(
+                        new OrderItemRequest(p.get("Crystal Nuggets"), 2, null),
+                        new OrderItemRequest(p.get("Spicy Wings"), 1, "Extra piccante per favore"),
+                        new OrderItemRequest(p.get("Blue BBQ"), 1, null)));
+                saveOrder(o3);
+
+                // ── ORDER 4: Dine-in, Cash, Table T-12 ──────────────────────────
+                // Mountain Wrap + Classic Blue Burger + Crystal Mayo
+                OrderRequest o4 = new OrderRequest();
+                o4.setUserId(user.getId());
+                o4.setServiceType("DINE_IN");
+                o4.setOrderType("STANDARD");
+                o4.setTableNumber("T-12");
+                o4.setPaymentType("CASH");
+                o4.setItems(List.of(
+                        new OrderItemRequest(p.get("Mountain Wrap"), 1, null),
+                        new OrderItemRequest(p.get("Classic Blue Burger"), 1, "Senza pomodoro"),
+                        new OrderItemRequest(p.get("Crystal Mayo"), 2, null)));
+                saveOrder(o4);
+
+                // ── ORDER 5: Dine-in, Card, Table T-03 ──────────────────────────
+                // Frozen Crystal Brownie + Blue Lagoon Soda x2
+                OrderRequest o5 = new OrderRequest();
+                o5.setUserId(user.getId());
+                o5.setServiceType("DINE_IN");
+                o5.setOrderType("STANDARD");
+                o5.setTableNumber("T-03");
+                o5.setPaymentType("CARD");
+                o5.setItems(List.of(
+                        new OrderItemRequest(p.get("Frozen Crystal Brownie"), 1, null),
+                        new OrderItemRequest(p.get("Blue Lagoon Soda"), 2, null)));
+                saveOrder(o5);
+        }
+
+        // -----------------------------------------------------------------------
+        // HELPERS
+        // -----------------------------------------------------------------------
+
+        private void saveProduct(ProductRequest request) {
+                try {
+                        productService.createProduct(request);
+                        log.info("Product created: {}", request.getName());
+                } catch (ProductAlreadyExistsException e) {
+                        log.debug("Product already exists, skipping: {}", request.getName());
+                }
+        }
+
+        private void saveOrder(OrderRequest request) {
+                try {
+                        orderService.create(request);
+                        log.info("Order created: {} items, service={}", 
+                                request.getItems().size(), request.getServiceType());
+                } catch (Exception e) {
+                        log.debug("Order already exists or error, skipping: {}", e.getMessage());
+                }
         }
 }

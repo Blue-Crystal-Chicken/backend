@@ -50,6 +50,10 @@ public class OrderEntity {
     @Column(name = "Total_at")
     private BigDecimal totalAt;
 
+    @Enumerated(EnumType.STRING)
+    @Column(name = "Status")
+    private OrderStatus status;
+
     @Column(name = "Created_at", nullable = false, updatable = false)
     private LocalDateTime createdAt;
 
@@ -65,8 +69,9 @@ public class OrderEntity {
     private LocationEntity location;
 
     // Bidirectional with OrderProduct
-    @OneToMany(mappedBy = "order", cascade = CascadeType.ALL)
+    @OneToMany(mappedBy = "order", cascade = CascadeType.ALL, fetch = FetchType.EAGER)
     private List<OrderProduct> orderProducts;
+
 
     @PrePersist
     protected void onCreate() {

@@ -51,7 +51,7 @@ public class LocationService {
         existing.setCity(updated.getCity());
         existing.setPhoneCode(updated.getPhoneCode());
         existing.setPhoneNumber(updated.getPhoneNumber());
-        existing.setOpeningHours(updated.getOpeningHours());
+        existing.setIsOpen(updated.getIsOpen());
         existing.setStatus(updated.getStatus());
         return locationRepository.save(existing);
     }

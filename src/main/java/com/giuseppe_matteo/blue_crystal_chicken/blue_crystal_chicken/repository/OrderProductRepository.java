@@ -1,7 +1,9 @@
 package com.giuseppe_matteo.blue_crystal_chicken.blue_crystal_chicken.repository;
 
 import com.giuseppe_matteo.blue_crystal_chicken.blue_crystal_chicken.entity.OrderProduct;
+import com.giuseppe_matteo.blue_crystal_chicken.blue_crystal_chicken.entity.ProductEntity;
 import com.giuseppe_matteo.blue_crystal_chicken.blue_crystal_chicken.entity.key.OrderProductKey;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
@@ -26,4 +28,5 @@ public interface OrderProductRepository extends JpaRepository<OrderProduct, Orde
     boolean existsById_OrderIdAndId_ProductId(Long orderId, Long productId);
 
     void deleteById_OrderIdAndId_ProductId(Long orderId, Long productId);
+
 }

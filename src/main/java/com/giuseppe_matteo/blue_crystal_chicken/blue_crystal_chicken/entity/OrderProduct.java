@@ -41,6 +41,7 @@ public class OrderProduct {
     @ManyToOne
     @MapsId("orderId")
     @JoinColumn(name = "Order_id")
+    @com.fasterxml.jackson.annotation.JsonIgnore
     private OrderEntity order;
 
     @ManyToOne

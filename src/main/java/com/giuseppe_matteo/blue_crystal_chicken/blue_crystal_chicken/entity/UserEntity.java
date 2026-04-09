@@ -73,6 +73,7 @@ public class UserEntity {
 
     // Bidirectional relationship with Order
     @OneToMany(mappedBy = "user", cascade = CascadeType.ALL)
+    @com.fasterxml.jackson.annotation.JsonIgnore
     private List<OrderEntity> orders;
 
     @ManyToOne(fetch = FetchType.LAZY)

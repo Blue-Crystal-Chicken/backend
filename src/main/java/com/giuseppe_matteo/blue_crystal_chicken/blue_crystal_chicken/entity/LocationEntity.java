@@ -40,8 +40,9 @@ public class LocationEntity {
     @Column(name = "Phone_number")
     private String phoneNumber;
 
-    @Column(name = "Opening_hours")
-    private String openingHours;
+    @Column(name = "Is_open")
+    private Boolean isOpen;
+
 
     @Column(name = "Status")
     private String status;

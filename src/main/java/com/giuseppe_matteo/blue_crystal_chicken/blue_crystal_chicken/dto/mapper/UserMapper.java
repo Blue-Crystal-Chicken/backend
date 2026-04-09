@@ -8,5 +8,7 @@ public interface UserMapper {
 
     UserEntity toUser(UserRequest userRequest);
 
+    UserEntity toUser(Long userId);
+
     UserResponse toUserResponse(UserEntity user);
 }
