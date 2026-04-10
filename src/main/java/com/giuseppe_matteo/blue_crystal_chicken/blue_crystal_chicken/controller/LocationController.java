@@ -110,4 +110,45 @@ public class LocationController {
         locationIngredientService.removeIngredientFromLocation(locationId, ingredientId);
         return ResponseEntity.noContent().build();
     }
+
+
+    // ── APERTURA/CHIUSURA ──────────────────────────────────────────────
+
+    // GET /api/locations/status/open
+    @GetMapping("/status/open")
+    public ResponseEntity<List<LocationEntity>> getOpen() {
+        return ResponseEntity.ok(locationService.findByIsOpen(true));
+    }
+
+    // GET /api/locations/status/closed
+    @GetMapping("/status/closed")
+    public ResponseEntity<List<LocationEntity>> getClosed() {
+        return ResponseEntity.ok(locationService.findByIsOpen(false));
+    }
+
+    // PUT /api/locations/{id}/open
+    @PutMapping("/{id}/open")
+    public ResponseEntity<LocationEntity> open(@PathVariable Long id) {
+        return ResponseEntity.ok(locationService.setIsOpen(id, true));
+    }
+
+    // PUT /api/locations/{id}/close
+    @PutMapping("/{id}/close")
+    public ResponseEntity<LocationEntity> close(@PathVariable Long id) {
+        return ResponseEntity.ok(locationService.setIsOpen(id, false));
+    }
+
+    // PUT /api/locations/status/open/all
+    @PutMapping("/status/open/all")
+    public ResponseEntity<Void> openAll() {
+        locationService.setAllIsOpen(true);
+        return ResponseEntity.ok().build();
+    }
+
+    // PUT /api/locations/status/closed/all
+    @PutMapping("/status/closed/all")
+    public ResponseEntity<Void> closeAll() {
+        locationService.setAllIsOpen(false);
+        return ResponseEntity.ok().build();
+    }
 }

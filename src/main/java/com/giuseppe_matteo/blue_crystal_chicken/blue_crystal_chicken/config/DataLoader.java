@@ -19,8 +19,10 @@ import com.giuseppe_matteo.blue_crystal_chicken.blue_crystal_chicken.repository.
 import com.giuseppe_matteo.blue_crystal_chicken.blue_crystal_chicken.repository.UserRepository;
 import com.giuseppe_matteo.blue_crystal_chicken.blue_crystal_chicken.service.CategoryService;
 import com.giuseppe_matteo.blue_crystal_chicken.blue_crystal_chicken.service.OrderService;
+import com.giuseppe_matteo.blue_crystal_chicken.blue_crystal_chicken.service.LocationService;
 import com.giuseppe_matteo.blue_crystal_chicken.blue_crystal_chicken.service.ProductService;
 import com.giuseppe_matteo.blue_crystal_chicken.blue_crystal_chicken.service.UserService;
+import com.giuseppe_matteo.blue_crystal_chicken.blue_crystal_chicken.entity.LocationEntity;
 
 import lombok.extern.slf4j.Slf4j;
 
@@ -46,6 +48,9 @@ public class DataLoader implements CommandLineRunner {
         private OrderService orderService;
 
         @Autowired
+        private LocationService locationService;
+
+        @Autowired
         private ProductRepository productRepository;
 
         @Autowired
@@ -55,6 +60,7 @@ public class DataLoader implements CommandLineRunner {
         public void run(String... args) throws Exception {
                 createCategory();
                 createProducts();
+                createLocations();
                 createUsers();
                 createOrders();
         }
@@ -268,6 +274,40 @@ public class DataLoader implements CommandLineRunner {
                 userRequest.setBirthday("2004-12-11");
                 userRequest.setRole(Role.ADMIN);
                 userService.registerUser(userRequest);
+        }
+
+        // -----------------------------------------------------------------------
+        // LOCATIONS
+        // -----------------------------------------------------------------------
+
+        private void createLocations() {
+                if (!locationService.findAll().isEmpty()) {
+                        log.debug("Locations already exist, skipping location creation");
+                        return;
+                }
+
+                String[][] locationsData = {
+                        {"Blue Crystal Torino", "Via Roma 10", "Torino", "011", "1234567"},
+                        {"Blue Crystal Roma", "Via del Corso 50", "Roma", "06", "1234567"},
+                        {"Blue Crystal Milano", "Piazza Duomo 1", "Milano", "02", "1234567"},
+                        {"Blue Crystal Bologna", "Via dell'Indipendenza 15", "Bologna", "051", "1234567"},
+                        {"Blue Crystal Napoli", "Via Toledo 100", "Napoli", "081", "1234567"},
+                        {"Blue Crystal Bari", "Corso Vittorio Emanuele 20", "Bari", "080", "1234567"}
+                };
+
+                for (String[] data : locationsData) {
+                        LocationEntity loc = new LocationEntity();
+                        loc.setName(data[0]);
+                        loc.setAddress(data[1]);
+                        loc.setCity(data[2]);
+                        loc.setPhoneCode(data[3]);
+                        loc.setPhoneNumber(data[4]);
+                        loc.setIsOpen(true);
+                        loc.setManuallyClosed(false);
+                        loc.setStatus("ACTIVE");
+                        locationService.create(loc);
+                        log.info("Location created: {}", loc.getName());
+                }
         }
 
         // -----------------------------------------------------------------------

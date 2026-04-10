@@ -29,6 +29,21 @@ public class LocationService {
         return locationRepository.findByCity(city);
     }
 
+    public List<LocationEntity> findByIsOpen(Boolean isOpen) {
+        return locationRepository.findByIsOpen(isOpen);
+    }
+
+    public LocationEntity setIsOpen(Long id, Boolean isOpen) {
+        LocationEntity location = findById(id);
+        location.setIsOpen(isOpen);
+        return locationRepository.save(location);
+    }
+
+    public List<LocationEntity> setAllIsOpen(Boolean isOpen) {
+        locationRepository.setAllIsOpen(isOpen);
+        return locationRepository.findAll();
+    }
+
     public List<LocationEntity> findByStatus(String status) {
         return locationRepository.findByStatus(status);
     }

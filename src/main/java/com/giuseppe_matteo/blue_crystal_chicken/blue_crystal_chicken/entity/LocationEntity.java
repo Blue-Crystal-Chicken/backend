@@ -43,6 +43,8 @@ public class LocationEntity {
     @Column(name = "Is_open")
     private Boolean isOpen;
 
+    @Column(nullable = false, columnDefinition = "boolean default false")
+    private boolean manuallyClosed;
 
     @Column(name = "Status")
     private String status;
