@@ -65,6 +65,7 @@ public class WebSecurityConfig {
                         .requestMatchers(HttpMethod.GET, "/api/categories/**").permitAll()
                         .requestMatchers("/error", "/favicon.ico", "/uploads/images/**", "/images/**").permitAll()
                         .requestMatchers(HttpMethod.GET, "/api/products/**").permitAll()
+                        .requestMatchers(HttpMethod.GET,"/api/locations/**").permitAll()
                         .requestMatchers(HttpMethod.POST,"/api/products/**").hasRole("ADMIN")
                         .requestMatchers(HttpMethod.PUT,"/api/products/**").hasRole("ADMIN")
                         .requestMatchers(HttpMethod.DELETE,"/api/products/**").hasRole("ADMIN")

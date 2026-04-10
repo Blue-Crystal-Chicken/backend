@@ -4,7 +4,7 @@ import com.giuseppe_matteo.blue_crystal_chicken.blue_crystal_chicken.entity.Loca
 import com.giuseppe_matteo.blue_crystal_chicken.blue_crystal_chicken.entity.LocationIngredient;
 import com.giuseppe_matteo.blue_crystal_chicken.blue_crystal_chicken.service.LocationIngredientService;
 import com.giuseppe_matteo.blue_crystal_chicken.blue_crystal_chicken.service.LocationService;
-import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -14,11 +14,13 @@ import java.util.Map;
 
 @RestController
 @RequestMapping("/api/locations")
-@RequiredArgsConstructor
 public class LocationController {
 
-    private final LocationService locationService;
-    private final LocationIngredientService locationIngredientService;
+    @Autowired
+    private LocationService locationService;
+
+    @Autowired
+    private LocationIngredientService locationIngredientService;
 
     // GET /api/locations
     @GetMapping
@@ -35,7 +37,7 @@ public class LocationController {
     // GET /api/locations/city/{city}
     @GetMapping("/city/{city}")
     public ResponseEntity<List<LocationEntity>> getByCity(@PathVariable String city) {
-        return ResponseEntity.ok(locationService.findByCity(city));
+        return ResponseEntity.ok(locationService.findByCity(city.substring(0, 1).toUpperCase() + city.substring(1)));
     }
 
     // GET /api/locations/status/{status}

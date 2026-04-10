@@ -3,6 +3,8 @@ package com.giuseppe_matteo.blue_crystal_chicken.blue_crystal_chicken.service;
 import com.giuseppe_matteo.blue_crystal_chicken.blue_crystal_chicken.entity.LocationEntity;
 import com.giuseppe_matteo.blue_crystal_chicken.blue_crystal_chicken.repository.LocationRepository;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
+
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -10,6 +12,7 @@ import java.util.List;
 
 @Service
 @RequiredArgsConstructor
+@Slf4j
 public class LocationService {
 
     private final LocationRepository locationRepository;
@@ -26,7 +29,10 @@ public class LocationService {
     }
 
     public List<LocationEntity> findByCity(String city) {
-        return locationRepository.findByCity(city);
+        log.info("City: " + city);
+        List<LocationEntity> locations = locationRepository.findByCity(city);
+        log.info("Locations: " + locations);
+        return locations;
     }
 
     public List<LocationEntity> findByIsOpen(Boolean isOpen) {
