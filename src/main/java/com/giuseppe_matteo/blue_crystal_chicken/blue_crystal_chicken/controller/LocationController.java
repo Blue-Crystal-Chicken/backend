@@ -7,6 +7,7 @@ import com.giuseppe_matteo.blue_crystal_chicken.blue_crystal_chicken.service.Loc
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -48,18 +49,21 @@ public class LocationController {
 
     // POST /api/locations
     @PostMapping
+    @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<LocationEntity> create(@RequestBody LocationEntity location) {
         return ResponseEntity.status(HttpStatus.CREATED).body(locationService.create(location));
     }
 
     // PUT /api/locations/{id}
     @PutMapping("/{id}")
+    @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<LocationEntity> update(@PathVariable Long id, @RequestBody LocationEntity location) {
         return ResponseEntity.ok(locationService.update(id, location));
     }
 
     // DELETE /api/locations/{id}
     @DeleteMapping("/{id}")
+    @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<Void> delete(@PathVariable Long id) {
         locationService.delete(id);
         return ResponseEntity.noContent().build();
@@ -84,6 +88,7 @@ public class LocationController {
     // POST /api/locations/{locationId}/stock/{ingredientId}
     // Body: { "quantity": 50.0 }
     @PostMapping("/{locationId}/stock/{ingredientId}")
+    @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<LocationIngredient> addStock(
             @PathVariable Long locationId,
             @PathVariable Long ingredientId,
@@ -96,6 +101,7 @@ public class LocationController {
     // PUT /api/locations/{locationId}/stock/{ingredientId}
     // Body: { "quantity": 30.0 }
     @PutMapping("/{locationId}/stock/{ingredientId}")
+    @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<LocationIngredient> updateStock(
             @PathVariable Long locationId,
             @PathVariable Long ingredientId,
@@ -106,6 +112,7 @@ public class LocationController {
 
     // DELETE /api/locations/{locationId}/stock/{ingredientId}
     @DeleteMapping("/{locationId}/stock/{ingredientId}")
+    @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<Void> removeStock(
             @PathVariable Long locationId,
             @PathVariable Long ingredientId) {
@@ -130,18 +137,21 @@ public class LocationController {
 
     // PUT /api/locations/{id}/open
     @PutMapping("/{id}/open")
+    @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<LocationEntity> open(@PathVariable Long id) {
         return ResponseEntity.ok(locationService.setIsOpen(id, true));
     }
 
     // PUT /api/locations/{id}/close
     @PutMapping("/{id}/close")
+    @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<LocationEntity> close(@PathVariable Long id) {
         return ResponseEntity.ok(locationService.setIsOpen(id, false));
     }
 
     // PUT /api/locations/status/open/all
     @PutMapping("/status/open/all")
+    @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<Void> openAll() {
         locationService.setAllIsOpen(true);
         return ResponseEntity.ok().build();
@@ -149,6 +159,7 @@ public class LocationController {
 
     // PUT /api/locations/status/closed/all
     @PutMapping("/status/closed/all")
+    @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<Void> closeAll() {
         locationService.setAllIsOpen(false);
         return ResponseEntity.ok().build();

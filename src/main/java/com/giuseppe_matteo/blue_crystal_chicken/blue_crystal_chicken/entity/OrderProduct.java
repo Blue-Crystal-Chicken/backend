@@ -1,9 +1,9 @@
 package com.giuseppe_matteo.blue_crystal_chicken.blue_crystal_chicken.entity;
 
-import com.giuseppe_matteo.blue_crystal_chicken.blue_crystal_chicken.entity.key.OrderProductKey;
-
 import jakarta.persistence.*;
 import lombok.*;
+
+import java.math.BigDecimal;
 import java.time.LocalDateTime;
 
 /**
@@ -14,20 +14,21 @@ import java.time.LocalDateTime;
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
-@ToString(exclude = { "order", "product" })
+@ToString(exclude = { "order", "product", "offer" })
 public class OrderProduct {
 
-    @EmbeddedId
-    private OrderProductKey id;
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Long id;
 
     @Column(name = "Additions")
-    private Double additions;
+    private BigDecimal additions;
 
     @Column(name = "Quantity")
     private Integer quantity;
 
     @Column(name = "Price")
-    private Double price;
+    private BigDecimal price;
 
     @Column(name = "Special_note")
     private String specialNote;
@@ -39,15 +40,17 @@ public class OrderProduct {
     private LocalDateTime updatedAt;
 
     @ManyToOne
-    @MapsId("orderId")
     @JoinColumn(name = "Order_id")
     @com.fasterxml.jackson.annotation.JsonIgnore
     private OrderEntity order;
 
     @ManyToOne
-    @MapsId("productId")
-    @JoinColumn(name = "Product_id")
+    @JoinColumn(name = "Product_id", nullable = true)
     private ProductEntity product;
+
+    @ManyToOne
+    @JoinColumn(name = "Offer_id", nullable = true)
+    private OfferEntity offer;
 
     @PrePersist
     protected void onCreate() {

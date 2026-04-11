@@ -5,6 +5,7 @@ import com.giuseppe_matteo.blue_crystal_chicken.blue_crystal_chicken.service.Ing
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -54,18 +55,21 @@ public class IngredientController {
 
     // POST /api/ingredients
     @PostMapping
+    @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<IngredientEntity> create(@RequestBody IngredientEntity ingredient) {
         return ResponseEntity.status(HttpStatus.CREATED).body(ingredientService.create(ingredient));
     }
 
     // PUT /api/ingredients/{id}
     @PutMapping("/{id}")
+    @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<IngredientEntity> update(@PathVariable Long id, @RequestBody IngredientEntity ingredient) {
         return ResponseEntity.ok(ingredientService.update(id, ingredient));
     }
 
     // DELETE /api/ingredients/{id}
     @DeleteMapping("/{id}")
+    @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<Void> delete(@PathVariable Long id) {
         ingredientService.delete(id);
         return ResponseEntity.noContent().build();

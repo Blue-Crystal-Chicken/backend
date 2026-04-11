@@ -16,6 +16,7 @@ public class ProductRequest {
     private String categoryName;
     private String description;
 
+
     // ------------------------
     // GENERIC ATTRIBUTES
     // ------------------------
@@ -50,7 +51,7 @@ public class ProductRequest {
     // MEDIA
     // ------------------------
     private MultipartFile image;
-    private String imagePath;
+    private String imgPath;
 
     // ------------------------
     // RELATIONS

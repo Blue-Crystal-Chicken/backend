@@ -63,8 +63,17 @@ public class OrderMapperImpl implements OrderMapper {
     @Override
     public OrderItemResponse toItemResponse(OrderProduct op) {
         OrderItemResponse item = new OrderItemResponse();
-        item.setProductId(op.getProduct().getId());
-        item.setProductName(op.getProduct().getName());
+        
+        if (op.getProduct() != null) {
+            item.setProductId(op.getProduct().getId());
+            item.setProductName(op.getProduct().getName());
+        }
+        
+        if (op.getOffer() != null) {
+            item.setOfferId(op.getOffer().getId());
+            item.setOfferName(op.getOffer().getName());
+        }
+        
         item.setQuantity(op.getQuantity());
         item.setPrice(op.getPrice());
         item.setAdditions(op.getAdditions());

@@ -32,6 +32,9 @@ public class MenuEntity {
     @Column(name = "Description")
     private String description;
 
+    @Column(name = "Image")
+    private String imgPath;
+
     @Column(nullable = false, updatable = false)
     private LocalDateTime createdAt;
 

@@ -39,39 +39,23 @@ public class ProductEntity {
     @ManyToOne
     private Category category;
 
-    @Column(name = "Price")
-    private Double price;
-
     @Column(name = "Image")
     private String imgPath;
 
     @Column(name = "Available")
     private Boolean available = true;
 
-    // ==================== CATEGORY-SPECIFIC ====================
-
-    // FRIES
     @Column(name = "Size")
     private String size;
 
-    // SNACK
     @Column(name = "Quantity")
     private Integer quantity;
 
-    // DRINK
+    @Column(name = "Weight")
+    private Double weight;
+
     @Column(name = "Liters")
     private Double liters;
-
-    @Column(name = "IsCarbonated")
-    private Boolean isCarbonated;
-
-    @Column(name = "Temperature")
-    private String temperature; // cold / hot
-
-    // SHARED ATTRIBUTES
-
-    @Column(name = "Weight")
-    private Double weight; // grammi
 
     @Column(name = "IsSpicy")
     private Boolean isSpicy;
@@ -79,7 +63,11 @@ public class ProductEntity {
     @Column(name = "Flavor")
     private String flavor;
 
-    // ==================== DIETARY INFO ====================
+    @Column(name = "Temperature")
+    private String temperature;
+
+    @Column(name = "IsCarbonated")
+    private Boolean isCarbonated;
 
     @Column(name = "Calories")
     private Integer calories;
@@ -93,16 +81,13 @@ public class ProductEntity {
     @Column(name = "IsGlutenFree")
     private Boolean isGlutenFree;
 
-    @Column(name = "Nutritional_info")
-    private String nutritionalInfo;
-
-    // ==================== EXTRA ====================
-
     @Column(name = "Additions")
     private Double additions;
 
-    // ==================== RELATIONSHIPS ====================
+    @Column(name = "Price")
+    private Double price;
 
+    
     @OneToMany(mappedBy = "product", cascade = CascadeType.ALL)
     private List<MenuProduct> menuProducts;
 

@@ -11,6 +11,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import java.math.BigDecimal;
@@ -111,6 +112,7 @@ public class OrderController {
 
     // PUT /api/orders/{id}
     @PutMapping("/{id}")
+    @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<OrderResponse> update(@PathVariable Long id, @RequestBody UpdateOrderRequest request) {
         OrderEntity updated = orderService.update(id, request);
         return ResponseEntity.ok(orderMapper.toResponse(updated));
@@ -118,6 +120,7 @@ public class OrderController {
 
     // PUT /api/orders/{id}/status?status=PREPARING
     @PutMapping("/{id}/status")
+    @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<OrderResponse> updateStatus(@PathVariable Long id, @RequestParam String status) {
         OrderEntity updated = orderService.updateStatus(id, status);
         return ResponseEntity.ok(orderMapper.toResponse(updated));
@@ -125,6 +128,7 @@ public class OrderController {
 
     // DELETE /api/orders/{id}
     @DeleteMapping("/{id}")
+    @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<Void> delete(@PathVariable Long id) {
         orderService.delete(id);
         return ResponseEntity.noContent().build();

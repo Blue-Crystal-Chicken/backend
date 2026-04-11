@@ -6,10 +6,10 @@ import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.ErrorResponse;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
-import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
@@ -112,7 +112,7 @@ public class ProductController {
             @ApiResponse(responseCode = "404", description = "Prodotto non trovato", content = @Content(mediaType = "application/json", schema = @Schema(implementation = ErrorResponse.class))),
             @ApiResponse(responseCode = "500", description = "Errore del server", content = @Content(mediaType = "application/json", schema = @Schema(implementation = ErrorResponse.class)))
     })
-    public ResponseEntity<?> updateProduct(@PathVariable Long id, @RequestBody ProductRequest product) {
+    public ResponseEntity<?> updateProduct(@PathVariable Long id, @ModelAttribute ProductRequest product) {
         log.info("PUT /api/products/v1/products/{}", id);
         try {
             return ResponseEntity.ok(productService.updateProduct(id, product));
@@ -154,7 +154,7 @@ public class ProductController {
             @ApiResponse(responseCode = "404", description = "Prodotto non trovato", content = @Content(mediaType = "application/json", schema = @Schema(implementation = ErrorResponse.class))),
             @ApiResponse(responseCode = "500", description = "Errore del server", content = @Content(mediaType = "application/json", schema = @Schema(implementation = ErrorResponse.class)))
     })
-    public ResponseEntity<?> createProduct(@RequestBody ProductRequest product) {
+    public ResponseEntity<?> createProduct(@ModelAttribute ProductRequest product) {
         log.info("POST /api/products/v1/products");
         try {
             return ResponseEntity.ok(productService.createProduct(product));

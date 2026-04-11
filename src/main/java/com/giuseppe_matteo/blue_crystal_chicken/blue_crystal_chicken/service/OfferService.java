@@ -1,5 +1,8 @@
 package com.giuseppe_matteo.blue_crystal_chicken.blue_crystal_chicken.service;
 
+import com.giuseppe_matteo.blue_crystal_chicken.blue_crystal_chicken.dto.mapper.OfferMapper;
+import com.giuseppe_matteo.blue_crystal_chicken.blue_crystal_chicken.dto.request.OfferRequest;
+import com.giuseppe_matteo.blue_crystal_chicken.blue_crystal_chicken.dto.response.OfferResponse;
 import com.giuseppe_matteo.blue_crystal_chicken.blue_crystal_chicken.entity.MenuEntity;
 import com.giuseppe_matteo.blue_crystal_chicken.blue_crystal_chicken.entity.OfferEntity;
 import com.giuseppe_matteo.blue_crystal_chicken.blue_crystal_chicken.entity.OfferProduct;
@@ -8,10 +11,17 @@ import com.giuseppe_matteo.blue_crystal_chicken.blue_crystal_chicken.entity.key.
 import com.giuseppe_matteo.blue_crystal_chicken.blue_crystal_chicken.repository.OfferProductRepository;
 import com.giuseppe_matteo.blue_crystal_chicken.blue_crystal_chicken.repository.OfferRepository;
 import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-
+import org.springframework.web.multipart.MultipartFile;
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.nio.file.StandardCopyOption;
 import java.util.List;
+import java.util.UUID;
 
 @Service
 @RequiredArgsConstructor
@@ -21,11 +31,19 @@ public class OfferService {
     private final OfferProductRepository offerProductRepository;
     private final ProductService productService;
     private final MenuService menuService;
+    private final OfferMapper offerMapper;
+
+    @Value("${app.upload.dir}")
+    private String uploadDir;
 
     // ── READ ────────────────────────────────────────────────────────────────
 
-    public List<OfferEntity> findAll() {
-        return offerRepository.findAll();
+    public List<OfferResponse> findAll() {
+        return offerMapper.toResponseList(offerRepository.findAll());
+    }
+
+    public OfferResponse findOfferResponseById(Long id) {
+        return offerMapper.toResponse(findById(id));
     }
 
     public OfferEntity findById(Long id) {
@@ -33,16 +51,16 @@ public class OfferService {
                 .orElseThrow(() -> new RuntimeException("Offerta non trovata con id: " + id));
     }
 
-    public List<OfferEntity> findByName(String name) {
-        return offerRepository.findByNameContainingIgnoreCase(name);
+    public List<OfferResponse> findByName(String name) {
+        return offerMapper.toResponseList(offerRepository.findByNameContainingIgnoreCase(name));
     }
 
-    public List<OfferEntity> findByMenuId(Long menuId) {
-        return offerRepository.findByMenuId(menuId);
+    public List<OfferResponse> findByMenuId(Long menuId) {
+        return offerMapper.toResponseList(offerRepository.findByMenuId(menuId));
     }
 
-    public List<OfferEntity> findByProductId(Long productId) {
-        return offerRepository.findByProductId(productId);
+    public List<OfferResponse> findByProductId(Long productId) {
+        return offerMapper.toResponseList(offerRepository.findByProductId(productId));
     }
 
     public List<OfferProduct> findProductsByOfferId(Long offerId) {
@@ -52,19 +70,53 @@ public class OfferService {
     // ── WRITE ───────────────────────────────────────────────────────────────
 
     @Transactional
-    public OfferEntity create(OfferEntity offer) {
-        if (offerRepository.existsByName(offer.getName())) {
-            throw new RuntimeException("Offerta con nome '" + offer.getName() + "' già esistente");
+    public OfferResponse create(OfferRequest request) {
+        if (offerRepository.existsByName(request.getName())) {
+            throw new RuntimeException("Offerta con nome '" + request.getName() + "' già esistente");
         }
-        return offerRepository.save(offer);
+        OfferEntity offer = new OfferEntity();
+        offer.setName(request.getName());
+        offer.setDescription(request.getDescription());
+        offer.setPrice(request.getPrice());
+        
+        // Handle Image Upload
+        if (request.getImage() != null && !request.getImage().isEmpty()) {
+            try {
+                offer.setImgPath(saveImage(request.getImage()));
+            } catch (IOException e) {
+                throw new RuntimeException("Errore nel salvataggio dell'immagine: " + e.getMessage());
+            }
+        } else {
+            offer.setImgPath(request.getImgPath());
+        }
+
+        OfferEntity saved = offerRepository.save(offer);
+
+        if (request.getMenuIds() != null) {
+            for (Long menuId : request.getMenuIds()) {
+                addMenuToOffer(saved.getId(), menuId);
+            }
+        }
+
+        return offerMapper.toResponse(saved);
     }
 
     @Transactional
-    public OfferEntity update(Long id, OfferEntity updated) {
+    public OfferResponse update(Long id, OfferRequest request) {
         OfferEntity existing = findById(id);
-        existing.setName(updated.getName());
-        existing.setDescription(updated.getDescription());
-        return offerRepository.save(existing);
+        existing.setName(request.getName());
+        existing.setDescription(request.getDescription());
+        existing.setPrice(request.getPrice());
+
+        if (request.getImage() != null && !request.getImage().isEmpty()) {
+            try {
+                existing.setImgPath(saveImage(request.getImage()));
+            } catch (IOException e) {
+                throw new RuntimeException("Errore nel salvataggio dell'immagine: " + e.getMessage());
+            }
+        }
+
+        return offerMapper.toResponse(offerRepository.save(existing));
     }
 
     @Transactional
@@ -92,14 +144,14 @@ public class OfferService {
     }
 
     @Transactional
-    public OfferEntity addMenuToOffer(Long offerId, Long menuId) {
+    public OfferResponse addMenuToOffer(Long offerId, Long menuId) {
         OfferEntity offer = findById(offerId);
         MenuEntity menu = menuService.findById(menuId);
         if (offer.getMenus().stream().anyMatch(m -> m.getId().equals(menuId))) {
             throw new RuntimeException("Menu già presente nell'offerta");
         }
         offer.getMenus().add(menu);
-        return offerRepository.save(offer);
+        return offerMapper.toResponse(offerRepository.save(offer));
     }
 
     @Transactional
@@ -108,5 +160,16 @@ public class OfferService {
             throw new RuntimeException("Offerta non trovata con id: " + id);
         }
         offerRepository.deleteById(id);
+    }
+
+    private String saveImage(MultipartFile file) throws IOException {
+        Path uploadPath = Paths.get(uploadDir);
+        if (!Files.exists(uploadPath)) {
+            Files.createDirectories(uploadPath);
+        }
+        String filename = UUID.randomUUID() + "_" + file.getOriginalFilename();
+        Path filePath = uploadPath.resolve(filename);
+        Files.copy(file.getInputStream(), filePath, StandardCopyOption.REPLACE_EXISTING);
+        return filename;
     }
 }

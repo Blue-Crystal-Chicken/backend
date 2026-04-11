@@ -4,7 +4,6 @@ import com.giuseppe_matteo.blue_crystal_chicken.blue_crystal_chicken.dto.request
 import com.giuseppe_matteo.blue_crystal_chicken.blue_crystal_chicken.dto.request.OrderRequest;
 import com.giuseppe_matteo.blue_crystal_chicken.blue_crystal_chicken.dto.request.UpdateOrderRequest;
 import com.giuseppe_matteo.blue_crystal_chicken.blue_crystal_chicken.entity.*;
-import com.giuseppe_matteo.blue_crystal_chicken.blue_crystal_chicken.entity.key.OrderProductKey;
 import com.giuseppe_matteo.blue_crystal_chicken.blue_crystal_chicken.repository.*;
 import com.giuseppe_matteo.blue_crystal_chicken.blue_crystal_chicken.dto.mapper.OrderMapper;
 import lombok.RequiredArgsConstructor;
@@ -27,6 +26,7 @@ public class OrderService {
     private final UserRepository userRepository;
     private final LocationRepository locationRepository;
     private final ProductRepository productRepository;
+    private final OfferRepository offerRepository;
     private final OrderMapper orderMapper;
 
     // ── READ ────────────────────────────────────────────────────────────────
@@ -67,7 +67,7 @@ public class OrderService {
     }
 
     public List<OrderProduct> findProductsByOrderId(Long orderId) {
-        return orderProductRepository.findById_OrderId(orderId);
+        return orderProductRepository.findByOrder_Id(orderId);
     }
 
     public Integer getProductOrderCount(Long productId) {
@@ -108,23 +108,29 @@ public class OrderService {
         if (request.getItems() != null && !request.getItems().isEmpty()) {
             List<OrderProduct> orderProducts = new ArrayList<>();
             for (OrderItemRequest item : request.getItems()) {
-                ProductEntity product = productRepository.findById(item.getProductId())
-                        .orElseThrow(() -> new RuntimeException("Prodotto non trovato con id: " + item.getProductId()));
-
-                int qty = item.getQuantity() != null ? item.getQuantity() : 1;
-
                 OrderProduct op = new OrderProduct();
-                op.setId(OrderProductKey.builder()
-                        .orderId(savedOrder.getId())
-                        .productId(product.getId())
-                        .build());
                 op.setOrder(savedOrder);
-                op.setProduct(product);
-                op.setQuantity(qty);
-                op.setPrice(product.getPrice()); // snapshot del prezzo al momento dell'ordine
+                op.setQuantity(item.getQuantity() != null ? item.getQuantity() : 1);
                 op.setSpecialNote(item.getSpecialNote());
 
-                total = total.add(BigDecimal.valueOf(product.getPrice()).multiply(BigDecimal.valueOf(qty)));
+                BigDecimal unitPrice = BigDecimal.ZERO;
+
+                if (item.getOfferId() != null) {
+                    OfferEntity offer = offerRepository.findById(item.getOfferId())
+                            .orElseThrow(() -> new RuntimeException("Offerta non trovata con id: " + item.getOfferId()));
+                    op.setOffer(offer);
+                    unitPrice = BigDecimal.valueOf(offer.getPrice() != null ? offer.getPrice() : 0.0);
+                } else if (item.getProductId() != null) {
+                    ProductEntity product = productRepository.findById(item.getProductId())
+                            .orElseThrow(() -> new RuntimeException("Prodotto non trovato con id: " + item.getProductId()));
+                    op.setProduct(product);
+                    unitPrice = BigDecimal.valueOf(product.getPrice() != null ? product.getPrice() : 0.0);
+                } else {
+                    throw new RuntimeException("Ogni elemento dell'ordine deve avere un productId o un offerId");
+                }
+
+                op.setPrice(unitPrice);
+                total = total.add(unitPrice.multiply(BigDecimal.valueOf(op.getQuantity())));
                 orderProducts.add(op);
             }
             orderProductRepository.saveAll(orderProducts);

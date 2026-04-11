@@ -12,9 +12,9 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.giuseppe_matteo.blue_crystal_chicken.blue_crystal_chicken.entity.Category;
 import com.giuseppe_matteo.blue_crystal_chicken.blue_crystal_chicken.service.CategoryService;
-import org.springframework.transaction.annotation.Transactional;
 import org.springframework.http.HttpStatus;
-// import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.transaction.annotation.Transactional;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.media.Content;
@@ -31,6 +31,7 @@ public class CategoryController {
 
     @PostMapping
     @Transactional
+    @PreAuthorize("hasRole('ADMIN')")
     @ResponseStatus(HttpStatus.OK)
     @ApiResponses(value = {
         @ApiResponse(responseCode = "200", description = "Categoria creata con successo", content = @Content(mediaType = "application/json", schema = @Schema(implementation = Category.class))),

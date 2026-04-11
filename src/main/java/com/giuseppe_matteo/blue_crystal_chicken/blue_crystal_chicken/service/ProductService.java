@@ -179,8 +179,8 @@ public class ProductService {
                 log.error("Failed to save image for product: {}", request.getName(), e);
                 throw new RuntimeException("Errore nel salvataggio dell'immagine: " + e.getMessage(), e);
             }
-        } else if (request.getImagePath() != null) {
-            entity.setImgPath(request.getImagePath());
+        } else if (request.getImgPath() != null) {
+            entity.setImgPath(request.getImgPath());
         } else {
             log.warn("No image provided for product: {}", request.getName());
             entity.setImgPath(null);
@@ -266,8 +266,8 @@ public class ProductService {
         // ------------------------
         // MEDIA
         // ------------------------
-        if (request.getImagePath() != null) {
-            product.setImgPath(request.getImagePath());
+        if (request.getImgPath() != null) {
+            product.setImgPath(request.getImgPath());
         }
 
         // ------------------------

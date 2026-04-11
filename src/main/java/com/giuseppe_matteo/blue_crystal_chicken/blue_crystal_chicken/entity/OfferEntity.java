@@ -30,7 +30,7 @@ public class OfferEntity {
     private String description;
 
     @Column(name = "Image")
-    private String img_path;
+    private String imgPath;
 
     @Column(name = "Price")
     private Double price;
