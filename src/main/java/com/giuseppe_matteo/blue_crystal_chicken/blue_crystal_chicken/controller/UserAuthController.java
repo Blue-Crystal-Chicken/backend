@@ -31,7 +31,7 @@ public class UserAuthController {
     public ResponseEntity<?> login(@Valid @RequestBody Login user) {
 
         try {
-            return ResponseEntity.ok(userService.login(user));
+            return userService.login(user);
         } catch (Exception e) {
             return ResponseEntity.badRequest().body(e.getMessage());
         }
@@ -40,7 +40,7 @@ public class UserAuthController {
     @PostMapping("/register")
     public ResponseEntity<?> register(@Valid @RequestBody Register user) {
         try {
-            return ResponseEntity.ok(userService.registerUser(user));
+            return userService.registerUser(user);
         } catch (Exception e) {
             return ResponseEntity.badRequest().body(e.getMessage());
         }

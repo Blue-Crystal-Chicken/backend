@@ -110,7 +110,7 @@ public class UserService {
 
         userRepository.save(user);
 
-        return ResponseEntity.ok("User registered successfully");
+        return login(new Login(request.getEmail(), request.getPassword()));
     }
 
     @Transactional(readOnly = true)
