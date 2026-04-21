@@ -66,6 +66,32 @@ public class UserService {
                 roles));
     }
 
+    @Transactional(readOnly = true)
+    public ResponseEntity<?> getCurrentUser() {
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        if (authentication == null || !authentication.isAuthenticated() || authentication.getPrincipal().equals("anonymousUser")) {
+            return ResponseEntity.status(401).body("Not authenticated");
+        }
+
+        UserDetailsImpl userDetails = (UserDetailsImpl) authentication.getPrincipal();
+        List<String> roles = userDetails.getAuthorities().stream()
+                .map(GrantedAuthority::getAuthority)
+                .collect(Collectors.toList());
+
+        // Return user data without a new token (or we could generate a new one if needed, 
+        // but for session restoration, the old token is still valid)
+        return ResponseEntity.ok(new JwtResponse(null, 
+                userDetails.getId(), 
+                userDetails.getEmail(), 
+                userDetails.getName(),
+                userDetails.getSurname(),
+                userDetails.getPhone(),
+                userDetails.getGender(),
+                userDetails.getBirthday(),
+                roles));
+    }
+
+
     @Transactional
     public ResponseEntity<?> registerUser(Register request) {
         if (userRepository.existsByEmail(request.getEmail())) {

@@ -12,6 +12,7 @@ import com.giuseppe_matteo.blue_crystal_chicken.blue_crystal_chicken.repository.
 import com.giuseppe_matteo.blue_crystal_chicken.blue_crystal_chicken.repository.MenuRepository;
 
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
@@ -28,6 +29,7 @@ import java.util.UUID;
 
 @Service
 @RequiredArgsConstructor
+@Slf4j
 public class MenuService {
 
     private final MenuRepository menuRepository;
@@ -73,8 +75,13 @@ public class MenuService {
         return menuProductRepository.findById_MenuIdAndObligatoryTrue(menuId);
     }
 
-    public List<MenuProduct> findMenuByProductId(Long productId){
-        return menuProductRepository.findById_ProductId(productId);
+    public List<MenuResponse> findMenuByProductId(Long productId){
+        ArrayList<MenuEntity> menuProducts = new ArrayList<>();
+        for(MenuProduct mp : menuProductRepository.findByProductId(productId)){
+            menuProducts.add(mp.getMenu());
+        }
+        log.debug("MenuProducts trovati per productId {}: {}", productId, menuProducts);
+        return menuMapper.toResponseList(menuProducts);
     }
 
     // ── WRITE ───────────────────────────────────────────────────────────────

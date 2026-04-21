@@ -63,7 +63,7 @@ public class MenuMapperImpl implements MenuMapper {
         response.setProductName(menuProduct.getProduct().getName());
         response.setQuantity(menuProduct.getQuantity());
         response.setObligatory(menuProduct.getObligatory());
-        response.setUnitPrice(menuProduct.getMenu().getPrice());
+        response.setUnitPrice(menuProduct.getProduct().getPrice());
 
         return response;
     }

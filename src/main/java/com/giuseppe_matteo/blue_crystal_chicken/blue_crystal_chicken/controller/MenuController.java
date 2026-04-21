@@ -10,6 +10,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
+import lombok.extern.slf4j.Slf4j;
 
 import java.util.List;
 import java.util.Map;
@@ -17,6 +18,7 @@ import java.util.Map;
 @RestController
 @RequestMapping("/api/menus")
 @RequiredArgsConstructor
+@Slf4j
 public class MenuController {
 
     private final MenuService menuService;
@@ -62,8 +64,9 @@ public class MenuController {
 
     // GET /api/menus/product/{productId}
     @GetMapping("/product/{productId}")
-    public ResponseEntity<List<MenuProductResponse>> getMenuByProductId(@PathVariable Long productId) {
-        return ResponseEntity.ok(menuMapper.toMenuProductResponseList(menuService.findMenuByProductId(productId)));
+    public ResponseEntity<List<MenuResponse>> getMenuByProductId(@PathVariable Long productId) {
+        log.debug("Ricevuta richiesta per menu con productId: {}", productId);
+        return ResponseEntity.ok(menuService.findMenuByProductId(productId));
     }
 
     // GET /api/menus/{id}/products/obligatory

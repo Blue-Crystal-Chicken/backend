@@ -16,7 +16,7 @@
 	<description>Blue Crystal Kitchen Spring Boot Application</description>
 
 	<properties>
-		<java.version>25</java.version> 
+		<java.version>21</java.version> 
 		<lombok.version>1.18.44</lombok.version>
 	</properties>
 

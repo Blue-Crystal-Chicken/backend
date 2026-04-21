@@ -12,7 +12,7 @@ public interface MenuProductRepository extends JpaRepository<MenuProduct, MenuPr
 
     List<MenuProduct> findById_MenuId(Long menuId);
 
-    List<MenuProduct> findById_ProductId(Long productId);
+    List<MenuProduct> findByProductId(Long productId);
 
     // Solo i prodotti obbligatori di un menu
     List<MenuProduct> findById_MenuIdAndObligatoryTrue(Long menuId);
