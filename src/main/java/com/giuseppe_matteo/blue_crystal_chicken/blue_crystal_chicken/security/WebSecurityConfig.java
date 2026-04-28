@@ -64,7 +64,7 @@ public class WebSecurityConfig {
     @Bean
     public CorsConfigurationSource corsConfigurationSource() {
         CorsConfiguration configuration = new CorsConfiguration();
-        configuration.setAllowedOrigins(Arrays.asList("http://localhost:8081", "http://localhost:8082", "http://127.0.0.1:8081"));
+        configuration.setAllowedOrigins(Arrays.asList("http://localhost:8081", "http://localhost:8082", "http://127.0.0.1:8081", "http://localhost:5173", "http://127.0.0.1:5173"));
         configuration.setAllowedMethods(Arrays.asList("GET", "POST", "PUT", "DELETE", "OPTIONS"));
         configuration.setAllowedHeaders(Arrays.asList("Authorization", "Content-Type", "X-Requested-With", "Accept", "Origin", "Access-Control-Request-Method", "Access-Control-Request-Headers"));
         configuration.setExposedHeaders(Arrays.asList("Access-Control-Allow-Origin", "Access-Control-Allow-Credentials"));
@@ -81,6 +81,7 @@ public class WebSecurityConfig {
                 .exceptionHandling(exception -> exception.authenticationEntryPoint(unauthorizedHandler))
                 .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .authorizeHttpRequests(auth -> auth.requestMatchers("/api/auth/**").permitAll()
+                        .requestMatchers("/swagger-ui/**","/swagger-ui.html","/api-docs/**","/v3/api-docs/**","/v3/api-docs.yaml","/webjars/**","/swagger-resources/**").permitAll()
                         .requestMatchers("/error", "/favicon.ico", "/uploads/images/**", "/images/**").permitAll()
 
                         // Permetti GET a tutti per le risorse core
@@ -90,6 +91,7 @@ public class WebSecurityConfig {
                         .requestMatchers(HttpMethod.GET, "/api/ingredients/**").permitAll()
                         .requestMatchers(HttpMethod.GET, "/api/menus/**").permitAll()
                         .requestMatchers(HttpMethod.GET, "/api/offers/**").permitAll()
+                        .requestMatchers(HttpMethod.POST, "/api/orders").permitAll()
 
                         // Restringi POST, PUT, DELETE solo ad ADMIN
                         .requestMatchers(HttpMethod.POST, "/api/**").hasRole("ADMIN")

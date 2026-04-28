@@ -7,6 +7,7 @@ import com.giuseppe_matteo.blue_crystal_chicken.blue_crystal_chicken.entity.*;
 import com.giuseppe_matteo.blue_crystal_chicken.blue_crystal_chicken.repository.*;
 import com.giuseppe_matteo.blue_crystal_chicken.blue_crystal_chicken.dto.mapper.OrderMapper;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -19,6 +20,7 @@ import java.util.List;
 @Service
 @RequiredArgsConstructor
 @Transactional(readOnly = true)
+@Slf4j
 public class OrderService {
 
     private final OrderRepository orderRepository;
@@ -27,6 +29,7 @@ public class OrderService {
     private final LocationRepository locationRepository;
     private final ProductRepository productRepository;
     private final OfferRepository offerRepository;
+    private final IngredientRepository ingredientRepository;
     private final OrderMapper orderMapper;
 
     // ── READ ────────────────────────────────────────────────────────────────
@@ -93,15 +96,28 @@ public class OrderService {
             order.setUser(user);
         }
 
-        // Lookup location
         if (request.getLocationId() != null) {
+            log.info("Cerco location per id: {}", request.getLocationId());
             LocationEntity location = locationRepository.findById(request.getLocationId())
                     .orElseThrow(() -> new RuntimeException("Location non trovata con id: " + request.getLocationId()));
             order.setLocation(location);
+        } else if (request.getLocationName() != null) {
+            log.info("Location non trovata con id, cerco per nome: {}", request.getLocationName());
+            LocationEntity location = locationRepository
+                    .findByNameAndAddressAndCity(request.getLocationName(), request.getLocationAddress(),
+                            request.getLocationCity())
+                    .orElseThrow(() -> new RuntimeException("Location non trovata con nome: " + request.getLocationName()));
+            order.setLocation(location);
+            log.info("Location trovata: " + location);
         }
 
+        log.info("Provo a salvare l'ordine");
+        log.info("Creazione codice ordine");
+        order.setCode(generateLastCode(order.getLocation().getId()));
+        log.info("Codice generato: "+order.getCode());
         // Save order to get the ID
         OrderEntity savedOrder = orderRepository.save(order);
+        log.info("Order creata: " + savedOrder);
 
         // Create OrderProducts with price snapshots
         BigDecimal total = BigDecimal.ZERO;
@@ -130,6 +146,22 @@ public class OrderService {
                 }
 
                 op.setPrice(unitPrice);
+
+                // Handle ingredients (customizations)
+                if (item.getIngredientIds() != null && !item.getIngredientIds().isEmpty()) {
+                    List<IngredientEntity> ingredients = ingredientRepository.findAllById(item.getIngredientIds());
+                    op.setIngredients(ingredients);
+                    
+                    // Add ingredient prices to unit price
+                    for (IngredientEntity ing : ingredients) {
+                        if (ing.getPrice() != null) {
+                            unitPrice = unitPrice.add(BigDecimal.valueOf(ing.getPrice()));
+                        }
+                    }
+                    // Update op price after ingredients
+                    op.setPrice(unitPrice);
+                }
+
                 total = total.add(unitPrice.multiply(BigDecimal.valueOf(op.getQuantity())));
                 orderProducts.add(op);
             }
@@ -166,5 +198,20 @@ public class OrderService {
             throw new RuntimeException("Ordine non trovato con id: " + id);
         }
         orderRepository.deleteById(id);
+    }
+
+
+    // UTILITY
+
+    private String generateLastCode(Long location_id){
+        LocalDateTime now = LocalDateTime.now();
+        LocalDateTime startOfDay = now.toLocalDate().atStartOfDay();
+        LocalDateTime endOfDay = now.toLocalDate().atTime(23, 59, 59);
+        String lastCode = orderRepository.findLastCodeByLocationIdAndCreatedAtBetween(location_id, startOfDay, endOfDay);
+        if (lastCode == null) {
+            return "001";
+        }
+        int lastCodeInt = Integer.parseInt(lastCode);
+        return String.format("%03d", lastCodeInt + 1);
     }
 }

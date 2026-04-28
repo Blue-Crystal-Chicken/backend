@@ -14,6 +14,10 @@ public interface LocationRepository extends JpaRepository<LocationEntity, Long> 
 
     Optional<LocationEntity> findByName(String name);
 
+    Optional<LocationEntity> findByNameIgnoreCase(String name);
+
+    Optional<LocationEntity> findByNameAndAddressAndCity(String name, String address, String city);
+
     boolean existsByName(String name);
 
     List<LocationEntity> findByCity(String city);

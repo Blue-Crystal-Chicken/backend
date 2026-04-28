@@ -10,8 +10,6 @@ public class OrderRequest {
 
     private List<OrderItemRequest> items;
 
-    private String code;
-
     private String paymentType;
 
     private String serviceType;
@@ -21,4 +19,10 @@ public class OrderRequest {
     private String tableNumber;
 
     private Long locationId;
+    
+    private String locationName;
+
+    private String locationAddress;
+
+    private String locationCity;
 }

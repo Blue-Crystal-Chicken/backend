@@ -40,4 +40,9 @@ public interface OrderRepository extends JpaRepository<OrderEntity, Long> {
  
     // Ordini sopra un certo importo
     List<OrderEntity> findByTotalAtGreaterThanEqual(BigDecimal minTotal);
+
+
+    // Prendere l ultimo codice di oggi in base alla location_id
+    @Query("SELECT MAX(o.code) FROM OrderEntity o WHERE o.location.id = :locationId AND o.createdAt BETWEEN :from AND :to")
+    String findLastCodeByLocationIdAndCreatedAtBetween(@Param("locationId") Long locationId, @Param("from") LocalDateTime from, @Param("to") LocalDateTime to);
 }

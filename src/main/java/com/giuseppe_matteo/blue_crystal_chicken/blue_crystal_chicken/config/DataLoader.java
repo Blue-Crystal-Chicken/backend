@@ -29,6 +29,8 @@ import com.giuseppe_matteo.blue_crystal_chicken.blue_crystal_chicken.service.Men
 import com.giuseppe_matteo.blue_crystal_chicken.blue_crystal_chicken.dto.request.OfferRequest;
 import com.giuseppe_matteo.blue_crystal_chicken.blue_crystal_chicken.service.OfferService;
 import com.giuseppe_matteo.blue_crystal_chicken.blue_crystal_chicken.repository.OfferRepository;
+import com.giuseppe_matteo.blue_crystal_chicken.blue_crystal_chicken.service.IngredientService;
+import com.giuseppe_matteo.blue_crystal_chicken.blue_crystal_chicken.repository.IngredientRepository;
 
 import lombok.extern.slf4j.Slf4j;
 
@@ -71,9 +73,16 @@ public class DataLoader implements CommandLineRunner {
         @Autowired
         private OfferRepository offerRepository;
 
+        @Autowired
+        private IngredientService ingredientService;
+
+        @Autowired
+        private IngredientRepository ingredientRepository;
+
         @Override
         public void run(String... args) throws Exception {
                 createCategory();
+                createIngredients();
                 createProducts();
                 createLocations();
                 createUsers();
@@ -93,6 +102,36 @@ public class DataLoader implements CommandLineRunner {
         }
 
         // -----------------------------------------------------------------------
+        // INGREDIENTS
+        // -----------------------------------------------------------------------
+
+        private void createIngredients() {
+                String[][] ingredientsData = {
+                        {"Cheddar", "Formaggio cheddar fuso", "0.80", "100.0"},
+                        {"Bacon", "Bacon croccante affumicato", "1.20", "50.0"},
+                        {"Cipolla Caramellata", "Cipolla dolce caramellata", "0.50", "80.0"},
+                        {"Jalapeños", "Peperoncini piccanti a fette", "0.60", "40.0"},
+                        {"Uovo", "Uovo all'occhio di bue", "1.00", "30.0"},
+                        {"Doppio Pollo", "Un pezzo extra di pollo fritto", "2.50", "20.0"}
+                };
+
+                for (String[] data : ingredientsData) {
+                        try {
+                                com.giuseppe_matteo.blue_crystal_chicken.blue_crystal_chicken.dto.request.IngredientRequest req = 
+                                        new com.giuseppe_matteo.blue_crystal_chicken.blue_crystal_chicken.dto.request.IngredientRequest();
+                                req.setName(data[0]);
+                                req.setDescription(data[1]);
+                                req.setPrice(Double.parseDouble(data[2]));
+                                req.setQuantity(Double.parseDouble(data[3]));
+                                ingredientService.create(req);
+                                log.info("Ingredient created: {}", data[0]);
+                        } catch (Exception e) {
+                                log.debug("Ingredient already exists or error: {}", e.getMessage());
+                        }
+                }
+        }
+
+        // -----------------------------------------------------------------------
         // PRODUCTS
         // -----------------------------------------------------------------------
 
@@ -102,6 +141,9 @@ public class DataLoader implements CommandLineRunner {
          * (thrown on repeated startup) are silently skipped.
          */
         private void createProducts() {
+                // Build ingredient name → ID map
+                Map<String, Long> iMap = new HashMap<>();
+                ingredientRepository.findAll().forEach(ing -> iMap.put(ing.getName(), ing.getId()));
 
                 // --------------------------------------------------
                 // 🍔 HAMBURGER
@@ -119,6 +161,7 @@ public class DataLoader implements CommandLineRunner {
                 burger.setIsVegan(false);
                 burger.setIsGlutenFree(false);
                 burger.setImgPath("images/prodotti/classic_blue_burger.jpg");
+                burger.setIngredientIds(List.of(iMap.get("Cheddar"), iMap.get("Bacon")));
                 saveProduct(burger);
 
                 ProductRequest spicyBurger = new ProductRequest();
@@ -133,6 +176,7 @@ public class DataLoader implements CommandLineRunner {
                 spicyBurger.setIsVegan(false);
                 spicyBurger.setIsGlutenFree(false);
                 spicyBurger.setImgPath("images/prodotti/the_crystal_spicy.jpg");
+                spicyBurger.setIngredientIds(List.of(iMap.get("Jalapeños"), iMap.get("Cheddar")));
                 saveProduct(spicyBurger);
 
                 // --------------------------------------------------
@@ -148,6 +192,7 @@ public class DataLoader implements CommandLineRunner {
                 wrapProd.setWeight(220.0);
                 wrapProd.setIsSpicy(false);
                 wrapProd.setImgPath("images/prodotti/mountain_wrap.jpg");
+                wrapProd.setIngredientIds(List.of(iMap.get("Bacon"), iMap.get("Cheddar")));
                 saveProduct(wrapProd);
 
                 // --------------------------------------------------
@@ -410,6 +455,15 @@ public class DataLoader implements CommandLineRunner {
                 Map<String, Long> p = new HashMap<>();
                 productRepository.findAll().forEach(prod -> p.put(prod.getName(), prod.getId()));
 
+                // Build ingredient name → ID map
+                Map<String, Long> iMap = new HashMap<>();
+                ingredientRepository.findAll().forEach(ing -> iMap.put(ing.getName(), ing.getId()));
+
+                // Common location details for test orders
+                String locName = "Blue Crystal Torino";
+                String locAddr = "Via Roma 10";
+                String locCity = "Torino";
+
                 // ── ORDER 1: Dine-in, Card, Table T-05 ──────────────────────────
                 // Classic Blue Burger + Diamond Fries + Blue Lagoon Soda
                 OrderRequest o1 = new OrderRequest();
@@ -418,10 +472,13 @@ public class DataLoader implements CommandLineRunner {
                 o1.setOrderType("STANDARD");
                 o1.setTableNumber("T-05");
                 o1.setPaymentType("CARD");
+                o1.setLocationName(locName);
+                o1.setLocationAddress(locAddr);
+                o1.setLocationCity(locCity);
                 o1.setItems(List.of(
-                        new OrderItemRequest(p.get("Classic Blue Burger"), null, 1, null),
-                        new OrderItemRequest(p.get("Diamond Fries"), null, 1, null),
-                        new OrderItemRequest(p.get("Blue Lagoon Soda"), null, 1, null)));
+                        new OrderItemRequest(p.get("Classic Blue Burger"), null, 1, "Extra Bacon", List.of(iMap.get("Bacon"))),
+                        new OrderItemRequest(p.get("Diamond Fries"), null, 1, null, null),
+                        new OrderItemRequest(p.get("Blue Lagoon Soda"), null, 1, null, null)));
                 saveOrder(o1);
 
                 // ── ORDER 2: Takeaway, Cash ──────────────────────────────────────
@@ -431,10 +488,13 @@ public class DataLoader implements CommandLineRunner {
                 o2.setServiceType("TAKEAWAY");
                 o2.setOrderType("STANDARD");
                 o2.setPaymentType("CASH");
+                o2.setLocationName(locName);
+                o2.setLocationAddress(locAddr);
+                o2.setLocationCity(locCity);
                 o2.setItems(List.of(
-                        new OrderItemRequest(p.get("The Crystal Spicy"), null, 1, null),
-                        new OrderItemRequest(p.get("Cheesy Blue Fries"), null, 1, null),
-                        new OrderItemRequest(p.get("Iced Tea"), null, 1, null)));
+                        new OrderItemRequest(p.get("The Crystal Spicy"), null, 1, "Extra piccante", List.of(iMap.get("Jalapeños"), iMap.get("Uovo"))),
+                        new OrderItemRequest(p.get("Cheesy Blue Fries"), null, 1, null, null),
+                        new OrderItemRequest(p.get("Iced Tea"), null, 1, null, null)));
                 saveOrder(o2);
 
                 // ── ORDER 3: Delivery, Card ──────────────────────────────────────
@@ -444,10 +504,13 @@ public class DataLoader implements CommandLineRunner {
                 o3.setServiceType("DELIVERY");
                 o3.setOrderType("STANDARD");
                 o3.setPaymentType("CARD");
+                o3.setLocationName(locName);
+                o3.setLocationAddress(locAddr);
+                o3.setLocationCity(locCity);
                 o3.setItems(List.of(
-                        new OrderItemRequest(p.get("Crystal Nuggets"), null, 2, null),
-                        new OrderItemRequest(p.get("Spicy Wings"), null, 1, "Extra piccante per favore"),
-                        new OrderItemRequest(p.get("Blue BBQ"), null, 1, null)));
+                        new OrderItemRequest(p.get("Crystal Nuggets"), null, 2, null, null),
+                        new OrderItemRequest(p.get("Spicy Wings"), null, 1, "Extra piccante per favore", null),
+                        new OrderItemRequest(p.get("Blue BBQ"), null, 1, null, null)));
                 saveOrder(o3);
 
                 // ── ORDER 4: Dine-in, Cash, Table T-12 ──────────────────────────
@@ -458,10 +521,13 @@ public class DataLoader implements CommandLineRunner {
                 o4.setOrderType("STANDARD");
                 o4.setTableNumber("T-12");
                 o4.setPaymentType("CASH");
+                o4.setLocationName(locName);
+                o4.setLocationAddress(locAddr);
+                o4.setLocationCity(locCity);
                 o4.setItems(List.of(
-                        new OrderItemRequest(p.get("Mountain Wrap"), null, 1, null),
-                        new OrderItemRequest(p.get("Classic Blue Burger"), null, 1, "Senza pomodoro"),
-                        new OrderItemRequest(p.get("Crystal Mayo"), null, 2, null)));
+                        new OrderItemRequest(p.get("Mountain Wrap"), null, 1, null, null),
+                        new OrderItemRequest(p.get("Classic Blue Burger"), null, 1, "Senza pomodoro", null),
+                        new OrderItemRequest(p.get("Crystal Mayo"), null, 2, null, null)));
                 saveOrder(o4);
 
                 // ── ORDER 5: Dine-in, Card, Table T-03 ──────────────────────────
@@ -472,9 +538,12 @@ public class DataLoader implements CommandLineRunner {
                 o5.setOrderType("STANDARD");
                 o5.setTableNumber("T-03");
                 o5.setPaymentType("CARD");
+                o5.setLocationName(locName);
+                o5.setLocationAddress(locAddr);
+                o5.setLocationCity(locCity);
                 o5.setItems(List.of(
-                        new OrderItemRequest(p.get("Frozen Crystal Brownie"), null, 1, null),
-                        new OrderItemRequest(p.get("Blue Lagoon Soda"), null, 2, null)));
+                        new OrderItemRequest(p.get("Frozen Crystal Brownie"), null, 1, null, null),
+                        new OrderItemRequest(p.get("Blue Lagoon Soda"), null, 2, null, null)));
                 saveOrder(o5);
 
                 // ── ORDER 6: Takeaway, Card, WITH OFFER ─────────────────────────
@@ -487,8 +556,11 @@ public class DataLoader implements CommandLineRunner {
                 o6.setServiceType("TAKEAWAY");
                 o6.setOrderType("STANDARD");
                 o6.setPaymentType("CARD");
+                o6.setLocationName(locName);
+                o6.setLocationAddress(locAddr);
+                o6.setLocationCity(locCity);
                 o6.setItems(List.of(
-                        new OrderItemRequest(null, off.get("Family Crystal Pack"), 1, "Consegna veloce")));
+                        new OrderItemRequest(null, off.get("Family Crystal Pack"), 1, "Consegna veloce", null)));
                 saveOrder(o6);
         }
 

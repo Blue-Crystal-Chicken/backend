@@ -5,6 +5,7 @@ import lombok.*;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
+import java.util.List;
 
 /**
  * Junction entity for Order and Product with additional attributes.
@@ -51,6 +52,14 @@ public class OrderProduct {
     @ManyToOne
     @JoinColumn(name = "Offer_id", nullable = true)
     private OfferEntity offer;
+
+    @ManyToMany
+    @JoinTable(
+        name = "Order_Product_Ingredients",
+        joinColumns = @JoinColumn(name = "order_product_id"),
+        inverseJoinColumns = @JoinColumn(name = "ingredient_id")
+    )
+    private List<IngredientEntity> ingredients;
 
     @PrePersist
     protected void onCreate() {

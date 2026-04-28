@@ -1,5 +1,6 @@
 package com.giuseppe_matteo.blue_crystal_chicken.blue_crystal_chicken.dto.mapper.Impl;
 
+import com.giuseppe_matteo.blue_crystal_chicken.blue_crystal_chicken.dto.mapper.IngredientMapper;
 import com.giuseppe_matteo.blue_crystal_chicken.blue_crystal_chicken.dto.mapper.OrderMapper;
 import com.giuseppe_matteo.blue_crystal_chicken.blue_crystal_chicken.dto.request.OrderRequest;
 import com.giuseppe_matteo.blue_crystal_chicken.blue_crystal_chicken.dto.response.OrderItemResponse;
@@ -8,19 +9,22 @@ import com.giuseppe_matteo.blue_crystal_chicken.blue_crystal_chicken.entity.Orde
 import com.giuseppe_matteo.blue_crystal_chicken.blue_crystal_chicken.entity.OrderProduct;
 import com.giuseppe_matteo.blue_crystal_chicken.blue_crystal_chicken.entity.OrderStatus;
 
+import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 
 import java.util.UUID;
 import java.util.stream.Collectors;
 
 @Component
+@RequiredArgsConstructor
 public class OrderMapperImpl implements OrderMapper {
+
+    private final IngredientMapper ingredientMapper;
 
     @Override
     public OrderEntity toEntity(OrderRequest request) {
         OrderEntity entity = new OrderEntity();
         entity.setOrderId(UUID.randomUUID().toString());
-        entity.setCode(request.getCode());
         entity.setServiceType(request.getServiceType());
         entity.setOrderType(request.getOrderType());
         entity.setTableNumber(request.getTableNumber());
@@ -78,6 +82,13 @@ public class OrderMapperImpl implements OrderMapper {
         item.setPrice(op.getPrice());
         item.setAdditions(op.getAdditions());
         item.setSpecialNote(op.getSpecialNote());
+
+        if (op.getIngredients() != null) {
+            item.setIngredients(op.getIngredients().stream()
+                    .map(ingredientMapper::toResponse)
+                    .collect(Collectors.toList()));
+        }
+
         return item;
     }
 }
