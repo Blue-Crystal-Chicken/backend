@@ -9,6 +9,8 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -26,6 +28,13 @@ public class OfferController {
     @GetMapping
     public ResponseEntity<List<OfferResponse>> getAll() {
         return ResponseEntity.ok(offerService.findAll());
+    }
+
+    // GET /api/offers/top-offers?limit=5
+    @GetMapping("/v1/top")
+    public ResponseEntity<List<OfferResponse>> getTop(@RequestParam(defaultValue = "5") int limit) {
+        Pageable pageable = PageRequest.of(0, limit);
+        return ResponseEntity.ok(offerService.findPage(pageable).getContent());
     }
 
     // GET /api/offers/{id}

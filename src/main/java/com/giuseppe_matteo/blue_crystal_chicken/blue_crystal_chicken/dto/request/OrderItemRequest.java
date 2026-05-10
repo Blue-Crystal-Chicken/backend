@@ -11,6 +11,7 @@ import java.util.List;
 public class OrderItemRequest {
     private Long productId;
     private Long offerId;
+    private Long menuId;
     private Integer quantity;
     private String specialNote;
     private List<Long> ingredientIds;

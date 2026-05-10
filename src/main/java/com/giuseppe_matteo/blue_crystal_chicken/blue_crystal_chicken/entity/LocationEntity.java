@@ -1,6 +1,7 @@
 package com.giuseppe_matteo.blue_crystal_chicken.blue_crystal_chicken.entity;
 
 import jakarta.persistence.*;
+import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.NotBlank;
 import lombok.*;
 import java.time.LocalDateTime;
@@ -48,6 +49,10 @@ public class LocationEntity {
 
     @Column(name = "Status")
     private String status;
+
+    @Column(name = "Tables", columnDefinition = "integer default 0")
+    @Min(value = 0)
+    private Integer tables;
 
     @Column(nullable = false, updatable = false)
     private LocalDateTime createdAt;

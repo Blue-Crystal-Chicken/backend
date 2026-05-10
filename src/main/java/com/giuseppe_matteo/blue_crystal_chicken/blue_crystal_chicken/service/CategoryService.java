@@ -1,5 +1,6 @@
 package com.giuseppe_matteo.blue_crystal_chicken.blue_crystal_chicken.service;
 
+import java.util.HashMap;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -9,6 +10,7 @@ import org.springframework.stereotype.Service;
 import com.giuseppe_matteo.blue_crystal_chicken.blue_crystal_chicken.dto.request.CategoryRequest;
 import com.giuseppe_matteo.blue_crystal_chicken.blue_crystal_chicken.dto.response.CategoryResponse;
 import com.giuseppe_matteo.blue_crystal_chicken.blue_crystal_chicken.repository.CategoryRepository;
+import com.giuseppe_matteo.blue_crystal_chicken.blue_crystal_chicken.dto.projection.CategoryWithCount;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.http.ResponseEntity;
@@ -51,6 +53,26 @@ public class CategoryService {
     public List<CategoryResponse> findAll() {
         List<Category> categories = categoryRepository.findAll();
         return categories.stream().map(categoryMapper::toCategoryResponse).collect(Collectors.toList());
+    }
+
+    public ResponseEntity<CategoryResponse> findByName(String name) {
+        try {
+            CategoryName categoryName = CategoryName.valueOf(name.toUpperCase());
+            return categoryRepository.findByName(categoryName)
+                    .map(categoryMapper::toCategoryResponse)
+                    .map(ResponseEntity::ok)
+                    .orElseGet(() -> {
+                        log.info("Category {} not found", name);
+                        return ResponseEntity.notFound().build();
+                    });
+        } catch (IllegalArgumentException e) {
+            log.error("Invalid category name: {}", name);
+            return ResponseEntity.badRequest().build();
+        }
+    }
+
+    public List<CategoryWithCount> getCategoriesWithCount() {
+    return categoryRepository.findAllCategoriesWithProductCount();
     }
 
 }

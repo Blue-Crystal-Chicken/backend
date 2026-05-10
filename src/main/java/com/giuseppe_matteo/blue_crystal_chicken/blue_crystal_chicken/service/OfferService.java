@@ -12,6 +12,8 @@ import com.giuseppe_matteo.blue_crystal_chicken.blue_crystal_chicken.repository.
 import com.giuseppe_matteo.blue_crystal_chicken.blue_crystal_chicken.repository.OfferRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
@@ -40,6 +42,10 @@ public class OfferService {
 
     public List<OfferResponse> findAll() {
         return offerMapper.toResponseList(offerRepository.findAll());
+    }
+
+    public Page<OfferResponse> findPage(Pageable pageable) {
+        return offerRepository.findAll(pageable).map(offerMapper::toResponse);
     }
 
     public OfferResponse findOfferResponseById(Long id) {

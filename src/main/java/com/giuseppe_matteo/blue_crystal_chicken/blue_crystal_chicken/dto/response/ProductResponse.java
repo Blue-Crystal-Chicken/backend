@@ -9,7 +9,7 @@ import lombok.Data;
 public class ProductResponse {
     private Long id;
     private String name;
-    private String category;    
+    private CategoryResponse category;    
     private String description;
 
     // ------------------------

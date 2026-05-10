@@ -3,6 +3,7 @@ package com.giuseppe_matteo.blue_crystal_chicken.blue_crystal_chicken.service;
 import com.giuseppe_matteo.blue_crystal_chicken.blue_crystal_chicken.dto.request.OrderItemRequest;
 import com.giuseppe_matteo.blue_crystal_chicken.blue_crystal_chicken.dto.request.OrderRequest;
 import com.giuseppe_matteo.blue_crystal_chicken.blue_crystal_chicken.dto.request.UpdateOrderRequest;
+import com.giuseppe_matteo.blue_crystal_chicken.blue_crystal_chicken.dto.response.IngredientResponse;
 import com.giuseppe_matteo.blue_crystal_chicken.blue_crystal_chicken.entity.*;
 import com.giuseppe_matteo.blue_crystal_chicken.blue_crystal_chicken.repository.*;
 import com.giuseppe_matteo.blue_crystal_chicken.blue_crystal_chicken.dto.mapper.OrderMapper;
@@ -28,9 +29,11 @@ public class OrderService {
     private final UserRepository userRepository;
     private final LocationRepository locationRepository;
     private final ProductRepository productRepository;
-    private final OfferRepository offerRepository;
     private final IngredientRepository ingredientRepository;
+    private final OfferRepository offerRepository;
+    private final MenuRepository menuRepository;
     private final OrderMapper orderMapper;
+
 
     // ── READ ────────────────────────────────────────────────────────────────
 
@@ -111,10 +114,22 @@ public class OrderService {
             log.info("Location trovata: " + location);
         }
 
-        log.info("Provo a salvare l'ordine");
-        log.info("Creazione codice ordine");
+        if (order.getLocation() == null) {
+            log.error("Tentativo di creare un ordine senza una location valida. Request: {}", request);
+            throw new RuntimeException("Impossibile creare l'ordine: location non trovata o non specificata.");
+        }
+
         order.setCode(generateLastCode(order.getLocation().getId()));
         log.info("Codice generato: "+order.getCode());
+        // Set initial status based on payment type
+        if ("cash".equalsIgnoreCase(request.getPaymentType())) {
+            order.setStatus(OrderStatus.PENDING);
+        } else if ("card".equalsIgnoreCase(request.getPaymentType())) {
+            order.setStatus(OrderStatus.PREPARING);
+        } else {
+            order.setStatus(OrderStatus.PENDING);
+        }
+
         // Save order to get the ID
         OrderEntity savedOrder = orderRepository.save(order);
         log.info("Order creata: " + savedOrder);
@@ -130,38 +145,37 @@ public class OrderService {
                 op.setSpecialNote(item.getSpecialNote());
 
                 BigDecimal unitPrice = BigDecimal.ZERO;
-
                 if (item.getOfferId() != null) {
                     OfferEntity offer = offerRepository.findById(item.getOfferId())
                             .orElseThrow(() -> new RuntimeException("Offerta non trovata con id: " + item.getOfferId()));
                     op.setOffer(offer);
+                    log.info("Offerta trovata: " + offer);
                     unitPrice = BigDecimal.valueOf(offer.getPrice() != null ? offer.getPrice() : 0.0);
                 } else if (item.getProductId() != null) {
                     ProductEntity product = productRepository.findById(item.getProductId())
                             .orElseThrow(() -> new RuntimeException("Prodotto non trovato con id: " + item.getProductId()));
                     op.setProduct(product);
                     unitPrice = BigDecimal.valueOf(product.getPrice() != null ? product.getPrice() : 0.0);
-                } else {
-                    throw new RuntimeException("Ogni elemento dell'ordine deve avere un productId o un offerId");
+                } else if(item.getMenuId() != null) {
+                    MenuEntity menu = menuRepository.findById(item.getMenuId())
+                        .orElseThrow(() -> new RuntimeException("Menu non trovato con id: " + item.getMenuId()));
+                    op.setMenu(menu);
+                    unitPrice = BigDecimal.valueOf(menu.getPrice() != null ? menu.getPrice() : 0.0);
+                }else {
+                    throw new RuntimeException("Ogni elemento dell'ordine deve avere un productId, un offerId o un menuId");
                 }
-
-                op.setPrice(unitPrice);
-
-                // Handle ingredients (customizations)
-                if (item.getIngredientIds() != null && !item.getIngredientIds().isEmpty()) {
-                    List<IngredientEntity> ingredients = ingredientRepository.findAllById(item.getIngredientIds());
-                    op.setIngredients(ingredients);
-                    
-                    // Add ingredient prices to unit price
-                    for (IngredientEntity ing : ingredients) {
-                        if (ing.getPrice() != null) {
-                            unitPrice = unitPrice.add(BigDecimal.valueOf(ing.getPrice()));
-                        }
+                // Aggiunta ingredienti se presenti
+                if(item.getIngredientIds() != null){
+                    ArrayList<IngredientEntity> ingredients= new ArrayList<>();
+                    for(Long id : item.getIngredientIds()){
+                        IngredientEntity ingredient = ingredientRepository.findById(id)
+                                .orElseThrow(() -> new RuntimeException("Ingrediente non trovato con id: " + id));
+                        ingredients.add(ingredient);
+                        unitPrice = unitPrice.add(BigDecimal.valueOf(ingredient.getPrice() != null ? ingredient.getPrice() : 0.0));
                     }
-                    // Update op price after ingredients
-                    op.setPrice(unitPrice);
+                    op.setIngredients(ingredients);
                 }
-
+                op.setPrice(unitPrice);
                 total = total.add(unitPrice.multiply(BigDecimal.valueOf(op.getQuantity())));
                 orderProducts.add(op);
             }
@@ -213,5 +227,11 @@ public class OrderService {
         }
         int lastCodeInt = Integer.parseInt(lastCode);
         return String.format("%03d", lastCodeInt + 1);
+    }
+
+
+    private BigDecimal totalAdditions(OrderItemRequest item){
+        BigDecimal additions = BigDecimal.ZERO;
+        return additions;
     }
 }

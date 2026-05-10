@@ -91,6 +91,7 @@ public class WebSecurityConfig {
                         .requestMatchers(HttpMethod.GET, "/api/ingredients/**").permitAll()
                         .requestMatchers(HttpMethod.GET, "/api/menus/**").permitAll()
                         .requestMatchers(HttpMethod.GET, "/api/offers/**").permitAll()
+                        .requestMatchers(HttpMethod.GET, "/api/orders/**").permitAll()
                         .requestMatchers(HttpMethod.POST, "/api/orders").permitAll()
 
                         // Restringi POST, PUT, DELETE solo ad ADMIN

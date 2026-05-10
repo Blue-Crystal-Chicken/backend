@@ -15,7 +15,7 @@ import java.util.List;
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
-@ToString(exclude = { "order", "product", "offer" })
+@ToString(exclude = { "order", "product", "offer", "menu" })
 public class OrderProduct {
 
     @Id
@@ -52,6 +52,10 @@ public class OrderProduct {
     @ManyToOne
     @JoinColumn(name = "Offer_id", nullable = true)
     private OfferEntity offer;
+
+    @ManyToOne
+    @JoinColumn(name = "Menu_id", nullable = true)
+    private MenuEntity menu;
 
     @ManyToMany
     @JoinTable(

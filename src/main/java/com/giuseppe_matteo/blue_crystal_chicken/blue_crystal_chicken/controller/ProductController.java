@@ -62,10 +62,10 @@ public class ProductController {
     }
 
     @GetMapping("/v1/products/{id}")
-    @Operation(summary = "Lista prodotti", description = "Endpoint per la lista dei prodotti")
+    @Operation(summary = "Prodotto", description = "Endpoint per il singolo prodotto")
     @ResponseStatus(HttpStatus.OK)
     @ApiResponses(value = {
-            @ApiResponse(responseCode = "200", description = "Lista prodotti", content = @Content(mediaType = "application/json", schema = @Schema(implementation = ProductResponse.class))),
+            @ApiResponse(responseCode = "200", description = "Prodotto", content = @Content(mediaType = "application/json", schema = @Schema(implementation = ProductResponse.class))),
             @ApiResponse(responseCode = "400", description = "Richiesta non valida", content = @Content(mediaType = "application/json", schema = @Schema(implementation = ErrorResponse.class))),
             @ApiResponse(responseCode = "401", description = "Non autorizzato", content = @Content(mediaType = "application/json", schema = @Schema(implementation = ErrorResponse.class))),
             @ApiResponse(responseCode = "404", description = "Prodotto non trovato", content = @Content(mediaType = "application/json", schema = @Schema(implementation = ErrorResponse.class))),
@@ -97,6 +97,26 @@ public class ProductController {
             return ResponseEntity.ok(productService.getProductsByCategoryName(category.trim().toUpperCase()));
         } catch (Exception e) {
             log.error("GET /api/products/v1/category/{} - ERROR: {}", category, e.getMessage());
+            return ResponseEntity.badRequest().body(e.getMessage());
+        }
+    }
+
+    @GetMapping("/v1/category/id/{categoryId}")
+    @Operation(summary = "Lista prodotti filtrato per categoria", description = "Endpoit per ricevere una lista filtrata di prodotti tramite la categoria")
+    @ResponseStatus(HttpStatus.OK)
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Lista prodotti filtrata per categoria", content = @Content(mediaType = "application/json", schema = @Schema(implementation = ProductResponse.class))),
+            @ApiResponse(responseCode = "400", description = "Richiesta non valida", content = @Content(mediaType = "application/json", schema = @Schema(implementation = ErrorResponse.class))),
+            @ApiResponse(responseCode = "401", description = "Non autorizzato", content = @Content(mediaType = "application/json", schema = @Schema(implementation = ErrorResponse.class))),
+            @ApiResponse(responseCode = "404", description = "Prodotto non trovato", content = @Content(mediaType = "application/json", schema = @Schema(implementation = ErrorResponse.class))),
+            @ApiResponse(responseCode = "500", description = "Errore del server", content = @Content(mediaType = "application/json", schema = @Schema(implementation = ErrorResponse.class)))
+    })
+    public ResponseEntity<?> getProductsByCategoryId(@PathVariable Long categoryId) {
+        log.info("GET /api/products/v1/category/id/{}", categoryId);
+        try {
+            return ResponseEntity.ok(productService.getProductsByCategoryId(categoryId));
+        } catch (Exception e) {
+            log.error("GET /api/products/v1/category/id/{} - ERROR: {}", categoryId, e.getMessage());
             return ResponseEntity.badRequest().body(e.getMessage());
         }
     }

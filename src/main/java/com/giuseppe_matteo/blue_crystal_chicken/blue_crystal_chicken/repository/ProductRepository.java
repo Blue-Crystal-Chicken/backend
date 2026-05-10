@@ -20,6 +20,7 @@ public interface ProductRepository extends JpaRepository<ProductEntity, Long> {
     List<ProductEntity> findByCategoryId(Long categoryId);
 
     List<ProductEntity> findByCategoryName(CategoryName name);
+    
 
     @Query("SELECT op.product FROM OrderProduct op " +
        "GROUP BY op.product " +

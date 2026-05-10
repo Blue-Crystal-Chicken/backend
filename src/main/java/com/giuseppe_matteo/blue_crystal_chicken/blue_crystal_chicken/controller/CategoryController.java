@@ -65,5 +65,24 @@ public class CategoryController {
             return ResponseEntity.badRequest().body(e.getMessage());
         }
     }
+
+    @GetMapping("/v1/categories/tot_product")
+    @Transactional
+    @ResponseStatus(HttpStatus.OK)
+    @ApiResponses(value = {
+        @ApiResponse(responseCode = "200", description = "Categorie trovate", content = @Content(mediaType = "application/json", schema = @Schema(implementation = Category.class))),
+        @ApiResponse(responseCode = "400", description = "Richiesta non valida", content = @Content(mediaType = "application/json", schema = @Schema(implementation = ErrorResponse.class))),
+        @ApiResponse(responseCode = "401", description = "Non autorizzato", content = @Content(mediaType = "application/json", schema = @Schema(implementation = ErrorResponse.class))),
+        @ApiResponse(responseCode = "404", description = "Categoria non trovata", content = @Content(mediaType = "application/json", schema = @Schema(implementation = ErrorResponse.class))),
+        @ApiResponse(responseCode = "500", description = "Errore del server", content = @Content(mediaType = "application/json", schema = @Schema(implementation = ErrorResponse.class)))
+    })
+    public ResponseEntity<?> getCategoriesWithTotProduct() {
+        try{
+            return ResponseEntity.ok(categoryService.getCategoriesWithCount());
+        }catch(Exception e){
+            return ResponseEntity.badRequest().body(e.getMessage());
+        }
+    }
+
     
 }

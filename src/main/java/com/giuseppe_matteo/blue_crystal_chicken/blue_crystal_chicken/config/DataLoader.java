@@ -23,7 +23,7 @@ import com.giuseppe_matteo.blue_crystal_chicken.blue_crystal_chicken.service.Pro
 import com.giuseppe_matteo.blue_crystal_chicken.blue_crystal_chicken.service.UserService;
 import com.giuseppe_matteo.blue_crystal_chicken.blue_crystal_chicken.dto.request.MenuProductRequest;
 import com.giuseppe_matteo.blue_crystal_chicken.blue_crystal_chicken.dto.request.MenuRequest;
-import com.giuseppe_matteo.blue_crystal_chicken.blue_crystal_chicken.entity.LocationEntity;
+import com.giuseppe_matteo.blue_crystal_chicken.blue_crystal_chicken.dto.request.LocationRequest;
 import com.giuseppe_matteo.blue_crystal_chicken.blue_crystal_chicken.service.MenuService;
 
 import com.giuseppe_matteo.blue_crystal_chicken.blue_crystal_chicken.dto.request.OfferRequest;
@@ -351,26 +351,27 @@ public class DataLoader implements CommandLineRunner {
                 }
 
                 String[][] locationsData = {
-                        {"Blue Crystal Torino", "Via Roma 10", "Torino", "011", "1234567"},
-                        {"Blue Crystal Roma", "Via del Corso 50", "Roma", "06", "1234567"},
-                        {"Blue Crystal Milano", "Piazza Duomo 1", "Milano", "02", "1234567"},
-                        {"Blue Crystal Bologna", "Via dell'Indipendenza 15", "Bologna", "051", "1234567"},
-                        {"Blue Crystal Napoli", "Via Toledo 100", "Napoli", "081", "1234567"},
-                        {"Blue Crystal Bari", "Corso Vittorio Emanuele 20", "Bari", "080", "1234567"}
+                        {"Blue Crystal Torino", "Via Roma 10", "Torino", "011", "1234567","25"},
+                        {"Blue Crystal Roma", "Via del Corso 50", "Roma", "06", "1234567","20"},
+                        {"Blue Crystal Milano", "Piazza Duomo 1", "Milano", "02", "1234567","20"},
+                        {"Blue Crystal Bologna", "Via dell'Indipendenza 15", "Bologna", "051", "1234567","15"},
+                        {"Blue Crystal Napoli", "Via Toledo 100", "Napoli", "081", "1234567","10"},
+                        {"Blue Crystal Bari", "Corso Vittorio Emanuele 20", "Bari", "080", "1234567","12"}
                 };
 
                 for (String[] data : locationsData) {
-                        LocationEntity loc = new LocationEntity();
-                        loc.setName(data[0]);
-                        loc.setAddress(data[1]);
-                        loc.setCity(data[2]);
-                        loc.setPhoneCode(data[3]);
-                        loc.setPhoneNumber(data[4]);
-                        loc.setIsOpen(true);
-                        loc.setManuallyClosed(false);
-                        loc.setStatus("ACTIVE");
-                        locationService.create(loc);
-                        log.info("Location created: {}", loc.getName());
+                        LocationRequest req = new LocationRequest();
+                        req.setName(data[0]);
+                        req.setAddress(data[1]);
+                        req.setCity(data[2]);
+                        req.setPhoneCode(data[3]);
+                        req.setPhoneNumber(data[4]);
+                        req.setTables(Integer.parseInt(data[5]));
+                        req.setIsOpen(true);
+                        req.setManuallyClosed(false);
+                        req.setStatus("ACTIVE");
+                        locationService.create(req);
+                        log.info("Location created: {}", req.getName());
                 }
         }
 
@@ -476,9 +477,9 @@ public class DataLoader implements CommandLineRunner {
                 o1.setLocationAddress(locAddr);
                 o1.setLocationCity(locCity);
                 o1.setItems(List.of(
-                        new OrderItemRequest(p.get("Classic Blue Burger"), null, 1, "Extra Bacon", List.of(iMap.get("Bacon"))),
-                        new OrderItemRequest(p.get("Diamond Fries"), null, 1, null, null),
-                        new OrderItemRequest(p.get("Blue Lagoon Soda"), null, 1, null, null)));
+                        new OrderItemRequest(p.get("Classic Blue Burger"), null, null, 1, "Extra Bacon", List.of(iMap.get("Bacon"))),
+                        new OrderItemRequest(p.get("Diamond Fries"), null, null, 1, null, null),
+                        new OrderItemRequest(p.get("Blue Lagoon Soda"), null, null, 1, null, null)));
                 saveOrder(o1);
 
                 // ── ORDER 2: Takeaway, Cash ──────────────────────────────────────
@@ -492,9 +493,9 @@ public class DataLoader implements CommandLineRunner {
                 o2.setLocationAddress(locAddr);
                 o2.setLocationCity(locCity);
                 o2.setItems(List.of(
-                        new OrderItemRequest(p.get("The Crystal Spicy"), null, 1, "Extra piccante", List.of(iMap.get("Jalapeños"), iMap.get("Uovo"))),
-                        new OrderItemRequest(p.get("Cheesy Blue Fries"), null, 1, null, null),
-                        new OrderItemRequest(p.get("Iced Tea"), null, 1, null, null)));
+                        new OrderItemRequest(p.get("The Crystal Spicy"), null, null, 1, "Extra piccante", List.of(iMap.get("Jalapeños"), iMap.get("Uovo"))),
+                        new OrderItemRequest(p.get("Cheesy Blue Fries"), null, null, 1, null, null),
+                        new OrderItemRequest(p.get("Iced Tea"), null, null, 1, null, null)));
                 saveOrder(o2);
 
                 // ── ORDER 3: Delivery, Card ──────────────────────────────────────
@@ -508,9 +509,9 @@ public class DataLoader implements CommandLineRunner {
                 o3.setLocationAddress(locAddr);
                 o3.setLocationCity(locCity);
                 o3.setItems(List.of(
-                        new OrderItemRequest(p.get("Crystal Nuggets"), null, 2, null, null),
-                        new OrderItemRequest(p.get("Spicy Wings"), null, 1, "Extra piccante per favore", null),
-                        new OrderItemRequest(p.get("Blue BBQ"), null, 1, null, null)));
+                        new OrderItemRequest(p.get("Crystal Nuggets"), null,null, 2, null, null),
+                        new OrderItemRequest(p.get("Spicy Wings"), null,null, 1, "Extra piccante per favore", null),
+                        new OrderItemRequest(p.get("Blue BBQ"), null,null, 1, null, null)));
                 saveOrder(o3);
 
                 // ── ORDER 4: Dine-in, Cash, Table T-12 ──────────────────────────
@@ -525,9 +526,9 @@ public class DataLoader implements CommandLineRunner {
                 o4.setLocationAddress(locAddr);
                 o4.setLocationCity(locCity);
                 o4.setItems(List.of(
-                        new OrderItemRequest(p.get("Mountain Wrap"), null, 1, null, null),
-                        new OrderItemRequest(p.get("Classic Blue Burger"), null, 1, "Senza pomodoro", null),
-                        new OrderItemRequest(p.get("Crystal Mayo"), null, 2, null, null)));
+                        new OrderItemRequest(p.get("Mountain Wrap"), null,null, 1, null, null),
+                        new OrderItemRequest(p.get("Classic Blue Burger"), null,null, 1, "Senza pomodoro", null),
+                        new OrderItemRequest(p.get("Crystal Mayo"), null,null, 2, null, null)));
                 saveOrder(o4);
 
                 // ── ORDER 5: Dine-in, Card, Table T-03 ──────────────────────────
@@ -542,8 +543,8 @@ public class DataLoader implements CommandLineRunner {
                 o5.setLocationAddress(locAddr);
                 o5.setLocationCity(locCity);
                 o5.setItems(List.of(
-                        new OrderItemRequest(p.get("Frozen Crystal Brownie"), null, 1, null, null),
-                        new OrderItemRequest(p.get("Blue Lagoon Soda"), null, 2, null, null)));
+                        new OrderItemRequest(p.get("Frozen Crystal Brownie"), null,null, 1, null, null),
+                        new OrderItemRequest(p.get("Blue Lagoon Soda"), null,null, 2, null, null)));
                 saveOrder(o5);
 
                 // ── ORDER 6: Takeaway, Card, WITH OFFER ─────────────────────────
@@ -560,7 +561,7 @@ public class DataLoader implements CommandLineRunner {
                 o6.setLocationAddress(locAddr);
                 o6.setLocationCity(locCity);
                 o6.setItems(List.of(
-                        new OrderItemRequest(null, off.get("Family Crystal Pack"), 1, "Consegna veloce", null)));
+                        new OrderItemRequest(null, off.get("Family Crystal Pack"),null, 1, "Consegna veloce", null)));
                 saveOrder(o6);
         }
 

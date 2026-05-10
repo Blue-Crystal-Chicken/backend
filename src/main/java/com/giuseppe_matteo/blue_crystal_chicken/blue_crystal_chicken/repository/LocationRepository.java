@@ -33,4 +33,8 @@ public interface LocationRepository extends JpaRepository<LocationEntity, Long> 
     @Modifying
     @Query("UPDATE LocationEntity l SET l.isOpen = :isOpen WHERE l.manuallyClosed = false")
     void setAllIsOpen(boolean isOpen);
+
+    // Query che restituisce il numero di tavoli presenti in base a location id
+    @Query("SELECT l.tables FROM LocationEntity l WHERE l.id = :id")
+    int getTablesByLocationId(Long id);
 }
