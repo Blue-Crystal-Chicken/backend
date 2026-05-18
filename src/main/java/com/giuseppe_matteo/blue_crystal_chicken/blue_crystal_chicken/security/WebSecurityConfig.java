@@ -93,6 +93,7 @@ public class WebSecurityConfig {
                         .requestMatchers(HttpMethod.GET, "/api/offers/**").permitAll()
                         .requestMatchers(HttpMethod.GET, "/api/orders/**").permitAll()
                         .requestMatchers(HttpMethod.POST, "/api/orders").permitAll()
+                        .requestMatchers(HttpMethod.POST, "/api/products/favorite/**").permitAll()
 
                         // Restringi POST, PUT, DELETE solo ad ADMIN
                         .requestMatchers(HttpMethod.POST, "/api/**").hasRole("ADMIN")
