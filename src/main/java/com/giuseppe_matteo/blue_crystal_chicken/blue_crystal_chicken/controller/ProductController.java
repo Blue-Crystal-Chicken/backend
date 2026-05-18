@@ -19,6 +19,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 
 import com.giuseppe_matteo.blue_crystal_chicken.blue_crystal_chicken.dto.request.ProductRequest;
 import com.giuseppe_matteo.blue_crystal_chicken.blue_crystal_chicken.dto.response.ProductResponse;
+import com.giuseppe_matteo.blue_crystal_chicken.blue_crystal_chicken.dto.response.UserFavoriteProductRequest;
 import com.giuseppe_matteo.blue_crystal_chicken.blue_crystal_chicken.service.ProductService;
 
 import io.swagger.v3.oas.annotations.Operation;
