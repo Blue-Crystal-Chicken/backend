@@ -219,12 +219,12 @@ public class ProductController {
         @ApiResponse(responseCode = "404", description = "Prodotto non trovato", content = @Content(mediaType = "application/json", schema = @Schema(implementation = ErrorResponse.class))),
         @ApiResponse(responseCode = "500", description = "Errore del server", content = @Content(mediaType = "application/json", schema = @Schema(implementation = ErrorResponse.class)))
 })
-public ResponseEntity<?> addUserFavoriteProduct(@ModelAttribute UserFavoriteProductRequest request) {
-    log.info("POST /api/products/favorite/v1/user/{}/favorite", request.getUserId());
+public ResponseEntity<?> addUserFavoriteProduct(@RequestBody UserFavoriteProductRequest request) {
+    log.info("POST /api/products/favorite/v1/user/{}", request.getUserId());
     try {
         return ResponseEntity.ok(productService.addUserFavoriteProduct(request.getUserId(), request.getProductId()));
     } catch (Exception e) {
-        log.error("POST /api/products/favorite/v1/user/{}/favorite - ERROR: {}", request.getUserId(), e.getMessage());
+        log.error("POST /api/products/favorite/v1/user/{} - ERROR: {}", request.getUserId(), e.getMessage());
         return ResponseEntity.badRequest().body(e.getMessage());
     }
 }

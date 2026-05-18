@@ -28,6 +28,8 @@ import com.giuseppe_matteo.blue_crystal_chicken.blue_crystal_chicken.repository.
 import com.giuseppe_matteo.blue_crystal_chicken.blue_crystal_chicken.repository.CategoryRepository;
 import com.giuseppe_matteo.blue_crystal_chicken.blue_crystal_chicken.repository.ProductRepository;
 import com.giuseppe_matteo.blue_crystal_chicken.blue_crystal_chicken.repository.UserFavoriteProductRepository;
+import com.giuseppe_matteo.blue_crystal_chicken.blue_crystal_chicken.repository.UserRepository;
+import com.giuseppe_matteo.blue_crystal_chicken.blue_crystal_chicken.entity.UserEntity;
 import com.giuseppe_matteo.blue_crystal_chicken.blue_crystal_chicken.exception.ProductNotFoundException;
 import com.giuseppe_matteo.blue_crystal_chicken.blue_crystal_chicken.exception.ProductAlreadyExistsException;
 import org.springframework.data.domain.Pageable;
@@ -47,6 +49,7 @@ public class ProductService {
     private final ProductMapper productMapper;
     private final CategoryRepository categoryRepository;
     private final UserFavoriteProductRepository userFavoriteProductRepository;
+    private final UserRepository userRepository;
 
     @Value("${app.upload.dir}")
     private String uploadDir;
@@ -313,8 +316,15 @@ public class ProductService {
     // CREATE
     @Transactional
     public ResponseEntity<?> addUserFavoriteProduct(Long userId, Long productId) {
+        UserEntity user = userRepository.findById(userId)
+                .orElseThrow(() -> new RuntimeException("Utente non trovato con id: " + userId));
+        ProductEntity product = productRepository.findById(productId)
+                .orElseThrow(() -> new ProductNotFoundException("Prodotto non trovato con id: " + productId));
+
         UserFavoriteProduct userFavoriteProduct = new UserFavoriteProduct();
         userFavoriteProduct.setId(new UserProductKey(userId, productId));
+        userFavoriteProduct.setUser(user);
+        userFavoriteProduct.setProduct(product);
         userFavoriteProductRepository.save(userFavoriteProduct);
         return ResponseEntity.ok("User favorite product added successfully");
     }
