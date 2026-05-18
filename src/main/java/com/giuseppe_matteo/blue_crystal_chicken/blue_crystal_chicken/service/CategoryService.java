@@ -1,6 +1,6 @@
 package com.giuseppe_matteo.blue_crystal_chicken.blue_crystal_chicken.service;
 
-import java.util.HashMap;
+
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -51,7 +51,9 @@ public class CategoryService {
     }
 
     public List<CategoryResponse> findAll() {
+        log.info("Fetching all categories");
         List<Category> categories = categoryRepository.findAll();
+        log.info("Found {} categories", categories.size());
         return categories.stream().map(categoryMapper::toCategoryResponse).collect(Collectors.toList());
     }
 
@@ -72,7 +74,8 @@ public class CategoryService {
     }
 
     public List<CategoryWithCount> getCategoriesWithCount() {
-    return categoryRepository.findAllCategoriesWithProductCount();
+        log.info("Fetching categories with product count");
+        return categoryRepository.findAllCategoriesWithProductCount();
     }
 
 }

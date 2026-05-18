@@ -8,12 +8,14 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
+import lombok.extern.slf4j.Slf4j;
 
 import java.util.List;
 
 @RestController
 @RequestMapping("/api/ingredients")
 @RequiredArgsConstructor
+@Slf4j
 public class IngredientController {
 
     private final IngredientService ingredientService;
@@ -21,12 +23,14 @@ public class IngredientController {
     // GET /api/ingredients
     @GetMapping
     public ResponseEntity<List<IngredientResponse>> getAll() {
+        log.info("REST request to get all ingredients");
         return ResponseEntity.ok(ingredientService.findAll());
     }
 
     // GET /api/ingredients/{id}
     @GetMapping("/{id}")
     public ResponseEntity<IngredientResponse> getById(@PathVariable Long id) {
+        log.info("REST request to get ingredient by id: {}", id);
         return ResponseEntity.ok(ingredientService.findResponseById(id));
     }
 
@@ -58,6 +62,7 @@ public class IngredientController {
     @PostMapping
     @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<IngredientResponse> create(@RequestBody IngredientRequest request) {
+        log.info("REST request to create ingredient: {}", request.getName());
         return ResponseEntity.status(HttpStatus.CREATED).body(ingredientService.create(request));
     }
 
@@ -72,6 +77,7 @@ public class IngredientController {
     @DeleteMapping("/{id}")
     @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<Void> delete(@PathVariable Long id) {
+        log.info("REST request to delete ingredient: {}", id);
         ingredientService.delete(id);
         return ResponseEntity.noContent().build();
     }

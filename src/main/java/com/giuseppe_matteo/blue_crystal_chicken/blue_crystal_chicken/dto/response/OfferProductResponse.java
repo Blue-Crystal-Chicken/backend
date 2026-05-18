@@ -8,4 +8,5 @@ public class OfferProductResponse {
     private String productName;
     private Integer quantity;
     private Double unitPrice;
+    private String productImagePath;
 }

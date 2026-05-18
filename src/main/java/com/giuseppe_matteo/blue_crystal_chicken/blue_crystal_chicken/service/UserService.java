@@ -1,5 +1,6 @@
 package com.giuseppe_matteo.blue_crystal_chicken.blue_crystal_chicken.service;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -8,11 +9,15 @@ import org.springframework.transaction.annotation.Transactional;
 
 import com.giuseppe_matteo.blue_crystal_chicken.blue_crystal_chicken.dto.request.Login;
 import com.giuseppe_matteo.blue_crystal_chicken.blue_crystal_chicken.dto.request.Register;
+import com.giuseppe_matteo.blue_crystal_chicken.blue_crystal_chicken.dto.response.ProductResponse;
 import com.giuseppe_matteo.blue_crystal_chicken.blue_crystal_chicken.dto.response.JwtResponse;
 import com.giuseppe_matteo.blue_crystal_chicken.blue_crystal_chicken.entity.UserEntity;
+import com.giuseppe_matteo.blue_crystal_chicken.blue_crystal_chicken.entity.UserFavoriteProduct;
+import com.giuseppe_matteo.blue_crystal_chicken.blue_crystal_chicken.entity.key.UserProductKey;
 import com.giuseppe_matteo.blue_crystal_chicken.blue_crystal_chicken.exception.EmailNotFoundException;
 import com.giuseppe_matteo.blue_crystal_chicken.blue_crystal_chicken.exception.UserNotFoundException;
 import com.giuseppe_matteo.blue_crystal_chicken.blue_crystal_chicken.repository.UserRepository;
+import com.giuseppe_matteo.blue_crystal_chicken.blue_crystal_chicken.repository.UserFavoriteProductRepository;
 import com.giuseppe_matteo.blue_crystal_chicken.blue_crystal_chicken.security.jwt.JwtUtils;
 import com.giuseppe_matteo.blue_crystal_chicken.blue_crystal_chicken.security.servicies.UserDetailsImpl;
 import com.giuseppe_matteo.blue_crystal_chicken.blue_crystal_chicken.utils.PasswordHasher;
@@ -39,7 +44,8 @@ public class UserService {
     private AuthenticationManager authenticationManager;
 
     @Autowired
-    private JwtUtils jwtUtils; 
+    private JwtUtils jwtUtils;
+    
     
 
     @Transactional(readOnly = true)
@@ -145,7 +151,6 @@ public class UserService {
         userRepository.deleteById(id);
         return ResponseEntity.ok("User deleted successfully");
     }
-
 
     
 }

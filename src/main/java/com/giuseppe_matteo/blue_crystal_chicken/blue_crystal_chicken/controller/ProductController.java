@@ -206,4 +206,67 @@ public class ProductController {
         return ResponseEntity.badRequest().body(e.getMessage());
     }
 }
+
+//POST /api/products/v1/user/{id}/favorite
+@PostMapping("/v1/user/{id}/favorite")
+@Operation(summary = "Aggiunge un prodotto ai preferiti", description = "Endpoint per aggiungere un prodotto ai preferiti")
+@ResponseStatus(HttpStatus.OK)
+@ApiResponses(value = {
+        @ApiResponse(responseCode = "200", description = "Prodotto aggiunto ai preferiti", content = @Content(mediaType = "application/json", schema = @Schema(implementation = ProductResponse.class))),
+        @ApiResponse(responseCode = "400", description = "Richiesta non valida", content = @Content(mediaType = "application/json", schema = @Schema(implementation = ErrorResponse.class))),
+        @ApiResponse(responseCode = "401", description = "Non autorizzato", content = @Content(mediaType = "application/json", schema = @Schema(implementation = ErrorResponse.class))),
+        @ApiResponse(responseCode = "404", description = "Prodotto non trovato", content = @Content(mediaType = "application/json", schema = @Schema(implementation = ErrorResponse.class))),
+        @ApiResponse(responseCode = "500", description = "Errore del server", content = @Content(mediaType = "application/json", schema = @Schema(implementation = ErrorResponse.class)))
+})
+public ResponseEntity<?> addUserFavoriteProduct(@PathVariable Long id) {
+    log.info("POST /api/products/v1/user/{}/favorite", id);
+    try {
+        return ResponseEntity.ok(productService.addUserFavoriteProduct(id));
+    } catch (Exception e) {
+        log.error("POST /api/products/v1/user/{}/favorite - ERROR: {}", id, e.getMessage());
+        return ResponseEntity.badRequest().body(e.getMessage());
+    }
+}
+
+
+@GetMapping("/v1/user/{id}/favorite")
+@Operation(summary = "Lista prodotti preferiti", description = "Endpoint per la lista dei prodotti preferiti")
+@ResponseStatus(HttpStatus.OK)
+@ApiResponses(value = {
+        @ApiResponse(responseCode = "200", description = "Lista prodotti preferiti", content = @Content(mediaType = "application/json", schema = @Schema(implementation = ProductResponse.class))),
+        @ApiResponse(responseCode = "400", description = "Richiesta non valida", content = @Content(mediaType = "application/json", schema = @Schema(implementation = ErrorResponse.class))),
+        @ApiResponse(responseCode = "401", description = "Non autorizzato", content = @Content(mediaType = "application/json", schema = @Schema(implementation = ErrorResponse.class))),
+        @ApiResponse(responseCode = "404", description = "Prodotto non trovato", content = @Content(mediaType = "application/json", schema = @Schema(implementation = ErrorResponse.class))),
+        @ApiResponse(responseCode = "500", description = "Errore del server", content = @Content(mediaType = "application/json", schema = @Schema(implementation = ErrorResponse.class)))
+})
+public ResponseEntity<?> getUserFavoriteProducts(@PathVariable Long id) {
+    log.info("GET /api/products/v1/user/{}/favorite", id);
+    try {
+        return ResponseEntity.ok(productService.getUserFavoriteProducts(id));
+    } catch (Exception e) {
+        log.error("GET /api/products/v1/user/{}/favorite - ERROR: {}", id, e.getMessage());
+        return ResponseEntity.badRequest().body(e.getMessage());
+    }
+}
+
+@DeleteMapping("/v1/user/{id}/favorite")
+@Operation(summary = "Elimina un prodotto dai preferiti", description = "Endpoint per eliminare un prodotto dai preferiti")
+@ResponseStatus(HttpStatus.OK)
+@ApiResponses(value = {
+        @ApiResponse(responseCode = "200", description = "Prodotto eliminato dai preferiti", content = @Content(mediaType = "application/json", schema = @Schema(implementation = ProductResponse.class))),
+        @ApiResponse(responseCode = "400", description = "Richiesta non valida", content = @Content(mediaType = "application/json", schema = @Schema(implementation = ErrorResponse.class))),
+        @ApiResponse(responseCode = "401", description = "Non autorizzato", content = @Content(mediaType = "application/json", schema = @Schema(implementation = ErrorResponse.class))),
+        @ApiResponse(responseCode = "404", description = "Prodotto non trovato", content = @Content(mediaType = "application/json", schema = @Schema(implementation = ErrorResponse.class))),
+        @ApiResponse(responseCode = "500", description = "Errore del server", content = @Content(mediaType = "application/json", schema = @Schema(implementation = ErrorResponse.class)))
+})
+public ResponseEntity<?> deleteUserFavoriteProduct(@PathVariable Long id) {
+    log.info("DELETE /api/products/v1/user/{}/favorite", id);
+    try {
+        return ResponseEntity.ok(productService.deleteUserFavoriteProduct(id));
+    } catch (Exception e) {
+        log.error("DELETE /api/products/v1/user/{}/favorite - ERROR: {}", id, e.getMessage());
+        return ResponseEntity.badRequest().body(e.getMessage());
+    }
+}
+
 }

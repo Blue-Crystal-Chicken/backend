@@ -12,4 +12,5 @@ public class OfferRequest {
     private String imgPath;
     private MultipartFile image;
     private List<Long> menuIds;
+    private List<OfferProductRequest> products;
 }

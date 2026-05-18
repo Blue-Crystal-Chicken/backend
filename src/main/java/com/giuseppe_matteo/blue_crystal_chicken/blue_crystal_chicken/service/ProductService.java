@@ -1,9 +1,11 @@
 package com.giuseppe_matteo.blue_crystal_chicken.blue_crystal_chicken.service;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
@@ -20,37 +22,34 @@ import com.giuseppe_matteo.blue_crystal_chicken.blue_crystal_chicken.entity.Cate
 import com.giuseppe_matteo.blue_crystal_chicken.blue_crystal_chicken.entity.Category;
 import com.giuseppe_matteo.blue_crystal_chicken.blue_crystal_chicken.entity.IngredientEntity;
 import com.giuseppe_matteo.blue_crystal_chicken.blue_crystal_chicken.entity.ProductEntity;
+import com.giuseppe_matteo.blue_crystal_chicken.blue_crystal_chicken.entity.UserFavoriteProduct;
+import com.giuseppe_matteo.blue_crystal_chicken.blue_crystal_chicken.entity.key.UserProductKey;
 import com.giuseppe_matteo.blue_crystal_chicken.blue_crystal_chicken.repository.IngredientRepository;
 import com.giuseppe_matteo.blue_crystal_chicken.blue_crystal_chicken.repository.CategoryRepository;
 import com.giuseppe_matteo.blue_crystal_chicken.blue_crystal_chicken.repository.ProductRepository;
+import com.giuseppe_matteo.blue_crystal_chicken.blue_crystal_chicken.repository.UserFavoriteProductRepository;
 import com.giuseppe_matteo.blue_crystal_chicken.blue_crystal_chicken.exception.ProductNotFoundException;
 import com.giuseppe_matteo.blue_crystal_chicken.blue_crystal_chicken.exception.ProductAlreadyExistsException;
 import org.springframework.data.domain.Pageable;
+import org.springframework.http.ResponseEntity;
 import org.springframework.data.domain.Page;
 import org.springframework.beans.factory.annotation.Value;
 import lombok.extern.slf4j.Slf4j;
+import lombok.RequiredArgsConstructor;
 
 @Service
 @Slf4j
+@RequiredArgsConstructor
 public class ProductService {
 
     private final ProductRepository productRepository;
     private final IngredientRepository ingredientRepository;
     private final ProductMapper productMapper;
     private final CategoryRepository categoryRepository;
+    private final UserFavoriteProductRepository userFavoriteProductRepository;
 
     @Value("${app.upload.dir}")
     private String uploadDir;
-
-    public ProductService(ProductRepository productRepository,
-            IngredientRepository ingredientRepository,
-            ProductMapper productMapper,
-            CategoryRepository categoryRepository) {
-        this.productRepository = productRepository;
-        this.ingredientRepository = ingredientRepository;
-        this.productMapper = productMapper;
-        this.categoryRepository = categoryRepository;
-    }
 
     // -------------------------------------------------------------------------
     // GET ALL
@@ -220,7 +219,7 @@ public class ProductService {
                 });
 
         // ------------------------
-        // CATEGORY (FIX IMPORTANTE)
+        // CATEGORY
         // ------------------------
         CategoryName categoryName = CategoryName.valueOf(request.getCategoryName().toUpperCase());
         Category category = categoryRepository.findByName(categoryName)
@@ -303,5 +302,35 @@ public class ProductService {
         productRepository.delete(product);
         log.info("Product deleted with id: {}", id);
         return productMapper.toResponse(product);
+    }
+
+    //-------- FAVORITE --------
+
+    // CREATE
+    @Transactional
+    public ResponseEntity<?> addUserFavoriteProduct(Long userId, Long productId) {
+        UserFavoriteProduct userFavoriteProduct = new UserFavoriteProduct();
+        userFavoriteProduct.setId(new UserProductKey(userId, productId));
+        userFavoriteProductRepository.save(userFavoriteProduct);
+        return ResponseEntity.ok("User favorite product added successfully");
+    }
+
+    // READ
+    @Transactional(readOnly = true)
+    public ResponseEntity<List<ProductResponse>> getUserFavoriteProducts(Long userId) {
+        List<UserFavoriteProduct> userFavoriteProducts = userFavoriteProductRepository.findByIdUserId(userId);
+        List<ProductResponse> productResponse = new ArrayList<>();
+        for (UserFavoriteProduct userFavoriteProduct : userFavoriteProducts) {
+            productResponse.add(productMapper.toResponse(userFavoriteProduct.getProduct()));
+        }
+        return ResponseEntity.ok(productResponse);
+    }
+
+    // DELETE
+    @Transactional
+    public ResponseEntity<?> deleteUserFavoriteProduct(Long userId, Long productId) {
+        UserFavoriteProduct userFavoriteProduct = userFavoriteProductRepository.findByIdUserId(userId)
+        userFavoriteProductRepository.delete(userFavoriteProduct);
+        return ResponseEntity.ok("User favorite product deleted successfully");
     }
 }

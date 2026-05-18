@@ -1,6 +1,7 @@
 package com.giuseppe_matteo.blue_crystal_chicken.blue_crystal_chicken.service;
 
 import com.giuseppe_matteo.blue_crystal_chicken.blue_crystal_chicken.dto.mapper.OfferMapper;
+import com.giuseppe_matteo.blue_crystal_chicken.blue_crystal_chicken.dto.request.OfferProductRequest;
 import com.giuseppe_matteo.blue_crystal_chicken.blue_crystal_chicken.dto.request.OfferRequest;
 import com.giuseppe_matteo.blue_crystal_chicken.blue_crystal_chicken.dto.response.OfferResponse;
 import com.giuseppe_matteo.blue_crystal_chicken.blue_crystal_chicken.entity.MenuEntity;
@@ -23,10 +24,13 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.nio.file.StandardCopyOption;
 import java.util.List;
+import java.util.ArrayList;
 import java.util.UUID;
+import lombok.extern.slf4j.Slf4j;
 
 @Service
 @RequiredArgsConstructor
+@Slf4j
 public class OfferService {
 
     private final OfferRepository offerRepository;
@@ -41,7 +45,10 @@ public class OfferService {
     // ── READ ────────────────────────────────────────────────────────────────
 
     public List<OfferResponse> findAll() {
-        return offerMapper.toResponseList(offerRepository.findAll());
+        log.info("Fetching all offers");
+        List<OfferResponse> offers = offerMapper.toResponseList(offerRepository.findAll());
+        log.info("Found {} offers", offers.size());
+        return offers;
     }
 
     public Page<OfferResponse> findPage(Pageable pageable) {
@@ -53,8 +60,20 @@ public class OfferService {
     }
 
     public OfferEntity findById(Long id) {
+        log.info("Finding offer by id: {}", id);
         return offerRepository.findById(id)
+                .orElseThrow(() -> {
+                    log.error("Offer not found with id: {}", id);
+                    return new RuntimeException("Offerta non trovata con id: " + id);
+                });
+    }
+
+    public OfferResponse findByIdWithProducts(Long id) {
+        OfferEntity offerEntity = offerRepository.findById(id)
                 .orElseThrow(() -> new RuntimeException("Offerta non trovata con id: " + id));
+        ArrayList<OfferProduct> products = new ArrayList<>(offerProductRepository.findById_OfferId(id));
+        offerEntity.setOfferProducts(products);
+        return offerMapper.toResponse(offerEntity);
     }
 
     public List<OfferResponse> findByName(String name) {
@@ -77,7 +96,9 @@ public class OfferService {
 
     @Transactional
     public OfferResponse create(OfferRequest request) {
+        log.info("Creating new offer: {}", request.getName());
         if (offerRepository.existsByName(request.getName())) {
+            log.error("Offer with name '{}' already exists", request.getName());
             throw new RuntimeException("Offerta con nome '" + request.getName() + "' già esistente");
         }
         OfferEntity offer = new OfferEntity();
@@ -104,7 +125,21 @@ public class OfferService {
             }
         }
 
-        return offerMapper.toResponse(saved);
+        if (request.getProducts() != null) {
+            List<OfferProduct> offerProducts = new ArrayList<>();
+            for (OfferProductRequest prodReq : request.getProducts()) {
+                ProductEntity product = productService.findById(prodReq.getProductId());
+                OfferProduct offerProduct = new OfferProduct();
+                offerProduct.setId(new OfferProductKey(saved.getId(), product.getId()));
+                offerProduct.setOffer(saved); 
+                offerProduct.setProduct(product);
+                offerProduct.setQuantity(prodReq.getQuantity());
+                offerProducts.add(offerProduct);
+            }
+            saved.setOfferProducts(offerProducts);
+            saved = offerRepository.save(saved); 
+        }
+    return offerMapper.toResponse(saved);
     }
 
     @Transactional
@@ -162,10 +197,13 @@ public class OfferService {
 
     @Transactional
     public void delete(Long id) {
+        log.info("Deleting offer with id: {}", id);
         if (!offerRepository.existsById(id)) {
+            log.error("Attempted to delete non-existent offer with id: {}", id);
             throw new RuntimeException("Offerta non trovata con id: " + id);
         }
         offerRepository.deleteById(id);
+        log.info("Offer deleted successfully: {}", id);
     }
 
     private String saveImage(MultipartFile file) throws IOException {

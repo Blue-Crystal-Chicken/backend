@@ -6,11 +6,13 @@ import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Size;
 import org.hibernate.annotations.ColumnDefault;
 import com.fasterxml.jackson.annotation.JsonProperty;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import lombok.*;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Set;
 
 /**
  * Represents a user in the Blue Crystal Kitchen system.
@@ -80,6 +82,10 @@ public class UserEntity {
     @JoinColumn(name = "Location_id")
     @JsonIgnoreProperties("locationIngredients")
     private LocationEntity location;
+
+    @OneToMany(mappedBy = "user")
+    @JsonIgnore
+    private Set<UserFavoriteProduct> favoriteProducts;
 
     @PrePersist
     protected void onCreate() {

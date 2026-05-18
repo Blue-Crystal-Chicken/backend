@@ -62,7 +62,8 @@ public class OfferMapperImpl implements OfferMapper {
         response.setProductId(offerProduct.getProduct().getId());
         response.setProductName(offerProduct.getProduct().getName());
         response.setQuantity(offerProduct.getQuantity());
-        response.setUnitPrice(offerProduct.getOffer().getPrice());
+        response.setUnitPrice(offerProduct.getProduct().getPrice());
+        response.setProductImagePath(offerProduct.getProduct().getImgPath());
 
         return response;
     }

@@ -8,6 +8,9 @@ import lombok.*;
 
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Set;
+
+import com.fasterxml.jackson.annotation.JsonIgnore;
 
 /**
  * Represents a product in the Blue Crystal Kitchen system.
@@ -104,6 +107,10 @@ public class ProductEntity {
 
     @OneToMany(mappedBy = "product", cascade = CascadeType.ALL)
     private List<OrderProduct> orderProducts;
+
+    @OneToMany(mappedBy = "product")
+    @JsonIgnore
+    private Set<UserFavoriteProduct> favoriteProducts;
 
     // ==================== TIMESTAMPS ====================
 

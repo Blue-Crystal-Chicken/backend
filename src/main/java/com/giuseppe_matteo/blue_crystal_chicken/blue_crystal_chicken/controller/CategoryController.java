@@ -9,6 +9,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
+import lombok.extern.slf4j.Slf4j;
 
 import com.giuseppe_matteo.blue_crystal_chicken.blue_crystal_chicken.entity.Category;
 import com.giuseppe_matteo.blue_crystal_chicken.blue_crystal_chicken.service.CategoryService;
@@ -24,6 +25,7 @@ import com.giuseppe_matteo.blue_crystal_chicken.blue_crystal_chicken.dto.request
 
 @RestController
 @RequestMapping("/api/categories")
+@Slf4j
 public class CategoryController {
     
     @Autowired
@@ -41,6 +43,7 @@ public class CategoryController {
         @ApiResponse(responseCode = "500", description = "Errore del server", content = @Content(mediaType = "application/json", schema = @Schema(implementation = ErrorResponse.class)))
     })
     public ResponseEntity<?> createCategory(@RequestBody CategoryRequest category) {
+        log.info("REST request to create category: {}", category);
         try{
             return ResponseEntity.ok(categoryService.save(category));
         }catch(Exception e){
@@ -59,6 +62,7 @@ public class CategoryController {
         @ApiResponse(responseCode = "500", description = "Errore del server", content = @Content(mediaType = "application/json", schema = @Schema(implementation = ErrorResponse.class)))
     })
     public ResponseEntity<?> getCategories() {
+        log.info("REST request to get all categories");
         try{
             return ResponseEntity.ok(categoryService.findAll());
         }catch(Exception e){
@@ -77,6 +81,7 @@ public class CategoryController {
         @ApiResponse(responseCode = "500", description = "Errore del server", content = @Content(mediaType = "application/json", schema = @Schema(implementation = ErrorResponse.class)))
     })
     public ResponseEntity<?> getCategoriesWithTotProduct() {
+        log.info("REST request to get categories with product count");
         try{
             return ResponseEntity.ok(categoryService.getCategoriesWithCount());
         }catch(Exception e){

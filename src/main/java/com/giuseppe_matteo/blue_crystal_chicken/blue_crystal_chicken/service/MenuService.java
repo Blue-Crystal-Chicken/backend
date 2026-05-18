@@ -25,6 +25,7 @@ import java.nio.file.Paths;
 import java.nio.file.StandardCopyOption;
 import java.util.ArrayList;
 import java.util.List;
+import org.springframework.data.domain.Pageable;
 import java.util.UUID;
 
 @Service
@@ -43,7 +44,14 @@ public class MenuService {
     // ── READ ────────────────────────────────────────────────────────────────
 
     public List<MenuResponse> findAll() {
-        return menuMapper.toResponseList(menuRepository.findAll());
+        log.info("Fetching all menus");
+        List<MenuResponse> menus = menuMapper.toResponseList(menuRepository.findAll());
+        log.info("Found {} menus", menus.size());
+        return menus;
+    }
+
+    public List<MenuResponse> findAll(Pageable pageable) {
+        return menuMapper.toResponseList(menuRepository.findAll(pageable).getContent());
     }
 
     public MenuResponse findMenuResponseById(Long id) {
@@ -51,8 +59,12 @@ public class MenuService {
     }
 
     public MenuEntity findById(Long id) {
+        log.info("Finding menu by id: {}", id);
         return menuRepository.findById(id)
-                .orElseThrow(() -> new RuntimeException("Menu non trovato con id: " + id));
+                .orElseThrow(() -> {
+                    log.error("Menu not found with id: {}", id);
+                    return new RuntimeException("Menu non trovato con id: " + id);
+                });
     }
 
     public List<MenuResponse> findByName(String name) {
@@ -88,10 +100,14 @@ public class MenuService {
 
     @Transactional
     public MenuResponse create(MenuEntity menu) {
+        log.info("Creating new menu: {}", menu.getName());
         if (menuRepository.existsByName(menu.getName())) {
+            log.error("Menu with name '{}' already exists", menu.getName());
             throw new RuntimeException("Menu con nome '" + menu.getName() + "' già esistente");
         }
-        return menuMapper.toResponse(menuRepository.save(menu));
+        MenuEntity saved = menuRepository.save(menu);
+        log.info("Menu created successfully: {}", saved.getId());
+        return menuMapper.toResponse(saved);
     }
 
     @Transactional
@@ -174,10 +190,13 @@ public class MenuService {
 
     @Transactional
     public void delete(Long id) {
+        log.info("Deleting menu with id: {}", id);
         if (!menuRepository.existsById(id)) {
+            log.error("Attempted to delete non-existent menu with id: {}", id);
             throw new RuntimeException("Menu non trovato con id: " + id);
         }
         menuRepository.deleteById(id);
+        log.info("Menu deleted successfully: {}", id);
     }
 
     private String saveImage(MultipartFile file) throws IOException {

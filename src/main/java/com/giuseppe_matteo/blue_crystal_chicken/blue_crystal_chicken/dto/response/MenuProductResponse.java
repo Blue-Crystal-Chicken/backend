@@ -8,5 +8,6 @@ public class MenuProductResponse {
     private String productName;
     private Integer quantity;
     private Boolean obligatory;
+    private String productimgPath;
     private Double unitPrice;
 }

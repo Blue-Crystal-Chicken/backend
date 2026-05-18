@@ -3,7 +3,6 @@ package com.giuseppe_matteo.blue_crystal_chicken.blue_crystal_chicken.service;
 import com.giuseppe_matteo.blue_crystal_chicken.blue_crystal_chicken.dto.request.OrderItemRequest;
 import com.giuseppe_matteo.blue_crystal_chicken.blue_crystal_chicken.dto.request.OrderRequest;
 import com.giuseppe_matteo.blue_crystal_chicken.blue_crystal_chicken.dto.request.UpdateOrderRequest;
-import com.giuseppe_matteo.blue_crystal_chicken.blue_crystal_chicken.dto.response.IngredientResponse;
 import com.giuseppe_matteo.blue_crystal_chicken.blue_crystal_chicken.entity.*;
 import com.giuseppe_matteo.blue_crystal_chicken.blue_crystal_chicken.repository.*;
 import com.giuseppe_matteo.blue_crystal_chicken.blue_crystal_chicken.dto.mapper.OrderMapper;
@@ -42,13 +41,21 @@ public class OrderService {
     }
 
     public OrderEntity findById(Long id) {
+        log.info("Finding order by id: {}", id);
         return orderRepository.findById(id)
-                .orElseThrow(() -> new RuntimeException("Ordine non trovato con id: " + id));
+                .orElseThrow(() -> {
+                    log.error("Order not found with id: {}", id);
+                    return new RuntimeException("Ordine non trovato con id: " + id);
+                });
     }
 
     public OrderEntity findByOrderId(String orderId) {
+        log.info("Finding order by orderId: {}", orderId);
         return orderRepository.findByOrderId(orderId)
-                .orElseThrow(() -> new RuntimeException("Ordine non trovato con orderId: " + orderId));
+                .orElseThrow(() -> {
+                    log.error("Order not found with orderId: {}", orderId);
+                    return new RuntimeException("Ordine non trovato con orderId: " + orderId);
+                });
     }
 
     public List<OrderEntity> findByUserId(Long userId) {
@@ -81,14 +88,16 @@ public class OrderService {
         return count != null ? count : 0;
     }
 
-    // ── WRITE ───────────────────────────────────────────────────────────────
+    // ── CREATE ───────────────────────────────────────────────────────────────
 
     @Transactional
     public OrderEntity create(OrderRequest request) {
         // Map flat fields + generate orderId
         OrderEntity order = orderMapper.toEntity(request);
+        log.info("Creating new order with orderId: {}", order.getOrderId());
 
         if (orderRepository.existsByOrderId(order.getOrderId())) {
+            log.error("Order with orderId '{}' already exists", order.getOrderId());
             throw new RuntimeException("Ordine con orderId '" + order.getOrderId() + "' già esistente");
         }
 
@@ -162,6 +171,7 @@ public class OrderService {
                     op.setMenu(menu);
                     unitPrice = BigDecimal.valueOf(menu.getPrice() != null ? menu.getPrice() : 0.0);
                 }else {
+                    log.error("Order item missing reference: {}", item);
                     throw new RuntimeException("Ogni elemento dell'ordine deve avere un productId, un offerId o un menuId");
                 }
                 // Aggiunta ingredienti se presenti
@@ -190,28 +200,37 @@ public class OrderService {
 
     @Transactional
     public OrderEntity update(Long id, UpdateOrderRequest request) {
+        log.info("Updating order with id: {}", id);
         OrderEntity existing = findById(id);
         if (request.getServiceType() != null) existing.setServiceType(request.getServiceType());
         if (request.getOrderType() != null) existing.setOrderType(request.getOrderType());
         if (request.getTableNumber() != null) existing.setTableNumber(request.getTableNumber());
         if (request.getPaymentType() != null) existing.setPaymentType(request.getPaymentType());
         if (request.getStatus() != null) existing.setStatus(OrderStatus.valueOf(request.getStatus()));
-        return orderRepository.save(existing);
+        OrderEntity updated = orderRepository.save(existing);
+        log.info("Order updated successfully: {}", updated.getId());
+        return updated;
     }
 
     @Transactional
     public OrderEntity updateStatus(Long id, String status) {
+        log.info("Updating status for order id {}: {}", id, status);
         OrderEntity existing = findById(id);
         existing.setStatus(OrderStatus.valueOf(status.toUpperCase()));
-        return orderRepository.save(existing);
+        OrderEntity updated = orderRepository.save(existing);
+        log.info("Order status updated successfully: {}", updated.getId());
+        return updated;
     }
 
     @Transactional
     public void delete(Long id) {
+        log.info("Deleting order with id: {}", id);
         if (!orderRepository.existsById(id)) {
+            log.error("Attempted to delete non-existent order with id: {}", id);
             throw new RuntimeException("Ordine non trovato con id: " + id);
         }
         orderRepository.deleteById(id);
+        log.info("Order deleted successfully: {}", id);
     }
 
 
@@ -230,8 +249,5 @@ public class OrderService {
     }
 
 
-    private BigDecimal totalAdditions(OrderItemRequest item){
-        BigDecimal additions = BigDecimal.ZERO;
-        return additions;
-    }
+    
 }

@@ -12,6 +12,7 @@ import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.web.bind.annotation.*;
+import lombok.extern.slf4j.Slf4j;
 
 import java.util.List;
 import java.util.Map;
@@ -19,6 +20,7 @@ import java.util.Map;
 @RestController
 @RequestMapping("/api/offers")
 @RequiredArgsConstructor
+@Slf4j
 public class OfferController {
 
     private final OfferService offerService;
@@ -27,6 +29,7 @@ public class OfferController {
     // GET /api/offers
     @GetMapping
     public ResponseEntity<List<OfferResponse>> getAll() {
+        log.info("REST request to get all offers");
         return ResponseEntity.ok(offerService.findAll());
     }
 
@@ -40,6 +43,13 @@ public class OfferController {
     // GET /api/offers/{id}
     @GetMapping("/{id}")
     public ResponseEntity<OfferResponse> getById(@PathVariable Long id) {
+        log.info("REST request to get offer by id: {}", id);
+        return ResponseEntity.ok(offerService.findOfferResponseById(id));
+    }
+
+    // GET /api/offers/v1/offer/{id}/details
+    @GetMapping("/v1/offer/{id}/details")
+    public ResponseEntity<OfferResponse> getDetails(@PathVariable Long id) {
         return ResponseEntity.ok(offerService.findOfferResponseById(id));
     }
 
@@ -71,6 +81,7 @@ public class OfferController {
     @PostMapping
     @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<OfferResponse> create(@ModelAttribute OfferRequest offer) {
+        log.info("REST request to create offer: {}", offer.getName());
         return ResponseEntity.status(HttpStatus.CREATED).body(offerService.create(offer));
     }
 
@@ -117,6 +128,7 @@ public class OfferController {
     @DeleteMapping("/{id}")
     @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<Void> delete(@PathVariable Long id) {
+        log.info("REST request to delete offer: {}", id);
         offerService.delete(id);
         return ResponseEntity.noContent().build();
     }

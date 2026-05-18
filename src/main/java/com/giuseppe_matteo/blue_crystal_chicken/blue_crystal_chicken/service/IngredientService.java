@@ -8,12 +8,14 @@ import com.giuseppe_matteo.blue_crystal_chicken.blue_crystal_chicken.repository.
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import lombok.extern.slf4j.Slf4j;
 
 import java.util.List;
 import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
+@Slf4j
 public class IngredientService {
 
     private final IngredientRepository ingredientRepository;
@@ -22,6 +24,7 @@ public class IngredientService {
     // ── READ ────────────────────────────────────────────────────────────────
 
     public List<IngredientResponse> findAll() {
+        log.info("Fetching all ingredients");
         return ingredientRepository.findAll().stream()
                 .map(ingredientMapper::toResponse)
                 .collect(Collectors.toList());
@@ -32,8 +35,12 @@ public class IngredientService {
     }
 
     public IngredientEntity findById(Long id) {
+        log.info("Finding ingredient by id: {}", id);
         return ingredientRepository.findById(id)
-                .orElseThrow(() -> new RuntimeException("Ingrediente non trovato con id: " + id));
+                .orElseThrow(() -> {
+                    log.error("Ingredient not found with id: {}", id);
+                    return new RuntimeException("Ingrediente non trovato con id: " + id);
+                });
     }
 
     public List<IngredientResponse> findByName(String name) {
@@ -64,11 +71,15 @@ public class IngredientService {
 
     @Transactional
     public IngredientResponse create(IngredientRequest request) {
+        log.info("Creating new ingredient: {}", request.getName());
         if (ingredientRepository.existsByName(request.getName())) {
+            log.error("Ingredient with name '{}' already exists", request.getName());
             throw new RuntimeException("Ingrediente con nome '" + request.getName() + "' già esistente");
         }
         IngredientEntity ingredient = ingredientMapper.toEntity(request);
-        return ingredientMapper.toResponse(ingredientRepository.save(ingredient));
+        IngredientEntity saved = ingredientRepository.save(ingredient);
+        log.info("Ingredient created successfully: {}", saved.getId());
+        return ingredientMapper.toResponse(saved);
     }
 
     @Transactional
@@ -83,9 +94,12 @@ public class IngredientService {
 
     @Transactional
     public void delete(Long id) {
+        log.info("Deleting ingredient with id: {}", id);
         if (!ingredientRepository.existsById(id)) {
+            log.error("Attempted to delete non-existent ingredient with id: {}", id);
             throw new RuntimeException("Ingrediente non trovato con id: " + id);
         }
         ingredientRepository.deleteById(id);
+        log.info("Ingredient deleted successfully: {}", id);
     }
 }

@@ -7,6 +7,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import com.giuseppe_matteo.blue_crystal_chicken.blue_crystal_chicken.dto.request.CategoryRequest;
 import com.giuseppe_matteo.blue_crystal_chicken.blue_crystal_chicken.dto.request.OrderItemRequest;
+import com.giuseppe_matteo.blue_crystal_chicken.blue_crystal_chicken.dto.request.OfferProductRequest;
 import com.giuseppe_matteo.blue_crystal_chicken.blue_crystal_chicken.dto.request.OrderRequest;
 import com.giuseppe_matteo.blue_crystal_chicken.blue_crystal_chicken.dto.request.ProductRequest;
 import com.giuseppe_matteo.blue_crystal_chicken.blue_crystal_chicken.dto.request.Register;
@@ -402,7 +403,7 @@ public class DataLoader implements CommandLineRunner {
 
                 try {
                         menuService.createMenu(classicMenu);
-                        log.info("Menu created: {}", classicMenu.getName());
+                        log.info("Menu created: {} - Products: {}", classicMenu.getName(), classicMenu.getProducts().size());
                 } catch (Exception e) {
                         log.debug("Menu already exists or error, skipping: {}", e.getMessage());
                 }
@@ -418,15 +419,23 @@ public class DataLoader implements CommandLineRunner {
                         return;
                 }
 
+                Map<String, Long> p = new HashMap<>();
+                productRepository.findAll().forEach(prod -> p.put(prod.getName(), prod.getId()));
+
                 OfferRequest familyOffer = new OfferRequest();
                 familyOffer.setName("Family Crystal Pack");
                 familyOffer.setPrice(19.90);
                 familyOffer.setDescription("4 Classic Blue Burger + 2 Diamond Fries + 1.5L Soda.");
                 familyOffer.setImgPath("images/offers/family_pack.jpg");
+                familyOffer.setProducts(List.of(
+                        new OfferProductRequest(p.get("Classic Blue Burger"), "Classic Blue Burger", 4, 5.90, "images/prodotti/classic_blue_burger.jpg"),
+                        new OfferProductRequest(p.get("Diamond Fries"), "Diamond Fries", 2, 2.50, "images/prodotti/diamond_fries.jpg"),
+                        new OfferProductRequest(p.get("Blue Lagoon Soda"), "Blue Lagoon Soda", 1, 4.00, "images/prodotti/blue_lagoon_soda.jpg")
+                ));
 
                 try {
                         offerService.create(familyOffer);
-                        log.info("Offer created: {}", familyOffer.getName());
+                        log.info("Offer created: {} - Products: {}", familyOffer.getName(), familyOffer.getProducts().size());
                 } catch (Exception e) {
                         log.debug("Offer already exists or error, skipping: {}", e.getMessage());
                 }

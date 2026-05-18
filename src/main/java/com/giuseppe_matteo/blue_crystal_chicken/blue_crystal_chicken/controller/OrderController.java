@@ -8,6 +8,7 @@ import com.giuseppe_matteo.blue_crystal_chicken.blue_crystal_chicken.dto.respons
 import com.giuseppe_matteo.blue_crystal_chicken.blue_crystal_chicken.entity.OrderEntity;
 import com.giuseppe_matteo.blue_crystal_chicken.blue_crystal_chicken.service.OrderService;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -23,6 +24,7 @@ import java.util.stream.Collectors;
 @RestController
 @RequestMapping("/api/orders")
 @RequiredArgsConstructor
+@Slf4j
 public class OrderController {
 
     private final OrderService orderService;
@@ -31,6 +33,7 @@ public class OrderController {
     // GET /api/orders
     @GetMapping
     public ResponseEntity<List<OrderResponse>> getAll() {
+        log.info("REST request to get all orders");
         return ResponseEntity.ok(
                 orderService.findAll().stream()
                         .map(orderMapper::toResponse)
@@ -40,6 +43,7 @@ public class OrderController {
     // GET /api/orders/{id}
     @GetMapping("/{id}")
     public ResponseEntity<OrderResponse> getById(@PathVariable Long id) {
+        log.info("REST request to get order by id: {}", id);
         return ResponseEntity.ok(orderMapper.toResponse(orderService.findById(id)));
     }
 
@@ -106,6 +110,7 @@ public class OrderController {
     // POST /api/orders
     @PostMapping
     public ResponseEntity<OrderResponse> create(@RequestBody OrderRequest order) {
+        log.info("REST request to create order: {}", order);
         OrderEntity created = orderService.create(order);
         return ResponseEntity.status(HttpStatus.CREATED).body(orderMapper.toResponse(created));
     }
@@ -114,6 +119,7 @@ public class OrderController {
     @PutMapping("/{id}")
     @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<OrderResponse> update(@PathVariable Long id, @RequestBody UpdateOrderRequest request) {
+        log.info("REST request to update order {}: {}", id, request);
         OrderEntity updated = orderService.update(id, request);
         return ResponseEntity.ok(orderMapper.toResponse(updated));
     }
@@ -130,6 +136,7 @@ public class OrderController {
     @DeleteMapping("/{id}")
     @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<Void> delete(@PathVariable Long id) {
+        log.info("REST request to delete order: {}", id);
         orderService.delete(id);
         return ResponseEntity.noContent().build();
     }

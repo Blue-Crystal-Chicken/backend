@@ -6,6 +6,9 @@ import com.giuseppe_matteo.blue_crystal_chicken.blue_crystal_chicken.dto.respons
 import com.giuseppe_matteo.blue_crystal_chicken.blue_crystal_chicken.dto.response.MenuResponse;
 import com.giuseppe_matteo.blue_crystal_chicken.blue_crystal_chicken.service.MenuService;
 import lombok.RequiredArgsConstructor;
+
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -27,12 +30,20 @@ public class MenuController {
     // GET /api/menus
     @GetMapping
     public ResponseEntity<List<MenuResponse>> getAll() {
+        log.info("REST request to get all menus");
         return ResponseEntity.ok(menuService.findAll());
+    }
+
+    @GetMapping("/v1/top")
+    public ResponseEntity<List<MenuResponse>> getAllPageable(@RequestParam(defaultValue = "5") int limit) {
+        Pageable pageable = PageRequest.of(0, limit);
+        return ResponseEntity.ok(menuService.findAll(pageable));
     }
 
     // GET /api/menus/{id}
     @GetMapping("/{id}")
     public ResponseEntity<MenuResponse> getById(@PathVariable Long id) {
+        log.info("REST request to get menu by id: {}", id);
         return ResponseEntity.ok(menuService.findMenuResponseById(id));
     }
 
@@ -79,6 +90,7 @@ public class MenuController {
     @PostMapping
     @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<MenuResponse> create(@ModelAttribute MenuRequest menu) {
+        log.info("REST request to create menu: {}", menu.getName());
         return ResponseEntity.status(HttpStatus.CREATED).body(menuService.createMenu(menu));
     }
 
@@ -117,6 +129,7 @@ public class MenuController {
     @DeleteMapping("/{id}")
     @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<Void> delete(@PathVariable Long id) {
+        log.info("REST request to delete menu: {}", id);
         menuService.delete(id);
         return ResponseEntity.noContent().build();
     }
