@@ -329,8 +329,12 @@ public class ProductService {
     // DELETE
     @Transactional
     public ResponseEntity<?> deleteUserFavoriteProduct(Long userId, Long productId) {
-        UserFavoriteProduct userFavoriteProduct = userFavoriteProductRepository.findById(new UserProductKey(userId, productId));
+        UserFavoriteProduct userFavoriteProduct = userFavoriteProductRepository.findById(new UserProductKey(userId, productId)).orElseThrow(() -> {
+                    log.warn("Product not found with id: {}", id);
+                    return new ProductNotFoundException("Prodotto favorito non trovato con id: " + id);
+                });
         userFavoriteProductRepository.delete(userFavoriteProduct);
+        log.info("Favorite product deleted with id: {}", id);
         return ResponseEntity.ok("User favorite product deleted successfully");
     }
 }
