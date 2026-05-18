@@ -329,7 +329,7 @@ public class ProductService {
     // DELETE
     @Transactional
     public ResponseEntity<?> deleteUserFavoriteProduct(Long userId, Long productId) {
-        UserFavoriteProduct userFavoriteProduct = userFavoriteProductRepository.findById(new UserFavoriteProductKey(userId, productId));
+        UserFavoriteProduct userFavoriteProduct = userFavoriteProductRepository.findById(new UserProductKey(userId, productId));
         userFavoriteProductRepository.delete(userFavoriteProduct);
         return ResponseEntity.ok("User favorite product deleted successfully");
     }
