@@ -123,11 +123,15 @@ public class ProductService {
     // GET BY CATEGORY NAME
     // -------------------------------------------------------------------------
 
-    public List<ProductResponse> getProductsByCategoryName(String name){
-        log.info("Fetching products with category name: {}",name);
+    public List<ProductResponse> getProductsByCategoryName(String name, Long userId) {
+        log.info("Fetching products with category name: {} by user: {}",name, userId);
         if(name.equals("ALL")){
             log.info("Fetching all products");
             return getAllProducts();
+        }
+        if(name.equals("FAVORITES")){
+            log.info("Fetching favorite products for user: {}", userId);
+            return getUserFavoriteProducts(userId).getBody();
         }
         log.info("Converting category name to enum");
         CategoryName categoryName = CategoryName.valueOf(name);

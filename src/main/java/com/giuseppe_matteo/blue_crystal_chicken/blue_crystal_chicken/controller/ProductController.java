@@ -82,7 +82,7 @@ public class ProductController {
         }
     }
 
-    @GetMapping("/v1/category/{category}")
+    @GetMapping("/v1/category/{category}/{userId}")
     @Operation(summary = "Lista prodotti filtrato per categoria", description = "Endpoit per ricevere una lista filtrata di prodotti tramite la categoria")
     @ResponseStatus(HttpStatus.OK)
     @ApiResponses(value = {
@@ -92,10 +92,10 @@ public class ProductController {
             @ApiResponse(responseCode = "404", description = "Prodotto non trovato", content = @Content(mediaType = "application/json", schema = @Schema(implementation = ErrorResponse.class))),
             @ApiResponse(responseCode = "500", description = "Errore del server", content = @Content(mediaType = "application/json", schema = @Schema(implementation = ErrorResponse.class)))
     })
-    public ResponseEntity<?> getProductsByCategoryName(@PathVariable String category) {
+    public ResponseEntity<?> getProductsByCategoryName(@PathVariable String category, @PathVariable Long userId) {
         log.info("GET /api/products/v1/category/{}", category);
         try {
-            return ResponseEntity.ok(productService.getProductsByCategoryName(category.trim().toUpperCase()));
+            return ResponseEntity.ok(productService.getProductsByCategoryName(category.trim().toUpperCase(), userId));
         } catch (Exception e) {
             log.error("GET /api/products/v1/category/{} - ERROR: {}", category, e.getMessage());
             return ResponseEntity.badRequest().body(e.getMessage());
@@ -208,7 +208,7 @@ public class ProductController {
     }
 }
 
-//POST /api/products/v1/user/{id}/favorite
+//POST /api/products/v1/user/favorite
 @PostMapping("/v1/user/favorite")
 @Operation(summary = "Aggiunge un prodotto ai preferiti", description = "Endpoint per aggiungere un prodotto ai preferiti")
 @ResponseStatus(HttpStatus.OK)
@@ -261,11 +261,11 @@ public ResponseEntity<?> getUserFavoriteProducts(@PathVariable Long id) {
         @ApiResponse(responseCode = "500", description = "Errore del server", content = @Content(mediaType = "application/json", schema = @Schema(implementation = ErrorResponse.class)))
 })
 public ResponseEntity<?> deleteUserFavoriteProduct(@PathVariable Long userId, @PathVariable Long productId) {
-    log.info("DELETE /api/products/v1/user/{}/favorite", userId);
+    log.info("DELETE /api/products/v1/user/{}/favorite/{}", userId, productId);
     try {
         return ResponseEntity.ok(productService.deleteUserFavoriteProduct(userId, productId));
     } catch (Exception e) {
-        log.error("DELETE /api/products/v1/user/{}/favorite - ERROR: {}", userId, e.getMessage());
+        log.error("DELETE /api/products/v1/user/{}/favorite/{} - ERROR: {}", userId, productId, e.getMessage());
         return ResponseEntity.badRequest().body(e.getMessage());
     }
 }
