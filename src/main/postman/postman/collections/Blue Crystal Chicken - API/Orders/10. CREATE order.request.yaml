@@ -1,0 +1,20 @@
+$kind: http-request
+url: "{{baseUrl}}/api/orders"
+method: POST
+headers:
+  Content-Type: application/json
+body:
+  type: text
+  content: |-
+    {
+      "orderId": "ORD-2024-001",
+      "code": "A01",
+      "serviceType": "TABLE",
+      "orderType": "STANDARD",
+      "tableNumber": "5",
+      "paymentType": "CARD",
+      "paymentAmount": 25.98,
+      "totalAt": 25.98,
+      "user": { "id": 1 }
+    }
+order: 10000

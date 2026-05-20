@@ -1,0 +1,4 @@
+$kind: http-request
+url: "{{baseUrl}}/api/locations/city/Torino"
+method: GET
+order: 4000

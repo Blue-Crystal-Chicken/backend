@@ -1,0 +1,4 @@
+$kind: http-request
+url: "{{baseUrl}}/api/offers/1/menus/1"
+method: POST
+order: 10000

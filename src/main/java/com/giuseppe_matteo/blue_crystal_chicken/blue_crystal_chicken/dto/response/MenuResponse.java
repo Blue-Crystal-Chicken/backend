@@ -13,4 +13,5 @@ public class MenuResponse {
     private String imgPath;
     private List<MenuProductResponse> menuProducts;
     private LocalDateTime updatedAt;
+    private Boolean isFavorite;
 }

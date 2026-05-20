@@ -77,6 +77,20 @@ public class ProductService {
                 .collect(Collectors.toList());
     }
 
+    public List<ProductResponse> getAllProductsByUser(Long userId) {
+        log.info("Fetching all products for user {}", userId);
+        List<ProductEntity> products = productRepository.findAll();
+        List<ProductResponse> productResponses = new ArrayList<>();
+        for (ProductEntity product : products) {
+            productResponses.add(productMapper.toResponse(product));
+        }
+        for (ProductResponse product : productResponses) {
+            product.setIsFavorite(isFavorite(userId, product.getId()));
+        }
+        log.info("Found {} products", products.size());
+        return productResponses;
+    }
+
     public List<ProductResponse> getTopProduct(Pageable pageable) {
         log.info("Fetching top products");
         List<ProductEntity> products = productRepository.findTop5MostOrderedProducts(pageable);
@@ -97,7 +111,20 @@ public class ProductService {
                     log.warn("Product not found with id: {}", id);
                     return new ProductNotFoundException("Prodotto non trovato con id: " + id);
                 });
+        
         return productMapper.toResponse(product);
+    }
+
+    public ProductResponse getProductById(Long id, Long userId) {
+        log.info("Fetching product with id: {} for user: {}", id, userId);
+        ProductEntity product = productRepository.findById(id)
+                .orElseThrow(() -> {
+                    log.warn("Product not found with id: {}", id);
+                    return new ProductNotFoundException("Prodotto non trovato con id: " + id);
+                });
+        ProductResponse response = productMapper.toResponse(product);
+        response.setIsFavorite(isFavorite(userId, id));
+        return response;
     }
 
     // Add this method to ProductService.java
@@ -130,20 +157,42 @@ public class ProductService {
         log.info("Fetching products with category name: {} by user: {}",name, userId);
         if(name.equals("ALL")){
             log.info("Fetching all products");
-            return getAllProducts();
+            if(userId != null){
+                log.info("Fetching all products for user: {}", userId);
+                return getAllProductsByUser(userId);
+            }else{
+                log.info("Fetching all products without user");
+                return getAllProducts();
+            }
         }
         if(name.equals("FAVORITES")){
             log.info("Fetching favorite products for user: {}", userId);
-            return getUserFavoriteProducts(userId).getBody();
+            if(userId == null){
+                log.info("Fetching favorite products without user");
+                return getAllProducts();
+            }else{
+                log.info("Fetching favorite products for user: {}", userId);
+                return getUserFavoriteProducts(userId).getBody();
+            }
         }
         log.info("Converting category name to enum");
         CategoryName categoryName = CategoryName.valueOf(name);
         log.info("Fetching products with category name: {}",categoryName);
         List<ProductEntity> products = productRepository.findByCategoryName(categoryName);
-        log.info("Found {} products", products.size());
-        return products.stream()
+        List<ProductResponse> responses = products.stream()
                 .map(productMapper::toResponse)
                 .collect(Collectors.toList());
+        if(userId != null && !products.isEmpty()){
+            for(ProductResponse product : responses){
+                if(userFavoriteProductRepository.findById(new UserProductKey(userId, product.getId())).isPresent()){
+                    product.setIsFavorite(true);
+                }else{
+                    product.setIsFavorite(false);
+                }
+            }
+        }
+        log.info("Found {} products", responses.size());
+        return responses;
     }
 
 
@@ -163,7 +212,7 @@ public class ProductService {
         ProductEntity entity = productMapper.toEntity(request);
 
         // ------------------------
-        // CATEGORY (FIX)
+        // CATEGORY
         // ------------------------
         if (request.getCategoryName() != null) {
             CategoryName categoryName = CategoryName.valueOf(request.getCategoryName().toUpperCase());
@@ -351,4 +400,10 @@ public class ProductService {
         log.info("Favorite product deleted with id {} - user id {}", productId, userId);
         return ResponseEntity.ok("User favorite product deleted successfully");
     }
+
+    // UTILITY
+    public boolean isFavorite(Long userId, Long productId) {
+        return userFavoriteProductRepository.findById(new UserProductKey(userId, productId)).isPresent();
+    }
+
 }

@@ -1,0 +1,7 @@
+$kind: http-request
+url: "{{baseUrl}}/api/menus/price?min=5&max=20"
+method: GET
+queryParams:
+  min: "5"
+  max: "20"
+order: 4000

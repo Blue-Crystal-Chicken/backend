@@ -1,0 +1,6 @@
+$kind: http-request
+url: "{{baseUrl}}/api/menus/search?name=classic"
+method: GET
+queryParams:
+  name: classic
+order: 3000

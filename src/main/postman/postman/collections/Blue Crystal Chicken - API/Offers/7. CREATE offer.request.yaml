@@ -1,0 +1,13 @@
+$kind: http-request
+url: "{{baseUrl}}/api/offers"
+method: POST
+headers:
+  Content-Type: application/json
+body:
+  type: text
+  content: |-
+    {
+      "name": "Promo Pranzo",
+      "description": "Offerta speciale per il pranzo dalle 12 alle 15"
+    }
+order: 7000

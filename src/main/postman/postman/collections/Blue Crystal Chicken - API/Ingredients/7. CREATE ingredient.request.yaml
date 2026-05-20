@@ -1,0 +1,15 @@
+$kind: http-request
+url: "{{baseUrl}}/api/ingredients"
+method: POST
+headers:
+  Content-Type: application/json
+body:
+  type: text
+  content: |-
+    {
+      "name": "Petto di Pollo",
+      "description": "Petto di pollo fresco",
+      "price": 2.50,
+      "quantity": 100.0
+    }
+order: 7000

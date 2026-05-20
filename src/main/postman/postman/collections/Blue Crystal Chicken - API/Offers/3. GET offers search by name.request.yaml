@@ -1,0 +1,6 @@
+$kind: http-request
+url: "{{baseUrl}}/api/offers/search?name=pranzo"
+method: GET
+queryParams:
+  name: pranzo
+order: 3000

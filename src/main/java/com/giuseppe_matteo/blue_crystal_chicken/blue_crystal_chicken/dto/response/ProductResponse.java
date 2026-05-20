@@ -51,6 +51,8 @@ public class ProductResponse {
     // INGREDIENTS
     // ------------------------
     private List<IngredientResponse> ingredients;
-    
+
+    private Boolean isFavorite;
+
     private LocalDateTime updatedAt;
 }

@@ -53,6 +53,26 @@ public class ProductController {
         }
     }
 
+    @GetMapping("/v1/products/user/{userId}")
+    @Operation(summary = "Lista prodotti per utente", description = "Endpoint per la lista dei prodotti per utente")
+    @ResponseStatus(HttpStatus.OK)
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Lista prodotti per utente", content = @Content(mediaType = "application/json", schema = @Schema(implementation = ProductResponse.class))),
+            @ApiResponse(responseCode = "400", description = "Richiesta non valida", content = @Content(mediaType = "application/json", schema = @Schema(implementation = ErrorResponse.class))),
+            @ApiResponse(responseCode = "401", description = "Non autorizzato", content = @Content(mediaType = "application/json", schema = @Schema(implementation = ErrorResponse.class))),
+            @ApiResponse(responseCode = "404", description = "Prodotto non trovato", content = @Content(mediaType = "application/json", schema = @Schema(implementation = ErrorResponse.class))),
+            @ApiResponse(responseCode = "500", description = "Errore del server", content = @Content(mediaType = "application/json", schema = @Schema(implementation = ErrorResponse.class)))
+    })
+    public ResponseEntity<?> getAllProductsByUser(@PathVariable Long userId) {
+        log.info("GET /api/products/v1/products/{}", userId);
+        try {
+            return ResponseEntity.ok(productService.getAllProductsByUser(userId));
+        } catch (Exception e) {
+            log.error("GET /api/products/v1/products/{} - ERROR: {}", userId, e.getMessage());
+            return ResponseEntity.badRequest().body(e.getMessage());
+        }
+    }
+
     @GetMapping("/v1/products/{id}")
     @Operation(summary = "Prodotto", description = "Endpoint per il singolo prodotto")
     @ResponseStatus(HttpStatus.OK)
@@ -69,6 +89,26 @@ public class ProductController {
             return ResponseEntity.ok(productService.getProductById(id));
         } catch (Exception e) {
             log.error("GET /api/products/v1/products/{} - ERROR: {}", id, e.getMessage());
+            return ResponseEntity.badRequest().body(e.getMessage());
+        }
+    }
+
+    @GetMapping("/v1/products/{id}/{userId}")
+    @Operation(summary = "Prodotto", description = "Endpoint per il singolo prodotto")
+    @ResponseStatus(HttpStatus.OK)
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Prodotto", content = @Content(mediaType = "application/json", schema = @Schema(implementation = ProductResponse.class))),
+            @ApiResponse(responseCode = "400", description = "Richiesta non valida", content = @Content(mediaType = "application/json", schema = @Schema(implementation = ErrorResponse.class))),
+            @ApiResponse(responseCode = "401", description = "Non autorizzato", content = @Content(mediaType = "application/json", schema = @Schema(implementation = ErrorResponse.class))),
+            @ApiResponse(responseCode = "404", description = "Prodotto non trovato", content = @Content(mediaType = "application/json", schema = @Schema(implementation = ErrorResponse.class))),
+            @ApiResponse(responseCode = "500", description = "Errore del server", content = @Content(mediaType = "application/json", schema = @Schema(implementation = ErrorResponse.class)))
+    })
+    public ResponseEntity<?> getProductById(@PathVariable Long id, @PathVariable Long userId) {
+        log.info("GET /api/products/v1/products/{}/{}", id, userId);
+        try {
+            return ResponseEntity.ok(productService.getProductById(id, userId));
+        } catch (Exception e) {
+            log.error("GET /api/products/v1/products/{}/{} - ERROR: {}", id, userId, e.getMessage());
             return ResponseEntity.badRequest().body(e.getMessage());
         }
     }

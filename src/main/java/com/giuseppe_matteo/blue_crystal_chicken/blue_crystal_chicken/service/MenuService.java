@@ -7,9 +7,15 @@ import com.giuseppe_matteo.blue_crystal_chicken.blue_crystal_chicken.dto.respons
 import com.giuseppe_matteo.blue_crystal_chicken.blue_crystal_chicken.entity.MenuEntity;
 import com.giuseppe_matteo.blue_crystal_chicken.blue_crystal_chicken.entity.MenuProduct;
 import com.giuseppe_matteo.blue_crystal_chicken.blue_crystal_chicken.entity.ProductEntity;
+import com.giuseppe_matteo.blue_crystal_chicken.blue_crystal_chicken.entity.UserEntity;
+import com.giuseppe_matteo.blue_crystal_chicken.blue_crystal_chicken.entity.UserFavoriteMenu;
 import com.giuseppe_matteo.blue_crystal_chicken.blue_crystal_chicken.entity.key.MenuProductKey;
+import com.giuseppe_matteo.blue_crystal_chicken.blue_crystal_chicken.entity.key.UserMenuKey;
 import com.giuseppe_matteo.blue_crystal_chicken.blue_crystal_chicken.repository.MenuProductRepository;
 import com.giuseppe_matteo.blue_crystal_chicken.blue_crystal_chicken.repository.MenuRepository;
+import com.giuseppe_matteo.blue_crystal_chicken.blue_crystal_chicken.repository.UserFavoriteMenuRepository;
+import com.giuseppe_matteo.blue_crystal_chicken.blue_crystal_chicken.repository.UserRepository;
+import org.springframework.http.ResponseEntity;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -37,6 +43,8 @@ public class MenuService {
     private final MenuProductRepository menuProductRepository;
     private final ProductService productService;
     private final MenuMapper menuMapper;
+    private final UserFavoriteMenuRepository userFavoriteMenuRepository;
+    private final UserRepository userRepository;
 
     @Value("${app.upload.dir}")
     private String uploadDir;
@@ -56,6 +64,12 @@ public class MenuService {
 
     public MenuResponse findMenuResponseById(Long id) {
         return menuMapper.toResponse(findById(id));
+    }
+
+    public MenuResponse findMenuResponseById(Long id, Long userId) {
+        MenuResponse response = menuMapper.toResponse(findById(id));
+        response.setIsFavorite(isFavorite(userId, id));
+        return response;
     }
 
     public MenuEntity findById(Long id) {
@@ -208,5 +222,51 @@ public class MenuService {
         Path filePath = uploadPath.resolve(filename);
         Files.copy(file.getInputStream(), filePath, StandardCopyOption.REPLACE_EXISTING);
         return filename;
+    }
+
+    //-------- FAVORITE --------
+
+    @Transactional
+    public ResponseEntity<?> addUserFavoriteMenu(Long userId, Long menuId) {
+        UserEntity user = userRepository.findById(userId)
+                .orElseThrow(() -> new RuntimeException("Utente non trovato con id: " + userId));
+        MenuEntity menu = menuRepository.findById(menuId)
+                .orElseThrow(() -> new RuntimeException("Menu non trovato con id: " + menuId));
+
+        UserFavoriteMenu userFavoriteMenu = new UserFavoriteMenu();
+        userFavoriteMenu.setId(new UserMenuKey(userId, menuId));
+        userFavoriteMenu.setUser(user);
+        userFavoriteMenu.setMenu(menu);
+        userFavoriteMenuRepository.save(userFavoriteMenu);
+        return ResponseEntity.ok("User favorite menu added successfully");
+    }
+
+    @Transactional(readOnly = true)
+    public ResponseEntity<List<MenuResponse>> getUserFavoriteMenus(Long userId) {
+        List<UserFavoriteMenu> userFavoriteMenus = userFavoriteMenuRepository.findByIdUserId(userId);
+        List<MenuResponse> menuResponses = new ArrayList<>();
+        for (UserFavoriteMenu userFavoriteMenu : userFavoriteMenus) {
+            MenuResponse response = menuMapper.toResponse(userFavoriteMenu.getMenu());
+            response.setIsFavorite(true);
+            menuResponses.add(response);
+        }
+        return ResponseEntity.ok(menuResponses);
+    }
+
+    @Transactional
+    public ResponseEntity<?> deleteUserFavoriteMenu(Long userId, Long menuId) {
+        UserFavoriteMenu userFavoriteMenu = userFavoriteMenuRepository.findById(new UserMenuKey(userId, menuId))
+                .orElseThrow(() -> {
+                    log.warn("Menu not found with menu id {} - user id {}", menuId, userId);
+                    return new RuntimeException("Menu favorito non trovato con id: " + menuId);
+                });
+        userFavoriteMenuRepository.delete(userFavoriteMenu);
+        log.info("Favorite menu deleted with id {} - user id {}", menuId, userId);
+        return ResponseEntity.ok("User favorite menu deleted successfully");
+    }
+
+    public boolean isFavorite(Long userId, Long menuId) {
+        if (userId == null) return false;
+        return userFavoriteMenuRepository.findById(new UserMenuKey(userId, menuId)).isPresent();
     }
 }

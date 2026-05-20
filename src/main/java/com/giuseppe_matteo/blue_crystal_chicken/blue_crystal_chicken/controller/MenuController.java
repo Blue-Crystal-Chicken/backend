@@ -2,6 +2,7 @@ package com.giuseppe_matteo.blue_crystal_chicken.blue_crystal_chicken.controller
 
 import com.giuseppe_matteo.blue_crystal_chicken.blue_crystal_chicken.dto.mapper.MenuMapper;
 import com.giuseppe_matteo.blue_crystal_chicken.blue_crystal_chicken.dto.request.MenuRequest;
+import com.giuseppe_matteo.blue_crystal_chicken.blue_crystal_chicken.dto.request.UserFavoriteMenuRequest;
 import com.giuseppe_matteo.blue_crystal_chicken.blue_crystal_chicken.dto.response.MenuProductResponse;
 import com.giuseppe_matteo.blue_crystal_chicken.blue_crystal_chicken.dto.response.MenuResponse;
 import com.giuseppe_matteo.blue_crystal_chicken.blue_crystal_chicken.service.MenuService;
@@ -45,6 +46,12 @@ public class MenuController {
     public ResponseEntity<MenuResponse> getById(@PathVariable Long id) {
         log.info("REST request to get menu by id: {}", id);
         return ResponseEntity.ok(menuService.findMenuResponseById(id));
+    }
+
+    @GetMapping("/v1/menus/{id}/{userId}")
+    public ResponseEntity<MenuResponse> getByIdWithUser(@PathVariable Long id, @PathVariable Long userId) {
+        log.info("REST request to get menu by id: {} for user: {}", id, userId);
+        return ResponseEntity.ok(menuService.findMenuResponseById(id, userId));
     }
 
     // GET /api/menus/search?name=chicken
@@ -132,5 +139,40 @@ public class MenuController {
         log.info("REST request to delete menu: {}", id);
         menuService.delete(id);
         return ResponseEntity.noContent().build();
+    }
+
+    // FAVORITES
+
+    @PostMapping("/favorite/v1/user/")
+    public ResponseEntity<?> addUserFavoriteMenu(@RequestBody UserFavoriteMenuRequest request) {
+        log.info("POST /api/menus/favorite/v1/user/{}", request.getUserId());
+        try {
+            return ResponseEntity.ok(menuService.addUserFavoriteMenu(request.getUserId(), request.getMenuId()));
+        } catch (Exception e) {
+            log.error("POST /api/menus/favorite/v1/user/{} - ERROR: {}", request.getUserId(), e.getMessage());
+            return ResponseEntity.badRequest().body(e.getMessage());
+        }
+    }
+
+    @GetMapping("/favorite/v1/user/{id}")
+    public ResponseEntity<?> getUserFavoriteMenus(@PathVariable Long id) {
+        log.info("GET /api/menus/favorite/v1/user/{}", id);
+        try {
+            return ResponseEntity.ok(menuService.getUserFavoriteMenus(id));
+        } catch (Exception e) {
+            log.error("GET /api/menus/favorite/v1/user/{} - ERROR: {}", id, e.getMessage());
+            return ResponseEntity.badRequest().body(e.getMessage());
+        }
+    }
+
+    @DeleteMapping("/favorite/v1/user/{userId}/{menuId}")
+    public ResponseEntity<?> deleteUserFavoriteMenu(@PathVariable Long userId, @PathVariable Long menuId) {
+        log.info("DELETE /api/menus/favorite/v1/user/{}/{}", userId, menuId);
+        try {
+            return ResponseEntity.ok(menuService.deleteUserFavoriteMenu(userId, menuId));
+        } catch (Exception e) {
+            log.error("DELETE /api/menus/favorite/v1/user/{}/{} - ERROR: {}", userId, menuId, e.getMessage());
+            return ResponseEntity.badRequest().body(e.getMessage());
+        }
     }
 }
