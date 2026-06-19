@@ -96,6 +96,18 @@ public class UserController {
         }
     }
 
+    @PutMapping("/v1/users/{id}/location/{locationId}")
+    @Operation(summary = "Aggiorna locale preferito dell'utente", description = "Associa un locale all'utente per personalizzare il menu e l'esperienza.")
+    @ResponseStatus(HttpStatus.OK)
+    @PreAuthorize("hasRole('ADMIN') or #id == authentication.principal.id")
+    public ResponseEntity<?> updateUserLocation(@PathVariable Long id, @PathVariable Long locationId) {
+        try {
+            return userService.updateUserLocation(id, locationId);
+        } catch (Exception e) {
+            return ResponseEntity.badRequest().body(e.getMessage());
+        }
+    }
+
     @DeleteMapping("/v1/users/{id}")
     @Operation(summary = "Elimina utente", description = "Endpoint per eliminare un utente")
     @ResponseStatus(HttpStatus.OK)

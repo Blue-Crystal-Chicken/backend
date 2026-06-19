@@ -28,6 +28,10 @@ import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.context.SecurityContextHolder;
 
 import java.time.LocalDate;
+import com.giuseppe_matteo.blue_crystal_chicken.blue_crystal_chicken.dto.mapper.LocationMapper;
+import com.giuseppe_matteo.blue_crystal_chicken.blue_crystal_chicken.dto.response.LocationResponse;
+import com.giuseppe_matteo.blue_crystal_chicken.blue_crystal_chicken.entity.LocationEntity;
+import com.giuseppe_matteo.blue_crystal_chicken.blue_crystal_chicken.repository.LocationRepository;
 
 
 @Service
@@ -41,6 +45,12 @@ public class UserService {
 
     @Autowired
     private JwtUtils jwtUtils;
+
+    @Autowired
+    private LocationMapper locationMapper;
+
+    @Autowired
+    private LocationRepository locationRepository;
     
     
 
@@ -57,6 +67,12 @@ public class UserService {
                 .map(GrantedAuthority::getAuthority)
                 .collect(Collectors.toList());
 
+        UserEntity user = userRepository.findById(userDetails.getId()).orElse(null);
+        LocationResponse locationResponse = null;
+        if (user != null && user.getLocation() != null) {
+            locationResponse = locationMapper.toResponse(user.getLocation());
+        }
+
         return ResponseEntity.ok(new JwtResponse(jwt, 
                 userDetails.getId(), 
                 userDetails.getEmail(), 
@@ -65,7 +81,8 @@ public class UserService {
                 userDetails.getPhone(),
                 userDetails.getGender(),
                 userDetails.getBirthday(),
-                roles));
+                roles,
+                locationResponse));
     }
 
     @Transactional(readOnly = true)
@@ -80,6 +97,12 @@ public class UserService {
                 .map(GrantedAuthority::getAuthority)
                 .collect(Collectors.toList());
 
+        UserEntity user = userRepository.findById(userDetails.getId()).orElse(null);
+        LocationResponse locationResponse = null;
+        if (user != null && user.getLocation() != null) {
+            locationResponse = locationMapper.toResponse(user.getLocation());
+        }
+
         // Return user data without a new token (or we could generate a new one if needed, 
         // but for session restoration, the old token is still valid)
         return ResponseEntity.ok(new JwtResponse(null, 
@@ -90,7 +113,8 @@ public class UserService {
                 userDetails.getPhone(),
                 userDetails.getGender(),
                 userDetails.getBirthday(),
-                roles));
+                roles,
+                locationResponse));
     }
 
 
@@ -148,5 +172,13 @@ public class UserService {
         return ResponseEntity.ok("User deleted successfully");
     }
 
-    
+    @Transactional
+    public ResponseEntity<?> updateUserLocation(Long id, Long locationId) {
+        UserEntity existingUser = userRepository.findById(id).orElseThrow(() -> new UserNotFoundException());
+        LocationEntity location = locationRepository.findById(locationId)
+                .orElseThrow(() -> new RuntimeException("Location not found"));
+        existingUser.setLocation(location);
+        UserEntity savedUser = userRepository.save(existingUser);
+        return ResponseEntity.ok(savedUser);
+    }
 }
