@@ -1,0 +1,5 @@
+$kind: http-request
+description: Console web del database H2 in-memory.
+url: "{{baseUrl}}/h2-console"
+method: GET
+order: 3000

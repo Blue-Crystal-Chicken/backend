@@ -1,0 +1,15 @@
+$kind: http-request
+description: Invia una notifica ad un device tramite FCM. Richiede l'ID della notifica e il token FCM del device.
+url: "{{baseUrl}}/device-notifications/send"
+method: POST
+headers:
+  Content-Type: application/json
+body:
+  type: json
+  content: |-
+    {
+      "notificationId": 1,
+      "deviceToken": "fcm-token-example",
+      "deviceTokenRequest": "fcm-token-example"
+    }
+order: 1000

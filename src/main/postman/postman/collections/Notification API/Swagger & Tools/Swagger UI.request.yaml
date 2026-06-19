@@ -1,0 +1,5 @@
+$kind: http-request
+description: Interfaccia grafica Swagger per esplorare le API.
+url: "{{baseUrl}}/swagger-ui/index.html"
+method: GET
+order: 1000

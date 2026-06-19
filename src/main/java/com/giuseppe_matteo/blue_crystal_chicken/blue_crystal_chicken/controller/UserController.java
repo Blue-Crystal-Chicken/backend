@@ -15,11 +15,13 @@ import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
+import jakarta.validation.Valid;
 import lombok.extern.slf4j.Slf4j;
 
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.ResponseStatus;
 
+import com.giuseppe_matteo.blue_crystal_chicken.blue_crystal_chicken.dto.request.UserUpdateRequest;
 import com.giuseppe_matteo.blue_crystal_chicken.blue_crystal_chicken.entity.UserEntity;
 import com.giuseppe_matteo.blue_crystal_chicken.blue_crystal_chicken.service.UserService;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -57,11 +59,11 @@ public class UserController {
     }
 
     @GetMapping("/v1/users/{id}")
-    @Operation(summary = "Lista utenti", description = "Endpoint per la lista degli utenti")
+    @Operation(summary = "Ottieni utente per ID", description = "Endpoint per ottenere un utente per ID")
     @ResponseStatus(HttpStatus.OK)
     @PreAuthorize("hasRole('ADMIN')")
     @ApiResponses(value = {
-            @ApiResponse(responseCode = "200", description = "Lista utenti", content = @Content(mediaType = "application/json", schema = @Schema(implementation = UserEntity.class))),
+            @ApiResponse(responseCode = "200", description = "Utente trovato", content = @Content(mediaType = "application/json", schema = @Schema(implementation = UserEntity.class))),
             @ApiResponse(responseCode = "400", description = "Richiesta non valida", content = @Content(mediaType = "application/json", schema = @Schema(implementation = ErrorResponse.class))),
             @ApiResponse(responseCode = "401", description = "Non autorizzato", content = @Content(mediaType = "application/json", schema = @Schema(implementation = ErrorResponse.class))),
             @ApiResponse(responseCode = "404", description = "Utente non trovato", content = @Content(mediaType = "application/json", schema = @Schema(implementation = ErrorResponse.class))),
@@ -76,9 +78,9 @@ public class UserController {
     }
 
     @PutMapping("/v1/users/{id}")
-    @Operation(summary = "Aggiorna utente", description = "Endpoint per aggiornare un utente")
+    @Operation(summary = "Aggiorna informazioni utente", description = "Aggiorna nome, cognome, email, telefono, genere e compleanno dell'utente. La password non viene modificata.")
     @ResponseStatus(HttpStatus.OK)
-    @PreAuthorize("hasRole('ADMIN')")
+    @PreAuthorize("hasRole('ADMIN') or #id == authentication.principal.id")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "Utente aggiornato con successo", content = @Content(mediaType = "application/json", schema = @Schema(implementation = UserEntity.class))),
             @ApiResponse(responseCode = "400", description = "Richiesta non valida", content = @Content(mediaType = "application/json", schema = @Schema(implementation = ErrorResponse.class))),
@@ -86,9 +88,9 @@ public class UserController {
             @ApiResponse(responseCode = "404", description = "Utente non trovato", content = @Content(mediaType = "application/json", schema = @Schema(implementation = ErrorResponse.class))),
             @ApiResponse(responseCode = "500", description = "Errore del server", content = @Content(mediaType = "application/json", schema = @Schema(implementation = ErrorResponse.class)))
     })
-    public ResponseEntity<?> updateUser(@PathVariable Long id, @RequestBody UserEntity user) {
+    public ResponseEntity<?> updateUser(@PathVariable Long id, @Valid @RequestBody UserUpdateRequest request) {
         try {
-            return ResponseEntity.ok(userService.updateUser(id, user));
+            return userService.updateUser(id, request);
         } catch (Exception e) {
             return ResponseEntity.badRequest().body(e.getMessage());
         }

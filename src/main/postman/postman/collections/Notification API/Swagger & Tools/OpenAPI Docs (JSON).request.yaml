@@ -1,0 +1,5 @@
+$kind: http-request
+description: Documentazione OpenAPI 3.0 in formato JSON.
+url: "{{baseUrl}}/v3/api-docs"
+method: GET
+order: 2000

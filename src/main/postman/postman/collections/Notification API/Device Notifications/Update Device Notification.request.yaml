@@ -1,0 +1,14 @@
+$kind: http-request
+description: Aggiorna lo stato di una device-notification tramite il suo ID.
+url: "{{baseUrl}}/device-notifications/1"
+method: PUT
+headers:
+  Content-Type: application/json
+body:
+  type: json
+  content: |-
+    {
+      "id": 1,
+      "status": "READ"
+    }
+order: 5000

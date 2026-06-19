@@ -1,0 +1,5 @@
+$kind: http-request
+description: Elimina un device tramite il suo ID.
+url: "{{baseUrl}}/devices/1"
+method: DELETE
+order: 5000

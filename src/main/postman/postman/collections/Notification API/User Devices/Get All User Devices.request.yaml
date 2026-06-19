@@ -1,0 +1,5 @@
+$kind: http-request
+description: Recupera tutte le associazioni utente-device.
+url: "{{baseUrl}}/user-devices"
+method: GET
+order: 2000

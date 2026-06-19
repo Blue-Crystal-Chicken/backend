@@ -1,0 +1,15 @@
+$kind: http-request
+description: Imposta la associazione utente-device come inattiva (logout).
+url: "{{baseUrl}}/user-devices/logout"
+method: POST
+headers:
+  Content-Type: application/json
+body:
+  type: json
+  content: |-
+    {
+      "userId": "user-123",
+      "token": "fcm-token-example",
+      "platform": "ANDROID"
+    }
+order: 7000

@@ -1,0 +1,15 @@
+$kind: http-request
+description: Aggiorna una associazione utente-device tramite il suo ID.
+url: "{{baseUrl}}/user-devices/1"
+method: PUT
+headers:
+  Content-Type: application/json
+body:
+  type: json
+  content: |-
+    {
+      "userId": "user-123",
+      "token": "fcm-token-updated",
+      "platform": "IOS"
+    }
+order: 5000

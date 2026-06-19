@@ -1,0 +1,5 @@
+$kind: http-request
+description: Recupera la lista di tutte le device-notification.
+url: "{{baseUrl}}/device-notifications"
+method: GET
+order: 3000

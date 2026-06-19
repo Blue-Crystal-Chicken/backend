@@ -1,0 +1,5 @@
+$kind: http-request
+description: Recupera una associazione utente-device tramite il suo ID.
+url: "{{baseUrl}}/user-devices/1"
+method: GET
+order: 3000

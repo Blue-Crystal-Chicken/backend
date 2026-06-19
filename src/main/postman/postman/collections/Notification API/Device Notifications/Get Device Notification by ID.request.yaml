@@ -1,0 +1,5 @@
+$kind: http-request
+description: Recupera una device-notification tramite il suo ID.
+url: "{{baseUrl}}/device-notifications/1"
+method: GET
+order: 4000

@@ -1,0 +1,19 @@
+$kind: http-request
+description: Aggiorna una notifica esistente tramite il suo ID.
+url: "{{baseUrl}}/api/notification/1"
+method: PUT
+headers:
+  Content-Type: application/json
+body:
+  type: json
+  content: |-
+    {
+      "title": "Richiesta ferie aggiornata",
+      "body": "Giovanni Rossi ha aggiornato la richiesta ferie",
+      "type": "VACATION_REQUEST",
+      "payload": {
+        "startDate": "2025-02-01",
+        "endDate": "2025-02-10"
+      }
+    }
+order: 4000
