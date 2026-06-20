@@ -14,6 +14,9 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.web.PageableDefault;
+import org.springframework.data.domain.Sort;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
@@ -55,9 +58,11 @@ public class OrderController {
 
     // GET /api/orders/user/{userId}
     @GetMapping("/user/{userId}")
-    public ResponseEntity<List<OrderResponse>> getByUser(@PathVariable Long userId) {
+    public ResponseEntity<List<OrderResponse>> getByUser(
+            @PathVariable Long userId,
+            @PageableDefault(size = 10, sort = "createdAt", direction = Sort.Direction.DESC) Pageable pageable) {
         return ResponseEntity.ok(
-                orderService.findByUserId(userId).stream()
+                orderService.findByUserId(userId, pageable).stream()
                         .map(orderMapper::toResponse)
                         .collect(Collectors.toList()));
     }

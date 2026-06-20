@@ -1,6 +1,7 @@
 package com.giuseppe_matteo.blue_crystal_chicken.blue_crystal_chicken.repository;
 
 import com.giuseppe_matteo.blue_crystal_chicken.blue_crystal_chicken.entity.OrderEntity;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
@@ -18,7 +19,8 @@ public interface OrderRepository extends JpaRepository<OrderEntity, Long> {
  
     boolean existsByOrderId(String orderId);
  
-    List<OrderEntity> findByUserId(Long userId);
+    List<OrderEntity> findByUserId(Long userId, Pageable pageable);
+
  
     List<OrderEntity> findByServiceType(String serviceType);
  

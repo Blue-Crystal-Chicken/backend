@@ -11,6 +11,7 @@ import lombok.extern.slf4j.Slf4j;
 
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.data.domain.Pageable;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
@@ -58,8 +59,8 @@ public class OrderService {
                 });
     }
 
-    public List<OrderEntity> findByUserId(Long userId) {
-        return orderRepository.findByUserId(userId);
+    public List<OrderEntity> findByUserId(Long userId, Pageable pageable) {
+        return orderRepository.findByUserId(userId, pageable);
     }
 
     public List<OrderEntity> findByServiceType(String serviceType) {
