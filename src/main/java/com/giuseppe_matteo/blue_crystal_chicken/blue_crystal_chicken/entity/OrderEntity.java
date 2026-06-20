@@ -69,7 +69,7 @@ public class OrderEntity {
     private LocationEntity location;
 
     // Bidirectional with OrderProduct
-    @OneToMany(mappedBy = "order", cascade = CascadeType.ALL, fetch = FetchType.EAGER)
+    @OneToMany(mappedBy = "order", cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.EAGER)
     private List<OrderProduct> orderProducts;
 
 

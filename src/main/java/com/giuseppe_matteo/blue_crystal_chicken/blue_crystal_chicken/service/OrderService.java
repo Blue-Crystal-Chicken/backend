@@ -51,11 +51,12 @@ public class OrderService {
     }
 
     public OrderEntity findByOrderId(String orderId) {
-        log.info("Finding order by orderId: {}", orderId);
+        log.info("Finding order by orderId/code: {}", orderId);
         return orderRepository.findByOrderId(orderId)
+                .or(() -> orderRepository.findFirstByCodeOrderByCreatedAtDesc(orderId))
                 .orElseThrow(() -> {
-                    log.error("Order not found with orderId: {}", orderId);
-                    return new RuntimeException("Ordine non trovato con orderId: " + orderId);
+                    log.error("Order not found with orderId/code: {}", orderId);
+                    return new RuntimeException("Ordine non trovato con id o codice: " + orderId);
                 });
     }
 
@@ -208,6 +209,65 @@ public class OrderService {
         if (request.getTableNumber() != null) existing.setTableNumber(request.getTableNumber());
         if (request.getPaymentType() != null) existing.setPaymentType(request.getPaymentType());
         if (request.getStatus() != null) existing.setStatus(OrderStatus.valueOf(request.getStatus()));
+        
+        if (request.getItems() != null) {
+            log.info("Updating items for order id: {}", id);
+            if (existing.getOrderProducts() != null) {
+                orderProductRepository.deleteAll(existing.getOrderProducts());
+                existing.getOrderProducts().clear();
+            } else {
+                existing.setOrderProducts(new ArrayList<>());
+            }
+            
+            BigDecimal total = BigDecimal.ZERO;
+            if (!request.getItems().isEmpty()) {
+                List<OrderProduct> orderProducts = new ArrayList<>();
+                for (OrderItemRequest item : request.getItems()) {
+                    OrderProduct op = new OrderProduct();
+                    op.setOrder(existing);
+                    op.setQuantity(item.getQuantity() != null ? item.getQuantity() : 1);
+                    op.setSpecialNote(item.getSpecialNote());
+
+                    BigDecimal unitPrice = BigDecimal.ZERO;
+                    if (item.getOfferId() != null) {
+                        OfferEntity offer = offerRepository.findById(item.getOfferId())
+                                .orElseThrow(() -> new RuntimeException("Offerta non trovata con id: " + item.getOfferId()));
+                        op.setOffer(offer);
+                        unitPrice = BigDecimal.valueOf(offer.getPrice() != null ? offer.getPrice() : 0.0);
+                    } else if (item.getProductId() != null) {
+                        ProductEntity product = productRepository.findById(item.getProductId())
+                                .orElseThrow(() -> new RuntimeException("Prodotto non trovato con id: " + item.getProductId()));
+                        op.setProduct(product);
+                        unitPrice = BigDecimal.valueOf(product.getPrice() != null ? product.getPrice() : 0.0);
+                    } else if (item.getMenuId() != null) {
+                        MenuEntity menu = menuRepository.findById(item.getMenuId())
+                            .orElseThrow(() -> new RuntimeException("Menu non trovato con id: " + item.getMenuId()));
+                        op.setMenu(menu);
+                        unitPrice = BigDecimal.valueOf(menu.getPrice() != null ? menu.getPrice() : 0.0);
+                    } else {
+                        throw new RuntimeException("Ogni elemento dell'ordine deve avere un productId, un offerId o un menuId");
+                    }
+                    if (item.getIngredientIds() != null) {
+                        ArrayList<IngredientEntity> ingredients = new ArrayList<>();
+                        for (Long idIng : item.getIngredientIds()) {
+                            IngredientEntity ingredient = ingredientRepository.findById(idIng)
+                                    .orElseThrow(() -> new RuntimeException("Ingrediente non trovato con id: " + idIng));
+                            ingredients.add(ingredient);
+                            unitPrice = unitPrice.add(BigDecimal.valueOf(ingredient.getPrice() != null ? ingredient.getPrice() : 0.0));
+                        }
+                        op.setIngredients(ingredients);
+                    }
+                    op.setPrice(unitPrice);
+                    total = total.add(unitPrice.multiply(BigDecimal.valueOf(op.getQuantity())));
+                    orderProducts.add(op);
+                }
+                orderProductRepository.saveAll(orderProducts);
+                existing.getOrderProducts().addAll(orderProducts);
+            }
+            existing.setTotalAt(total);
+            existing.setPaymentAmount(total);
+        }
+
         OrderEntity updated = orderRepository.save(existing);
         log.info("Order updated successfully: {}", updated.getId());
         return updated;
