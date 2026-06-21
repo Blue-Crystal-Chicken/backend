@@ -22,10 +22,10 @@ import lombok.extern.slf4j.Slf4j;
 @Slf4j
 public class JwtUtils {
 
-    @Value("${be.app.jwtSecret}")
+    @Value("${be.app.jwtSecret:v/K3ZpZ1J4TzFvQ2t4c092ZzhYcjZ6U2x0UHF3Tm01Z3I=}")
     private String jwtSecret;
 
-    @Value("${be.app.jwtExpirationMs}")
+    @Value("${be.app.jwtExpirationMs:86400000}")
     private int jwtExpirationMs;
 
     private SecretKey getSecretKey() {
