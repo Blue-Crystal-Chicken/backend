@@ -112,6 +112,26 @@ public class OrderController {
         return ResponseEntity.ok(Map.of("count", count));
     }
 
+    // GET /api/orders/location/{locationId}/preparing
+    @GetMapping("/location/{locationId}/preparing")
+    public ResponseEntity<List<OrderResponse>> getPreparingOrdersByLocation(@PathVariable Long locationId) {
+        log.info("REST request to get orders in preparation for location id: {}", locationId);
+        return ResponseEntity.ok(
+                orderService.findOrdersInPreparationByLocationId(locationId).stream()
+                        .map(orderMapper::toResponse)
+                        .collect(Collectors.toList()));
+    }
+
+    // GET /api/orders/location/{locationId}/ready
+    @GetMapping("/location/{locationId}/ready")
+    public ResponseEntity<List<OrderResponse>> getReadyOrdersByLocation(@PathVariable Long locationId) {
+        log.info("REST request to get orders ready for location id: {}", locationId);
+        return ResponseEntity.ok(
+                orderService.findOrdersReadyByLocationId(locationId).stream()
+                        .map(orderMapper::toResponse)
+                        .collect(Collectors.toList()));
+    }
+
     // POST /api/orders
     @PostMapping
     public ResponseEntity<OrderResponse> create(@RequestBody OrderRequest order) {

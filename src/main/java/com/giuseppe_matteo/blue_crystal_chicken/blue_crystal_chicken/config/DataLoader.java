@@ -30,8 +30,12 @@ import com.giuseppe_matteo.blue_crystal_chicken.blue_crystal_chicken.service.Men
 import com.giuseppe_matteo.blue_crystal_chicken.blue_crystal_chicken.dto.request.OfferRequest;
 import com.giuseppe_matteo.blue_crystal_chicken.blue_crystal_chicken.service.OfferService;
 import com.giuseppe_matteo.blue_crystal_chicken.blue_crystal_chicken.repository.OfferRepository;
+import com.giuseppe_matteo.blue_crystal_chicken.blue_crystal_chicken.repository.OrderRepository;
 import com.giuseppe_matteo.blue_crystal_chicken.blue_crystal_chicken.service.IngredientService;
+import com.giuseppe_matteo.blue_crystal_chicken.blue_crystal_chicken.repository.CategoryRepository;
 import com.giuseppe_matteo.blue_crystal_chicken.blue_crystal_chicken.repository.IngredientRepository;
+import com.giuseppe_matteo.blue_crystal_chicken.blue_crystal_chicken.repository.LocationRepository;
+import com.giuseppe_matteo.blue_crystal_chicken.blue_crystal_chicken.repository.MenuRepository;
 
 import lombok.extern.slf4j.Slf4j;
 
@@ -80,6 +84,18 @@ public class DataLoader implements CommandLineRunner {
         @Autowired
         private IngredientRepository ingredientRepository;
 
+        @Autowired
+        private CategoryRepository categoryRepository;
+
+        @Autowired
+        private LocationRepository locationRepository;
+
+        @Autowired
+        private MenuRepository menuRepository;
+
+        @Autowired
+        private OrderRepository orderRepository;
+
         @Override
         public void run(String... args) throws Exception {
                 createCategory();
@@ -97,6 +113,10 @@ public class DataLoader implements CommandLineRunner {
         // -----------------------------------------------------------------------
 
         private void createCategory() {
+                if (categoryRepository.count() > 0) {
+                        log.debug("Categories already exist, skipping category creation");
+                        return;
+                }
                 for (CategoryName categoryName : CategoryName.values()) {
                         categoryService.save(new CategoryRequest(categoryName.name()));
                 }
@@ -107,6 +127,10 @@ public class DataLoader implements CommandLineRunner {
         // -----------------------------------------------------------------------
 
         private void createIngredients() {
+                if (ingredientRepository.count() > 0) {
+                        log.debug("Ingredients already exist, skipping ingredient creation");
+                        return;
+                }
                 String[][] ingredientsData = {
                         {"Cheddar", "Formaggio cheddar fuso", "0.80", "100.0"},
                         {"Bacon", "Bacon croccante affumicato", "1.20", "50.0"},
@@ -142,6 +166,10 @@ public class DataLoader implements CommandLineRunner {
          * (thrown on repeated startup) are silently skipped.
          */
         private void createProducts() {
+                if (productRepository.count() > 0) {
+                        log.debug("Products already exist, skipping product creation");
+                        return;
+                }
                 // Build ingredient name → ID map
                 Map<String, Long> iMap = new HashMap<>();
                 ingredientRepository.findAll().forEach(ing -> iMap.put(ing.getName(), ing.getId()));
@@ -329,6 +357,10 @@ public class DataLoader implements CommandLineRunner {
         // -----------------------------------------------------------------------
 
         private void createUsers() {
+                if (userRepository.count() > 0) {
+                        log.debug("Users already exist, skipping user creation");
+                        return;
+                }
                 Register userRequest = new Register();
                 userRequest.setName("Giuseppe");
                 userRequest.setSurname("Tesse");
@@ -346,7 +378,7 @@ public class DataLoader implements CommandLineRunner {
         // -----------------------------------------------------------------------
 
         private void createLocations() {
-                if (!locationService.findAll().isEmpty()) {
+                if (locationRepository.count() > 0) {
                         log.debug("Locations already exist, skipping location creation");
                         return;
                 }
@@ -381,7 +413,7 @@ public class DataLoader implements CommandLineRunner {
         // -----------------------------------------------------------------------
 
         private void createMenus() {
-                if (!menuService.findAll().isEmpty()) {
+                if (menuRepository.count() > 0) {
                         log.debug("Menus already exist, skipping menu creation");
                         return;
                 }
@@ -414,7 +446,7 @@ public class DataLoader implements CommandLineRunner {
         // -----------------------------------------------------------------------
 
         private void createOffers() {
-                if (!offerService.findAll().isEmpty()) {
+                if (offerRepository.count() > 0) {
                         log.debug("Offers already exist, skipping offer creation");
                         return;
                 }
@@ -450,7 +482,7 @@ public class DataLoader implements CommandLineRunner {
          * Skips order creation if orders already exist in the database.
          */
         private void createOrders() {
-                if (!orderService.findAll().isEmpty()) {
+                if (orderRepository.count() > 0) {
                         log.debug("Orders already exist, skipping order creation");
                         return;
                 }

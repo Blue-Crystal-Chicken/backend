@@ -90,6 +90,16 @@ public class OrderService {
         return count != null ? count : 0;
     }
 
+    public List<OrderEntity> findOrdersInPreparationByLocationId(Long locationId) {
+        log.info("Finding preparing orders for location id: {}", locationId);
+        return orderRepository.findOrdersInPreparationByLocationId(locationId);
+    }
+
+    public List<OrderEntity> findOrdersReadyByLocationId(Long locationId) {
+        log.info("Finding ready orders for location id: {}", locationId);
+        return orderRepository.findOrdersReadyByLocationId(locationId);
+    }
+
     // ── CREATE ───────────────────────────────────────────────────────────────
 
     @Transactional
@@ -285,13 +295,15 @@ public class OrderService {
 
     @Transactional
     public void delete(Long id) {
-        log.info("Deleting order with id: {}", id);
-        if (!orderRepository.existsById(id)) {
-            log.error("Attempted to delete non-existent order with id: {}", id);
-            throw new RuntimeException("Ordine non trovato con id: " + id);
-        }
-        orderRepository.deleteById(id);
-        log.info("Order deleted successfully: {}", id);
+        log.info("Cancelling order with id: {}", id);
+        OrderEntity existing = orderRepository.findById(id)
+                .orElseThrow(() -> {
+                    log.error("Attempted to cancel non-existent order with id: {}", id);
+                    return new RuntimeException("Ordine non trovato con id: " + id);
+                });
+        existing.setStatus(OrderStatus.CANCELLED);
+        orderRepository.save(existing);
+        log.info("Order status set to CANCELLED (soft deleted) for id: {}", id);
     }
 
 

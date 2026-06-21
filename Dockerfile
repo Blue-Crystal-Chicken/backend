@@ -17,3 +17,8 @@ COPY --from=builder /app/target/*.jar app.jar
 
 # CREA CARTELLE
 RUN mkdir -p /app/logs \
+    && mkdir -p /app/uploads/images
+
+EXPOSE 8080
+
+ENTRYPOINT ["java", "-jar", "app.jar"]

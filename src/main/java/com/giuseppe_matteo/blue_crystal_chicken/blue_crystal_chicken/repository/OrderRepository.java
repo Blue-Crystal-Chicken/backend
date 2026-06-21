@@ -49,4 +49,12 @@ public interface OrderRepository extends JpaRepository<OrderEntity, Long> {
     // Prendere l ultimo codice di oggi in base alla location_id
     @Query("SELECT MAX(o.code) FROM OrderEntity o WHERE o.location.id = :locationId AND o.createdAt BETWEEN :from AND :to")
     String findLastCodeByLocationIdAndCreatedAtBetween(@Param("locationId") Long locationId, @Param("from") LocalDateTime from, @Param("to") LocalDateTime to);
+
+    // Prendere tutti gli ordini di una location che hanno come stato in preparazione
+    @Query("SELECT o FROM OrderEntity o WHERE o.location.id = :locationId AND o.status = 'PREPARING'")
+    List<OrderEntity> findOrdersInPreparationByLocationId(@Param("locationId") Long locationId);
+
+    // Prendere tutti gli ordini di una location che hanno come stato pronto
+    @Query("SELECT o FROM OrderEntity o WHERE o.location.id = :locationId AND o.status = 'READY'")
+    List<OrderEntity> findOrdersReadyByLocationId(@Param("locationId") Long locationId);
 }
