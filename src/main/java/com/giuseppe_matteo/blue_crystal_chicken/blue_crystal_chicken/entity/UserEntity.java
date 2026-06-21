@@ -15,7 +15,7 @@ import java.util.List;
 import java.util.Set;
 
 /**
- * Represents a user in the Blue Crystal Kitchen system.
+ * Represents a user in the Blue Crystal Chicken system.
  */
 @Entity
 @Table(name = "USERS", uniqueConstraints = {

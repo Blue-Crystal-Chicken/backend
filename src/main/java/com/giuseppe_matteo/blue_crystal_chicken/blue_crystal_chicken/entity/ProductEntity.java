@@ -13,7 +13,7 @@ import java.util.Set;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 
 /**
- * Represents a product in the Blue Crystal Kitchen system.
+ * Represents a product in the Blue Crystal Chicken system.
  */
 @Entity
 @Table(name = "PRODUCTS")

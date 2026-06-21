@@ -7,7 +7,7 @@ import java.time.LocalDateTime;
 import java.util.List;
 
 /**
- * Represents an offer in the Blue Crystal Kitchen system.
+ * Represents an offer in the Blue Crystal Chicken system.
  */
 @Entity
 @Table(name = "OFFER")

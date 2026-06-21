@@ -1,6 +1,6 @@
 # BCC Backend - Spring Boot REST API
 
-Questo è il backend del progetto **Blue Crystal Kitchen (BCC)**, sviluppato in **Spring Boot** (Java 21) e configurato per connettersi ad un database **PostgreSQL**.
+Questo è il backend del progetto **Blue Crystal Chicken (BCC)**, sviluppato in **Spring Boot** (Java 21) e configurato per connettersi ad un database **PostgreSQL**.
 
 ---
 

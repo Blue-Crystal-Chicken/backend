@@ -8,7 +8,7 @@ import java.time.LocalDateTime;
 import java.util.List;
 
 /**
- * Represents a location in the Blue Crystal Kitchen system.
+ * Represents a location in the Blue Crystal Chicken system.
  */
 @Entity
 @Table(name = "LOCATIONS")
