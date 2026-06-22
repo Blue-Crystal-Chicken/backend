@@ -1,0 +1,6 @@
+node_modules
+dist
+.tabellone.pid
+.env
+.env.local
+*.log

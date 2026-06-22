@@ -1,0 +1,6 @@
+node_modules
+dist
+.cucina.pid
+.env
+.env.local
+*.log

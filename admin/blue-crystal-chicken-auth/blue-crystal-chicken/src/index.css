@@ -1,0 +1,78 @@
+@import "tailwindcss";
+
+/* BLUE CRYSTAL CHICKEN — Global Setup
+   Importazione Font per il tema Enterprise 
+*/
+
+@theme {
+  /* Registriamo i font così puoi usare classi come font-display o font-body */
+  --font-display: "Syne", sans-serif;
+  --font-body: "DM Sans", sans-serif;
+
+  /* Registriamo l'animazione custom per Tailwind v4 */
+  --animation-pulse-slow: pulse-dot 2s infinite;
+}
+
+:root {
+  /* Manteniamo i tuoi colori base come fallback se necessario */
+  --color-bg-primary: #0a0c10;
+  --color-text-primary: #f0f4ff;
+}
+
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  padding: 0;
+  font-family: 'DM Sans', system-ui, -apple-system, sans-serif;
+  background-color: #0a0c10;
+  /* Sfondo scuro globale per evitare flash bianchi al caricamento */
+  color: #f0f4ff;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  overflow-x: hidden;
+}
+
+/* Scrollbar personalizzata per lo stile Industrial Dark */
+::-webkit-scrollbar {
+  width: 6px;
+}
+
+::-webkit-scrollbar-track {
+  background: #0a0c10;
+}
+
+::-webkit-scrollbar-thumb {
+  background: #1e293b;
+  border-radius: 10px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: #38b6ff;
+}
+
+/* Utility per le animazioni (usate nel live badge e nella dashboard) */
+@keyframes pulse-dot {
+  0%, 100% {
+    opacity: 1;
+    transform: scale(1);
+  }
+  50% {
+    opacity: 0.4;
+    transform: scale(0.8);
+  }
+}
+
+.animate-pulse-slow {
+  animation: pulse-dot 2s infinite;
+}
+
+/* Stati Ordine Colorati */
+.status-COMPLETED { color: #22d3a0; background: rgba(34, 211, 160, 0.1); }
+.status-IN_PROGRESS { color: #38b6ff; background: rgba(56, 182, 255, 0.1); }
+.status-PENDING { color: #fbbf24; background: rgba(251, 191, 36, 0.1); }
+.status-CANCELLED { color: #ff5e5e; background: rgba(255, 94, 94, 0.1); }

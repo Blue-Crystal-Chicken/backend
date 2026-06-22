@@ -1,0 +1,183 @@
+# =============================================================================
+#  STACK GLOBALE — Blue Crystal Chicken
+#  Orchestra TUTTO: infrastruttura (PostgreSQL + RabbitMQ), i due backend
+#  (principale 8080, notifiche 8085) e i quattro frontend (admin, manager,
+#  cucina, tabellone), ognuno con la propria immagine.
+#
+#  Avvio:   docker compose up -d --build
+#  Stop:    docker compose down            (aggiungi -v per cancellare i dati)
+#  Log:     docker compose logs -f bcc-backend
+#
+#  I frontend sono SPA servite da nginx che fa da reverse-proxy: il browser
+#  chiama same-origin /api e nginx inoltra al servizio backend giusto. Per questo
+#  NON serve esporre 8080/8085 al browser (li pubblichiamo solo per comodità/debug).
+# =============================================================================
+
+services:
+  # ----------------------------- INFRASTRUTTURA -----------------------------
+  postgres:
+    image: postgres:16-alpine
+    container_name: bcc-postgres
+    environment:
+      POSTGRES_USER: ${POSTGRES_USER:-bcc}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-changeme}
+      POSTGRES_DB: ${POSTGRES_DB:-blue_crystal_db}
+    ports:
+      - "${POSTGRES_PORT:-5432}:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+      - ./docker/postgres/init.sql:/docker-entrypoint-initdb.d/init.sql:ro
+    healthcheck:
+      # -d esplicito: senza, pg_isready prova a connettersi a un DB con lo stesso
+      # nome dell'utente (es. "bcc") che non esiste → spam di FATAL nei log.
+      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER:-bcc} -d ${POSTGRES_DB:-blue_crystal_db}"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  rabbitmq:
+    image: rabbitmq:3-management
+    container_name: bcc-rabbitmq
+    environment:
+      RABBITMQ_DEFAULT_USER: ${RABBITMQ_USER:-guest}
+      RABBITMQ_DEFAULT_PASS: ${RABBITMQ_PASSWORD:-guest}
+    ports:
+      - "${RABBITMQ_AMQP_PORT:-5672}:5672"
+      - "${RABBITMQ_UI_PORT:-15672}:15672"
+    volumes:
+      - rabbitmq_data:/var/lib/rabbitmq
+    healthcheck:
+      test: ["CMD", "rabbitmq-diagnostics", "ping"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  # ------------------------------- BACKEND ----------------------------------
+  bcc-backend:
+    build:
+      context: ./admin/backend
+    container_name: bcc-backend
+    environment:
+      SPRING_DATASOURCE_URL: jdbc:postgresql://postgres:5432/${POSTGRES_DB:-blue_crystal_db}
+      SPRING_DATASOURCE_USERNAME: ${POSTGRES_USER:-bcc}
+      SPRING_DATASOURCE_PASSWORD: ${POSTGRES_PASSWORD:-changeme}
+      SPRING_RABBITMQ_HOST: rabbitmq
+      SPRING_RABBITMQ_PORT: "5672"
+      SPRING_RABBITMQ_USERNAME: ${RABBITMQ_USER:-guest}
+      SPRING_RABBITMQ_PASSWORD: ${RABBITMQ_PASSWORD:-guest}
+      # JWT secret condiviso col servizio notifiche (dal .env, non in chiaro nel repo)
+      BE_APP_JWTSECRET: ${BE_APP_JWTSECRET:-ZGV2LXNlY3JldC1jaGFuZ2UtbWUtaW4tcHJvZHVjdGlvbi0wMDAwMDA=}
+    ports:
+      - "${BACKEND_PORT:-8080}:8080"
+    volumes:
+      - backend_uploads:/app/uploads
+    depends_on:
+      postgres:
+        condition: service_healthy
+      rabbitmq:
+        condition: service_healthy
+
+  bcc-notification:
+    build:
+      context: ./notification/notification
+    container_name: bcc-notification
+    environment:
+      # Stesso DB del backend (blue_crystal_db): niente più dipendenza dal secondo
+      # database bcc_db. Le tabelle del notification convivono con quelle del backend.
+      SPRING_DATASOURCE_URL: jdbc:postgresql://postgres:5432/${POSTGRES_DB:-blue_crystal_db}
+      SPRING_DATASOURCE_USERNAME: ${POSTGRES_USER:-bcc}
+      SPRING_DATASOURCE_PASSWORD: ${POSTGRES_PASSWORD:-changeme}
+      # ddl-auto + schema 'notif' sono configurati nell'application.properties del
+      # notification (le proprietà hibernate.* via env non si bindano in modo affidabile).
+      BE_APP_JWTSECRET: ${BE_APP_JWTSECRET:-ZGV2LXNlY3JldC1jaGFuZ2UtbWUtaW4tcHJvZHVjdGlvbi0wMDAwMDA=}
+    ports:
+      - "${NOTIFICATION_PORT:-8085}:8085"
+    depends_on:
+      postgres:
+        condition: service_healthy
+
+  # ------------------------------- FRONTEND ---------------------------------
+  bcc-admin-web:
+    build:
+      context: ./admin/blue-crystal-chicken-auth/blue-crystal-chicken
+      args:
+        VITE_API_URL: ""
+        VITE_NOTIFICATION_API_URL: ""
+        VITE_FIREBASE_API_KEY: ${VITE_FIREBASE_API_KEY:-}
+        VITE_FIREBASE_AUTH_DOMAIN: ${VITE_FIREBASE_AUTH_DOMAIN:-}
+        VITE_FIREBASE_PROJECT_ID: ${VITE_FIREBASE_PROJECT_ID:-}
+        VITE_FIREBASE_STORAGE_BUCKET: ${VITE_FIREBASE_STORAGE_BUCKET:-}
+        VITE_FIREBASE_MESSAGING_SENDER_ID: ${VITE_FIREBASE_MESSAGING_SENDER_ID:-}
+        VITE_FIREBASE_APP_ID: ${VITE_FIREBASE_APP_ID:-}
+        VITE_FIREBASE_MEASUREMENT_ID: ${VITE_FIREBASE_MEASUREMENT_ID:-}
+        VITE_FIREBASE_VAPID_KEY: ${VITE_FIREBASE_VAPID_KEY:-}
+    container_name: bcc-admin-web
+    ports:
+      - "${ADMIN_PORT:-8090}:80"
+    depends_on:
+      - bcc-backend
+      - bcc-notification
+
+  bcc-manager:
+    build:
+      context: ./manager
+      args:
+        VITE_API_URL: ""
+        VITE_NOTIFICATION_API_URL: ""
+        VITE_FIREBASE_API_KEY: ${VITE_FIREBASE_API_KEY:-}
+        VITE_FIREBASE_AUTH_DOMAIN: ${VITE_FIREBASE_AUTH_DOMAIN:-}
+        VITE_FIREBASE_PROJECT_ID: ${VITE_FIREBASE_PROJECT_ID:-}
+        VITE_FIREBASE_STORAGE_BUCKET: ${VITE_FIREBASE_STORAGE_BUCKET:-}
+        VITE_FIREBASE_MESSAGING_SENDER_ID: ${VITE_FIREBASE_MESSAGING_SENDER_ID:-}
+        VITE_FIREBASE_APP_ID: ${VITE_FIREBASE_APP_ID:-}
+        VITE_FIREBASE_MEASUREMENT_ID: ${VITE_FIREBASE_MEASUREMENT_ID:-}
+        VITE_FIREBASE_VAPID_KEY: ${VITE_FIREBASE_VAPID_KEY:-}
+    container_name: bcc-manager
+    ports:
+      - "${MANAGER_PORT:-5185}:80"
+    depends_on:
+      - bcc-backend
+      - bcc-notification
+
+  bcc-cucina:
+    build:
+      context: ./cucina
+      args:
+        VITE_API_HOST: ""
+        # Token-stazione della sede gestita da questa cucina (copialo dal pannello Admin).
+        VITE_STATION_TOKEN: ${VITE_STATION_TOKEN:-}
+    container_name: bcc-cucina
+    ports:
+      - "${CUCINA_PORT:-5183}:80"
+    depends_on:
+      - bcc-backend
+
+  bcc-tabellone:
+    build:
+      context: ./tabellone
+      args:
+        VITE_API_HOST: ""
+        # Token-stazione della sede gestita da questo tabellone (dal pannello Admin).
+        VITE_STATION_TOKEN: ${VITE_STATION_TOKEN:-}
+    container_name: bcc-tabellone
+    ports:
+      - "${TABELLONE_PORT:-5180}:80"
+    depends_on:
+      - bcc-backend
+
+  bcc-cassa:
+    build:
+      context: ./counter-main/counter-main
+      args:
+        # URL vuota ⇒ chiamate relative; nginx della cassa fa da proxy verso il backend.
+        VITE_API_BASE_URL: ""
+    container_name: bcc-cassa
+    ports:
+      - "${CASSA_PORT:-8081}:80"
+    depends_on:
+      - bcc-backend
+
+volumes:
+  postgres_data:
+  rabbitmq_data:
+  backend_uploads:

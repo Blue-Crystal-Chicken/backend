@@ -1,0 +1,5 @@
+node_modules
+dist
+.manager.pid
+.env.local
+*.log

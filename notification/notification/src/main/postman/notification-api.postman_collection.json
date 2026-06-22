@@ -1,0 +1,552 @@
+{
+  "info": {
+    "_postman_id": "notification-api-collection",
+    "name": "Notification API",
+    "description": "Tutte le chiamate API del progetto Notification (porta 8085)",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "variable": [
+    {
+      "key": "baseUrl",
+      "value": "http://localhost:8085",
+      "type": "string",
+      "enabled": true
+    }
+  ],
+  "item": [
+    {
+      "name": "Notifications",
+      "description": "Endpoint per la gestione delle notifiche (/api/notification)",
+      "item": [
+        {
+          "name": "Create Notification",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/notification/create",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "notification", "create"]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"title\": \"Richiesta ferie\",\n  \"body\": \"Giovanni Rossi ha richiesto ferie dal 01/01/2025 al 10/01/2025\",\n  \"type\": \"VACATION_REQUEST\",\n  \"payload\": {\n    \"startDate\": \"2025-01-01\",\n    \"endDate\": \"2025-01-10\"\n  }\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "description": "Crea una nuova notifica. Restituisce la notifica creata."
+          },
+          "response": []
+        },
+        {
+          "name": "Get All Notifications",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/notification",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "notification"]
+            },
+            "description": "Recupera la lista di tutte le notifiche."
+          },
+          "response": []
+        },
+        {
+          "name": "Get Notification by ID",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/notification/1",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "notification", "1"]
+            },
+            "description": "Recupera una notifica tramite il suo ID."
+          },
+          "response": []
+        },
+        {
+          "name": "Update Notification",
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/notification/1",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "notification", "1"]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"title\": \"Richiesta ferie aggiornata\",\n  \"body\": \"Giovanni Rossi ha aggiornato la richiesta ferie\",\n  \"type\": \"VACATION_REQUEST\",\n  \"payload\": {\n    \"startDate\": \"2025-02-01\",\n    \"endDate\": \"2025-02-10\"\n  }\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "description": "Aggiorna una notifica esistente tramite il suo ID."
+          },
+          "response": []
+        },
+        {
+          "name": "Delete Notification",
+          "request": {
+            "method": "DELETE",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/notification/1",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "notification", "1"]
+            },
+            "description": "Elimina una notifica tramite il suo ID."
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "Devices",
+      "description": "Endpoint per la gestione dei device (/devices)",
+      "item": [
+        {
+          "name": "Create Device",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/devices",
+              "host": ["{{baseUrl}}"],
+              "path": ["devices"]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"token\": \"fcm-token-example\",\n  \"platform\": \"ANDROID\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "description": "Registra un nuovo device. Restituisce il device creato."
+          },
+          "response": []
+        },
+        {
+          "name": "Get All Devices",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/devices",
+              "host": ["{{baseUrl}}"],
+              "path": ["devices"]
+            },
+            "description": "Recupera la lista di tutti i device registrati."
+          },
+          "response": []
+        },
+        {
+          "name": "Get Device by ID",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/devices/1",
+              "host": ["{{baseUrl}}"],
+              "path": ["devices", "1"]
+            },
+            "description": "Recupera un device tramite il suo ID."
+          },
+          "response": []
+        },
+        {
+          "name": "Update Device",
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/devices/1",
+              "host": ["{{baseUrl}}"],
+              "path": ["devices", "1"]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"token\": \"fcm-token-updated\",\n  \"platform\": \"IOS\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "description": "Aggiorna un device esistente tramite il suo ID."
+          },
+          "response": []
+        },
+        {
+          "name": "Delete Device",
+          "request": {
+            "method": "DELETE",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/devices/1",
+              "host": ["{{baseUrl}}"],
+              "path": ["devices", "1"]
+            },
+            "description": "Elimina un device tramite il suo ID."
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "Device Notifications",
+      "description": "Endpoint per inviare e gestire le notifiche ai device via FCM (/device-notifications)",
+      "item": [
+        {
+          "name": "Send Device Notification",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/device-notifications/send",
+              "host": ["{{baseUrl}}"],
+              "path": ["device-notifications", "send"]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"notificationId\": 1,\n  \"deviceToken\": \"fcm-token-example\",\n  \"deviceTokenRequest\": \"fcm-token-example\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "description": "Invia una notifica ad un device tramite FCM. Richiede l'ID della notifica e il token FCM del device."
+          },
+          "response": []
+        },
+        {
+          "name": "Send Notification to All Active Devices",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/device-notifications/send-all",
+              "host": ["{{baseUrl}}"],
+              "path": ["device-notifications", "send-all"]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"notificationId\": 1,\n  \"deviceTokenRequest\": \"fcm-token-example\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "description": "Invia la notifica specificata a tutti i device con isActive=true."
+          },
+          "response": []
+        },
+        {
+          "name": "Get All Device Notifications",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/device-notifications",
+              "host": ["{{baseUrl}}"],
+              "path": ["device-notifications"]
+            },
+            "description": "Recupera la lista di tutte le device-notification."
+          },
+          "response": []
+        },
+        {
+          "name": "Get Device Notification by ID",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/device-notifications/1",
+              "host": ["{{baseUrl}}"],
+              "path": ["device-notifications", "1"]
+            },
+            "description": "Recupera una device-notification tramite il suo ID."
+          },
+          "response": []
+        },
+        {
+          "name": "Update Device Notification",
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/device-notifications/1",
+              "host": ["{{baseUrl}}"],
+              "path": ["device-notifications", "1"]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"id\": 1,\n  \"status\": \"READ\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "description": "Aggiorna lo stato di una device-notification tramite il suo ID."
+          },
+          "response": []
+        },
+        {
+          "name": "Delete Device Notification",
+          "request": {
+            "method": "DELETE",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/device-notifications/1",
+              "host": ["{{baseUrl}}"],
+              "path": ["device-notifications", "1"]
+            },
+            "description": "Elimina una device-notification tramite il suo ID."
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "User Devices",
+      "description": "Endpoint per la gestione delle associazioni utente-device (/user-devices)",
+      "item": [
+        {
+          "name": "Create User Device",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/user-devices",
+              "host": ["{{baseUrl}}"],
+              "path": ["user-devices"]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"userId\": \"user-123\",\n  \"token\": \"fcm-token-example\",\n  \"platform\": \"ANDROID\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "description": "Associa un utente ad un device. Restituisce il record creato."
+          },
+          "response": []
+        },
+        {
+          "name": "Get All User Devices",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/user-devices",
+              "host": ["{{baseUrl}}"],
+              "path": ["user-devices"]
+            },
+            "description": "Recupera tutte le associazioni utente-device."
+          },
+          "response": []
+        },
+        {
+          "name": "Get User Device by ID",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/user-devices/1",
+              "host": ["{{baseUrl}}"],
+              "path": ["user-devices", "1"]
+            },
+            "description": "Recupera una associazione utente-device tramite il suo ID."
+          },
+          "response": []
+        },
+        {
+          "name": "Get User Devices by User ID",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/user-devices/user/user-123",
+              "host": ["{{baseUrl}}"],
+              "path": ["user-devices", "user", "user-123"]
+            },
+            "description": "Recupera tutte le associazioni utente-device per un determinato userId."
+          },
+          "response": []
+        },
+        {
+          "name": "Update User Device",
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/user-devices/1",
+              "host": ["{{baseUrl}}"],
+              "path": ["user-devices", "1"]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"userId\": \"user-123\",\n  \"token\": \"fcm-token-updated\",\n  \"platform\": \"IOS\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "description": "Aggiorna una associazione utente-device tramite il suo ID."
+          },
+          "response": []
+        },
+        {
+          "name": "Delete User Device",
+          "request": {
+            "method": "DELETE",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/user-devices/1",
+              "host": ["{{baseUrl}}"],
+              "path": ["user-devices", "1"]
+            },
+            "description": "Elimina una associazione utente-device tramite il suo ID."
+          },
+          "response": []
+        },
+        {
+          "name": "Logout User Device",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/user-devices/logout",
+              "host": ["{{baseUrl}}"],
+              "path": ["user-devices", "logout"]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"userId\": \"user-123\",\n  \"token\": \"fcm-token-example\",\n  \"platform\": \"ANDROID\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "description": "Imposta la associazione utente-device come inattiva (logout)."
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "Swagger & Tools",
+      "description": "Endpoint per la documentazione e strumenti di supporto",
+      "item": [
+        {
+          "name": "Swagger UI",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/swagger-ui/index.html",
+              "host": ["{{baseUrl}}"],
+              "path": ["swagger-ui", "index.html"]
+            },
+            "description": "Interfaccia grafica Swagger per esplorare le API."
+          },
+          "response": []
+        },
+        {
+          "name": "OpenAPI Docs (JSON)",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/v3/api-docs",
+              "host": ["{{baseUrl}}"],
+              "path": ["v3", "api-docs"]
+            },
+            "description": "Documentazione OpenAPI 3.0 in formato JSON."
+          },
+          "response": []
+        },
+        {
+          "name": "H2 Console",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/h2-console",
+              "host": ["{{baseUrl}}"],
+              "path": ["h2-console"]
+            },
+            "description": "Console web del database H2 in-memory."
+          },
+          "response": []
+        }
+      ]
+    }
+  ]
+}

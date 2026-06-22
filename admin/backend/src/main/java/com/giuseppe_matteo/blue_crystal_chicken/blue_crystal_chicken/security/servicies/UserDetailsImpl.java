@@ -1,0 +1,108 @@
+package com.giuseppe_matteo.blue_crystal_chicken.blue_crystal_chicken.security.servicies;
+
+import java.util.Collection;
+import java.util.List;
+
+import org.springframework.security.core.GrantedAuthority;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
+import org.springframework.security.core.userdetails.UserDetails;
+
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.giuseppe_matteo.blue_crystal_chicken.blue_crystal_chicken.entity.UserEntity;
+
+import lombok.Data;
+
+@Data
+public class UserDetailsImpl implements UserDetails {
+    private Long id;
+
+    private String email;
+
+    private String name;
+
+    private String surname;
+
+    private String phone;
+
+    private String gender;
+
+    private String birthday;
+
+    // Sede di appartenenza dell'utente (per lo scoping del Manager)
+    private Long locationId;
+
+    private String locationName;
+
+    @JsonIgnore
+    private String password;
+
+    private Collection<? extends GrantedAuthority> authorities;
+
+    public UserDetailsImpl(Long id, String email, String password,
+                           String name, String surname, String phone, String gender, String birthday,
+                           Long locationId, String locationName,
+                           Collection<? extends GrantedAuthority> authorities) {
+        this.id = id;
+        this.email = email;
+        this.password = password;
+        this.name = name;
+        this.surname = surname;
+        this.phone = phone;
+        this.gender = gender;
+        this.birthday = birthday;
+        this.locationId = locationId;
+        this.locationName = locationName;
+        this.authorities = authorities;
+    }
+
+    public static UserDetailsImpl build(UserEntity user) {
+        List<GrantedAuthority> authorities = List.of(new SimpleGrantedAuthority("ROLE_" + user.getRole().name()));
+        return new UserDetailsImpl(
+                user.getId(),
+                user.getEmail(),
+                user.getPassword(),
+                user.getName(),
+                user.getSurname(),
+                user.getPhone(),
+                user.getGender(),
+                user.getBirthday() != null ? user.getBirthday().toString() : null,
+                user.getLocation() != null ? user.getLocation().getId() : null,
+                user.getLocation() != null ? user.getLocation().getName() : null,
+                authorities);
+    }
+
+    @Override
+    public Collection<? extends GrantedAuthority> getAuthorities() {
+        return authorities;
+    }
+
+    @Override
+    public String getPassword() {
+        return password;
+    }
+
+    @Override
+    public String getUsername() {
+        return email;
+    }
+
+    @Override
+    public boolean isAccountNonExpired() {
+        return true;
+    }
+
+    @Override
+    public boolean isAccountNonLocked() {
+        return true;
+    }
+
+    @Override
+    public boolean isCredentialsNonExpired() {
+        return true;
+    }
+
+    @Override
+    public boolean isEnabled() {
+        return true;
+    }
+}

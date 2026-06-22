@@ -1,0 +1,80 @@
+Aggiungere nelle variabili d ambiente i seguenti dati del firebase :
+VITE_FIREBASE_API_KEY=AIzaSyAP1viDYyJ6dNB7Pyh-xwT5A3gJfXhQMCQ
+VITE_FIREBASE_AUTH_DOMAIN=notification-cab0a.firebaseapp.com
+VITE_FIREBASE_PROJECT_ID=notification-cab0a
+VITE_FIREBASE_STORAGE_BUCKET=notification-cab0a.firebasestorage.app
+VITE_FIREBASE_MESSAGING_SENDER_ID=1021605930612
+VITE_FIREBASE_APP_ID=1:1021605930612:web:bac71a93e6be97a48ad321
+VITE_FIREBASE_MEASUREMENT_ID=G-H8EPYXYSD4
+VITE_FIREBASE_VAPID_KEY=BCbIFRdppQdP6WIttgSmU3MS-ik5j3iSrVLcAvej_k4tjFmmWvdyNRif3pIRl3xUECqANtTQ5Um1RVaxTGJSGCM
+
+
+Richiedere all utente l autorizzazione di ricevere notifiche.
+Fare una chiamata a firebase per richiedere il token del device.
+
+Ricevuto il token si deve salvare nella tabella user_devices del database con il relativo userId.
+
+
+Fare chiamata a /user-devices con il userId, token del dispositivo e platform.
+
+Se si vuole inviare una notifica bisogna prima crearla, chiamando /api/notification/create. Si ricevera' un id della notifica.
+Successivamente si deve chiamare /device-notifications/send-all per inviare la notifica.
+
+DTO REQUEST:
+
+Creare associazione utente dispositivo: {
+    "userId": "userId",
+    "token": "token",
+    "platform": "platform"
+}
+
+Creare notifica:
+{
+    "title": "title",
+    "body": "body",
+    "type": "type",
+    "payload": {
+        "key": "value"
+    }
+}
+
+Per inviare notifica:{
+    "notificationId": 1,
+    "deviceTokenRequest": "deviceTokenRequest"
+}
+
+
+DTO RESPONSE:
+
+Per creazione dispositivo:{
+    "id": 1,
+    "userId": "userId",
+    "deviceId": "deviceId",
+    "deviceToken": "deviceToken",
+    "platform": "platform",
+    "isActive": true,
+    "lastSeenAt": "2022-01-01T00:00:00.000Z",
+    "createdAt": "2022-01-01T00:00:00.000Z",
+    "updatedAt": "2022-01-01T00:00:00.000Z"
+}
+
+Per creazione notifica:{
+    "id": 1,
+    "title": "title",
+    "body": "body",
+    "type": "type",
+    "payload": {
+        "key": "value"
+    },
+    "createdAt": "2022-01-01T00:00:00.000Z",
+    "updatedAt": "2022-01-01T00:00:00.000Z"
+}
+
+Per inviare notifica:{
+    "id": 1,
+    "notificationId": 1,
+    "deviceToken": "deviceToken",
+    "status": "status",
+    "createdAt": "2022-01-01T00:00:00.000Z",
+    "updatedAt": "2022-01-01T00:00:00.000Z"
+}
