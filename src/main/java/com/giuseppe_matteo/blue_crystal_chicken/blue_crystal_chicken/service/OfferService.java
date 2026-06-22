@@ -4,11 +4,11 @@ import com.giuseppe_matteo.blue_crystal_chicken.blue_crystal_chicken.dto.mapper.
 import com.giuseppe_matteo.blue_crystal_chicken.blue_crystal_chicken.dto.request.OfferProductRequest;
 import com.giuseppe_matteo.blue_crystal_chicken.blue_crystal_chicken.dto.request.OfferRequest;
 import com.giuseppe_matteo.blue_crystal_chicken.blue_crystal_chicken.dto.response.OfferResponse;
-import com.giuseppe_matteo.blue_crystal_chicken.blue_crystal_chicken.entity.MenuEntity;
-import com.giuseppe_matteo.blue_crystal_chicken.blue_crystal_chicken.entity.OfferEntity;
-import com.giuseppe_matteo.blue_crystal_chicken.blue_crystal_chicken.entity.OfferProduct;
-import com.giuseppe_matteo.blue_crystal_chicken.blue_crystal_chicken.entity.ProductEntity;
-import com.giuseppe_matteo.blue_crystal_chicken.blue_crystal_chicken.entity.key.OfferProductKey;
+import com.giuseppe_matteo.blue_crystal_chicken.blue_crystal_chicken.entity.menu.MenuEntity;
+import com.giuseppe_matteo.blue_crystal_chicken.blue_crystal_chicken.entity.offer.OfferEntity;
+import com.giuseppe_matteo.blue_crystal_chicken.blue_crystal_chicken.entity.join.OfferProduct;
+import com.giuseppe_matteo.blue_crystal_chicken.blue_crystal_chicken.entity.product.ProductEntity;
+import com.giuseppe_matteo.blue_crystal_chicken.blue_crystal_chicken.entity.join.key.OfferProductKey;
 import com.giuseppe_matteo.blue_crystal_chicken.blue_crystal_chicken.repository.OfferProductRepository;
 import com.giuseppe_matteo.blue_crystal_chicken.blue_crystal_chicken.repository.OfferRepository;
 import lombok.RequiredArgsConstructor;

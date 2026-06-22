@@ -2,7 +2,7 @@ package com.giuseppe_matteo.blue_crystal_chicken.blue_crystal_chicken.controller
 
 import com.giuseppe_matteo.blue_crystal_chicken.blue_crystal_chicken.dto.request.LocationRequest;
 import com.giuseppe_matteo.blue_crystal_chicken.blue_crystal_chicken.dto.response.LocationResponse;
-import com.giuseppe_matteo.blue_crystal_chicken.blue_crystal_chicken.entity.LocationIngredient;
+import com.giuseppe_matteo.blue_crystal_chicken.blue_crystal_chicken.entity.join.LocationIngredient;
 import com.giuseppe_matteo.blue_crystal_chicken.blue_crystal_chicken.service.LocationIngredientService;
 import com.giuseppe_matteo.blue_crystal_chicken.blue_crystal_chicken.service.LocationService;
 import lombok.RequiredArgsConstructor;

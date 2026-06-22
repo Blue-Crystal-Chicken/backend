@@ -1,9 +1,12 @@
 package com.giuseppe_matteo.blue_crystal_chicken.blue_crystal_chicken.service;
 
+import com.giuseppe_matteo.blue_crystal_chicken.blue_crystal_chicken.dto.mapper.AddressMapper;
 import com.giuseppe_matteo.blue_crystal_chicken.blue_crystal_chicken.dto.mapper.LocationMapper;
 import com.giuseppe_matteo.blue_crystal_chicken.blue_crystal_chicken.dto.request.LocationRequest;
 import com.giuseppe_matteo.blue_crystal_chicken.blue_crystal_chicken.dto.response.LocationResponse;
-import com.giuseppe_matteo.blue_crystal_chicken.blue_crystal_chicken.entity.LocationEntity;
+import com.giuseppe_matteo.blue_crystal_chicken.blue_crystal_chicken.entity.address.Address;
+import com.giuseppe_matteo.blue_crystal_chicken.blue_crystal_chicken.entity.address.AddressType;
+import com.giuseppe_matteo.blue_crystal_chicken.blue_crystal_chicken.entity.location.LocationEntity;
 import com.giuseppe_matteo.blue_crystal_chicken.blue_crystal_chicken.repository.LocationRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -20,6 +23,7 @@ public class LocationService {
 
     private final LocationRepository locationRepository;
     private final LocationMapper locationMapper;
+    private final AddressMapper addressMapper;
 
     // ── READ ────────────────────────────────────────────────────────────────
 
@@ -39,7 +43,7 @@ public class LocationService {
     }
 
     public List<LocationResponse> findByCity(String city) {
-        return locationRepository.findByCity(city).stream()
+        return locationRepository.findByAddress_City(city).stream()
                 .map(locationMapper::toResponse)
                 .collect(Collectors.toList());
     }
@@ -88,8 +92,23 @@ public class LocationService {
         LocationEntity existing = findById(id);
         
         existing.setName(request.getName());
-        existing.setAddress(request.getAddress());
-        existing.setCity(request.getCity());
+        
+        if (request.getAddress() != null) {
+            if (existing.getAddress() != null) {
+                Address addr = existing.getAddress();
+                addr.setType(request.getAddress().getType() != null ? AddressType.parsingSicuro(request.getAddress().getType()) : addr.getType());
+                addr.setStreet(request.getAddress().getStreet());
+                addr.setCity(request.getAddress().getCity());
+                addr.setState(request.getAddress().getState());
+                addr.setZipCode(request.getAddress().getZipCode());
+                addr.setCountry(request.getAddress().getCountry());
+            } else {
+                existing.setAddress(addressMapper.toEntity(request.getAddress()));
+            }
+        } else {
+            existing.setAddress(null);
+        }
+
         existing.setPhoneCode(request.getPhoneCode());
         existing.setPhoneNumber(request.getPhoneNumber());
         existing.setTables(request.getTables());

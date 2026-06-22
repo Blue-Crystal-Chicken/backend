@@ -11,9 +11,9 @@ import com.giuseppe_matteo.blue_crystal_chicken.blue_crystal_chicken.dto.request
 import com.giuseppe_matteo.blue_crystal_chicken.blue_crystal_chicken.dto.request.OrderRequest;
 import com.giuseppe_matteo.blue_crystal_chicken.blue_crystal_chicken.dto.request.ProductRequest;
 import com.giuseppe_matteo.blue_crystal_chicken.blue_crystal_chicken.dto.request.Register;
-import com.giuseppe_matteo.blue_crystal_chicken.blue_crystal_chicken.entity.CategoryName;
-import com.giuseppe_matteo.blue_crystal_chicken.blue_crystal_chicken.entity.Role;
-import com.giuseppe_matteo.blue_crystal_chicken.blue_crystal_chicken.entity.UserEntity;
+import com.giuseppe_matteo.blue_crystal_chicken.blue_crystal_chicken.entity.category.CategoryName;
+import com.giuseppe_matteo.blue_crystal_chicken.blue_crystal_chicken.entity.user.Role;
+import com.giuseppe_matteo.blue_crystal_chicken.blue_crystal_chicken.entity.user.UserEntity;
 import com.giuseppe_matteo.blue_crystal_chicken.blue_crystal_chicken.exception.ProductAlreadyExistsException;
 import com.giuseppe_matteo.blue_crystal_chicken.blue_crystal_chicken.repository.ProductRepository;
 import com.giuseppe_matteo.blue_crystal_chicken.blue_crystal_chicken.repository.UserRepository;
@@ -25,6 +25,7 @@ import com.giuseppe_matteo.blue_crystal_chicken.blue_crystal_chicken.service.Use
 import com.giuseppe_matteo.blue_crystal_chicken.blue_crystal_chicken.dto.request.MenuProductRequest;
 import com.giuseppe_matteo.blue_crystal_chicken.blue_crystal_chicken.dto.request.MenuRequest;
 import com.giuseppe_matteo.blue_crystal_chicken.blue_crystal_chicken.dto.request.LocationRequest;
+import com.giuseppe_matteo.blue_crystal_chicken.blue_crystal_chicken.dto.request.AddressRequest;
 import com.giuseppe_matteo.blue_crystal_chicken.blue_crystal_chicken.service.MenuService;
 
 import com.giuseppe_matteo.blue_crystal_chicken.blue_crystal_chicken.dto.request.OfferRequest;
@@ -395,8 +396,16 @@ public class DataLoader implements CommandLineRunner {
                 for (String[] data : locationsData) {
                         LocationRequest req = new LocationRequest();
                         req.setName(data[0]);
-                        req.setAddress(data[1]);
-                        req.setCity(data[2]);
+                        
+                        AddressRequest addr = new AddressRequest();
+                        addr.setType("VIA");
+                        addr.setStreet(data[1]);
+                        addr.setCity(data[2]);
+                        addr.setState("");
+                        addr.setZipCode("00000");
+                        addr.setCountry("Italy");
+                        req.setAddress(addr);
+
                         req.setPhoneCode(data[3]);
                         req.setPhoneNumber(data[4]);
                         req.setTables(Integer.parseInt(data[5]));

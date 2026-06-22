@@ -2,8 +2,8 @@ package com.giuseppe_matteo.blue_crystal_chicken.blue_crystal_chicken.dto.mapper
 
 import com.giuseppe_matteo.blue_crystal_chicken.blue_crystal_chicken.dto.response.MenuProductResponse;
 import com.giuseppe_matteo.blue_crystal_chicken.blue_crystal_chicken.dto.response.MenuResponse;
-import com.giuseppe_matteo.blue_crystal_chicken.blue_crystal_chicken.entity.MenuEntity;
-import com.giuseppe_matteo.blue_crystal_chicken.blue_crystal_chicken.entity.MenuProduct;
+import com.giuseppe_matteo.blue_crystal_chicken.blue_crystal_chicken.entity.menu.MenuEntity;
+import com.giuseppe_matteo.blue_crystal_chicken.blue_crystal_chicken.entity.join.MenuProduct;
 import java.util.List;
 
 public interface MenuMapper {

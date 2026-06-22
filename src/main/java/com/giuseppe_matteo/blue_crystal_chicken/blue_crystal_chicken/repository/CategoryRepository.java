@@ -7,8 +7,8 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 
 import com.giuseppe_matteo.blue_crystal_chicken.blue_crystal_chicken.dto.projection.CategoryWithCount;
-import com.giuseppe_matteo.blue_crystal_chicken.blue_crystal_chicken.entity.Category;
-import com.giuseppe_matteo.blue_crystal_chicken.blue_crystal_chicken.entity.CategoryName;
+import com.giuseppe_matteo.blue_crystal_chicken.blue_crystal_chicken.entity.category.Category;
+import com.giuseppe_matteo.blue_crystal_chicken.blue_crystal_chicken.entity.category.CategoryName;
 
 public interface CategoryRepository extends JpaRepository<Category, Long> {
 

@@ -5,9 +5,9 @@ import com.giuseppe_matteo.blue_crystal_chicken.blue_crystal_chicken.dto.mapper.
 import com.giuseppe_matteo.blue_crystal_chicken.blue_crystal_chicken.dto.request.OrderRequest;
 import com.giuseppe_matteo.blue_crystal_chicken.blue_crystal_chicken.dto.response.OrderItemResponse;
 import com.giuseppe_matteo.blue_crystal_chicken.blue_crystal_chicken.dto.response.OrderResponse;
-import com.giuseppe_matteo.blue_crystal_chicken.blue_crystal_chicken.entity.OrderEntity;
-import com.giuseppe_matteo.blue_crystal_chicken.blue_crystal_chicken.entity.OrderProduct;
-import com.giuseppe_matteo.blue_crystal_chicken.blue_crystal_chicken.entity.OrderStatus;
+import com.giuseppe_matteo.blue_crystal_chicken.blue_crystal_chicken.entity.order.OrderEntity;
+import com.giuseppe_matteo.blue_crystal_chicken.blue_crystal_chicken.entity.join.OrderProduct;
+import com.giuseppe_matteo.blue_crystal_chicken.blue_crystal_chicken.entity.order.OrderStatus;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;

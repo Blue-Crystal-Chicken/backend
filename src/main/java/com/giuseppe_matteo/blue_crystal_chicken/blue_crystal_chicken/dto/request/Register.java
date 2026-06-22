@@ -5,7 +5,7 @@ import jakarta.validation.constraints.NotBlank;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-import com.giuseppe_matteo.blue_crystal_chicken.blue_crystal_chicken.entity.Role;
+import com.giuseppe_matteo.blue_crystal_chicken.blue_crystal_chicken.entity.user.Role;
 
 
 @Data
@@ -29,6 +29,8 @@ public class Register {
     private String password;
 
     private Role role;
+
+    private AddressRequest address;
 
     public Register(String name, String surname, String email, String phone, String gender, String birthday, String password) {
         this.name = name;

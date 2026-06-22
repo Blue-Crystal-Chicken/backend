@@ -10,7 +10,7 @@ import com.giuseppe_matteo.blue_crystal_chicken.blue_crystal_chicken.dto.request
 import com.giuseppe_matteo.blue_crystal_chicken.blue_crystal_chicken.dto.request.Register;
 import com.giuseppe_matteo.blue_crystal_chicken.blue_crystal_chicken.dto.request.UserUpdateRequest;
 import com.giuseppe_matteo.blue_crystal_chicken.blue_crystal_chicken.dto.response.JwtResponse;
-import com.giuseppe_matteo.blue_crystal_chicken.blue_crystal_chicken.entity.UserEntity;
+import com.giuseppe_matteo.blue_crystal_chicken.blue_crystal_chicken.entity.user.UserEntity;
 import com.giuseppe_matteo.blue_crystal_chicken.blue_crystal_chicken.exception.EmailNotFoundException;
 import com.giuseppe_matteo.blue_crystal_chicken.blue_crystal_chicken.exception.UserNotFoundException;
 import com.giuseppe_matteo.blue_crystal_chicken.blue_crystal_chicken.repository.UserRepository;
@@ -28,9 +28,13 @@ import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.context.SecurityContextHolder;
 
 import java.time.LocalDate;
+import com.giuseppe_matteo.blue_crystal_chicken.blue_crystal_chicken.dto.mapper.AddressMapper;
 import com.giuseppe_matteo.blue_crystal_chicken.blue_crystal_chicken.dto.mapper.LocationMapper;
 import com.giuseppe_matteo.blue_crystal_chicken.blue_crystal_chicken.dto.response.LocationResponse;
-import com.giuseppe_matteo.blue_crystal_chicken.blue_crystal_chicken.entity.LocationEntity;
+import com.giuseppe_matteo.blue_crystal_chicken.blue_crystal_chicken.dto.response.AddressResponse;
+import com.giuseppe_matteo.blue_crystal_chicken.blue_crystal_chicken.entity.address.Address;
+import com.giuseppe_matteo.blue_crystal_chicken.blue_crystal_chicken.entity.address.AddressType;
+import com.giuseppe_matteo.blue_crystal_chicken.blue_crystal_chicken.entity.location.LocationEntity;
 import com.giuseppe_matteo.blue_crystal_chicken.blue_crystal_chicken.repository.LocationRepository;
 
 
@@ -51,6 +55,9 @@ public class UserService {
 
     @Autowired
     private LocationRepository locationRepository;
+
+    @Autowired
+    private AddressMapper addressMapper;
     
     
 
@@ -72,6 +79,10 @@ public class UserService {
         if (user != null && user.getLocation() != null) {
             locationResponse = locationMapper.toResponse(user.getLocation());
         }
+        AddressResponse addressResponse = null;
+        if (user != null && user.getAddress() != null) {
+            addressResponse = addressMapper.toResponse(user.getAddress());
+        }
 
         return ResponseEntity.ok(new JwtResponse(jwt, 
                 userDetails.getId(), 
@@ -82,7 +93,8 @@ public class UserService {
                 userDetails.getGender(),
                 userDetails.getBirthday(),
                 roles,
-                locationResponse));
+                locationResponse,
+                addressResponse));
     }
 
     @Transactional(readOnly = true)
@@ -102,6 +114,10 @@ public class UserService {
         if (user != null && user.getLocation() != null) {
             locationResponse = locationMapper.toResponse(user.getLocation());
         }
+        AddressResponse addressResponse = null;
+        if (user != null && user.getAddress() != null) {
+            addressResponse = addressMapper.toResponse(user.getAddress());
+        }
 
         // Return user data without a new token (or we could generate a new one if needed, 
         // but for session restoration, the old token is still valid)
@@ -114,7 +130,8 @@ public class UserService {
                 userDetails.getGender(),
                 userDetails.getBirthday(),
                 roles,
-                locationResponse));
+                locationResponse,
+                addressResponse));
     }
 
 
@@ -133,6 +150,10 @@ public class UserService {
         user.setRole(request.getRole());
         user.setGender(request.getGender());
         user.setBirthday(LocalDate.parse(request.getBirthday()));
+
+        if (request.getAddress() != null) {
+            user.setAddress(addressMapper.toEntity(request.getAddress()));
+        }
 
         userRepository.save(user);
 
@@ -163,6 +184,23 @@ public class UserService {
         existingUser.setPhone(request.getPhone());
         existingUser.setGender(request.getGender());
         existingUser.setBirthday(LocalDate.parse(request.getBirthday()));
+
+        if (request.getAddress() != null) {
+            if (existingUser.getAddress() != null) {
+                Address addr = existingUser.getAddress();
+                addr.setType(request.getAddress().getType() != null ? AddressType.parsingSicuro(request.getAddress().getType()) : addr.getType());
+                addr.setStreet(request.getAddress().getStreet());
+                addr.setCity(request.getAddress().getCity());
+                addr.setState(request.getAddress().getState());
+                addr.setZipCode(request.getAddress().getZipCode());
+                addr.setCountry(request.getAddress().getCountry());
+            } else {
+                existingUser.setAddress(addressMapper.toEntity(request.getAddress()));
+            }
+        } else {
+            existingUser.setAddress(null);
+        }
+
         return ResponseEntity.ok(userRepository.save(existingUser));
     }
 

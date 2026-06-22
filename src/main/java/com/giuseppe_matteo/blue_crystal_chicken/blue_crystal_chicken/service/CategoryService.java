@@ -15,8 +15,8 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.http.ResponseEntity;
 import com.giuseppe_matteo.blue_crystal_chicken.blue_crystal_chicken.dto.mapper.CategoryMapper;
-import com.giuseppe_matteo.blue_crystal_chicken.blue_crystal_chicken.entity.Category;
-import com.giuseppe_matteo.blue_crystal_chicken.blue_crystal_chicken.entity.CategoryName;
+import com.giuseppe_matteo.blue_crystal_chicken.blue_crystal_chicken.entity.category.Category;
+import com.giuseppe_matteo.blue_crystal_chicken.blue_crystal_chicken.entity.category.CategoryName;
 
 @Service
 @Transactional

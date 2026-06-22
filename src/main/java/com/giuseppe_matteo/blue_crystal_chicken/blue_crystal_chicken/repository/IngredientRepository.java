@@ -1,6 +1,6 @@
 package com.giuseppe_matteo.blue_crystal_chicken.blue_crystal_chicken.repository;
 
-import com.giuseppe_matteo.blue_crystal_chicken.blue_crystal_chicken.entity.IngredientEntity;
+import com.giuseppe_matteo.blue_crystal_chicken.blue_crystal_chicken.entity.ingredient.IngredientEntity;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;

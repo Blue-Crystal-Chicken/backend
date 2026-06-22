@@ -1,6 +1,6 @@
 package com.giuseppe_matteo.blue_crystal_chicken.blue_crystal_chicken.dto.response;
 
-import com.giuseppe_matteo.blue_crystal_chicken.blue_crystal_chicken.entity.Role;
+import com.giuseppe_matteo.blue_crystal_chicken.blue_crystal_chicken.entity.user.Role;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -16,5 +16,5 @@ public class UserResponse {
     private String gender;
     private String birthday;
     private Role role;
-
+    private AddressResponse address;
 }
