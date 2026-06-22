@@ -4,8 +4,8 @@ import com.giuseppe_matteo.blue_crystal_chicken.blue_crystal_chicken.dto.mapper.
 import com.giuseppe_matteo.blue_crystal_chicken.blue_crystal_chicken.dto.mapper.OfferMapper;
 import com.giuseppe_matteo.blue_crystal_chicken.blue_crystal_chicken.dto.response.OfferProductResponse;
 import com.giuseppe_matteo.blue_crystal_chicken.blue_crystal_chicken.dto.response.OfferResponse;
-import com.giuseppe_matteo.blue_crystal_chicken.blue_crystal_chicken.entity.OfferEntity;
-import com.giuseppe_matteo.blue_crystal_chicken.blue_crystal_chicken.entity.OfferProduct;
+import com.giuseppe_matteo.blue_crystal_chicken.blue_crystal_chicken.entity.offer.OfferEntity;
+import com.giuseppe_matteo.blue_crystal_chicken.blue_crystal_chicken.entity.join.OfferProduct;
 import org.modelmapper.ModelMapper;
 import org.springframework.stereotype.Component;
 

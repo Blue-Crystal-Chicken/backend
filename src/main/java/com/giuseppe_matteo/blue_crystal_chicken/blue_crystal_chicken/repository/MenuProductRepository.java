@@ -1,7 +1,7 @@
 package com.giuseppe_matteo.blue_crystal_chicken.blue_crystal_chicken.repository;
 
-import com.giuseppe_matteo.blue_crystal_chicken.blue_crystal_chicken.entity.MenuProduct;
-import com.giuseppe_matteo.blue_crystal_chicken.blue_crystal_chicken.entity.key.MenuProductKey;
+import com.giuseppe_matteo.blue_crystal_chicken.blue_crystal_chicken.entity.join.MenuProduct;
+import com.giuseppe_matteo.blue_crystal_chicken.blue_crystal_chicken.entity.join.key.MenuProductKey;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 

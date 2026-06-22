@@ -1,6 +1,6 @@
 package com.giuseppe_matteo.blue_crystal_chicken.blue_crystal_chicken.dto.request;
 
-import com.giuseppe_matteo.blue_crystal_chicken.blue_crystal_chicken.entity.Role;
+import com.giuseppe_matteo.blue_crystal_chicken.blue_crystal_chicken.entity.user.Role;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -17,5 +17,5 @@ public class UserRequest {
     private String birthday;
     private String password;
     private Role role;
-
+    private AddressRequest address;
 }

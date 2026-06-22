@@ -3,7 +3,15 @@ package com.giuseppe_matteo.blue_crystal_chicken.blue_crystal_chicken.service;
 import com.giuseppe_matteo.blue_crystal_chicken.blue_crystal_chicken.dto.request.OrderItemRequest;
 import com.giuseppe_matteo.blue_crystal_chicken.blue_crystal_chicken.dto.request.OrderRequest;
 import com.giuseppe_matteo.blue_crystal_chicken.blue_crystal_chicken.dto.request.UpdateOrderRequest;
-import com.giuseppe_matteo.blue_crystal_chicken.blue_crystal_chicken.entity.*;
+import com.giuseppe_matteo.blue_crystal_chicken.blue_crystal_chicken.entity.order.OrderEntity;
+import com.giuseppe_matteo.blue_crystal_chicken.blue_crystal_chicken.entity.order.OrderStatus;
+import com.giuseppe_matteo.blue_crystal_chicken.blue_crystal_chicken.entity.join.OrderProduct;
+import com.giuseppe_matteo.blue_crystal_chicken.blue_crystal_chicken.entity.user.UserEntity;
+import com.giuseppe_matteo.blue_crystal_chicken.blue_crystal_chicken.entity.location.LocationEntity;
+import com.giuseppe_matteo.blue_crystal_chicken.blue_crystal_chicken.entity.product.ProductEntity;
+import com.giuseppe_matteo.blue_crystal_chicken.blue_crystal_chicken.entity.ingredient.IngredientEntity;
+import com.giuseppe_matteo.blue_crystal_chicken.blue_crystal_chicken.entity.offer.OfferEntity;
+import com.giuseppe_matteo.blue_crystal_chicken.blue_crystal_chicken.entity.menu.MenuEntity;
 import com.giuseppe_matteo.blue_crystal_chicken.blue_crystal_chicken.repository.*;
 import com.giuseppe_matteo.blue_crystal_chicken.blue_crystal_chicken.dto.mapper.OrderMapper;
 import lombok.RequiredArgsConstructor;
@@ -128,7 +136,7 @@ public class OrderService {
         } else if (request.getLocationName() != null) {
             log.info("Location non trovata con id, cerco per nome: {}", request.getLocationName());
             LocationEntity location = locationRepository
-                    .findByNameAndAddressAndCity(request.getLocationName(), request.getLocationAddress(),
+                    .findByNameAndAddress_StreetAndAddress_City(request.getLocationName(), request.getLocationAddress(),
                             request.getLocationCity())
                     .orElseThrow(() -> new RuntimeException("Location non trovata con nome: " + request.getLocationName()));
             order.setLocation(location);

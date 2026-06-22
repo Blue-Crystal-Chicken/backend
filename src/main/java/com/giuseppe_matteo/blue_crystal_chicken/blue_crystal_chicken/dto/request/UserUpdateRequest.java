@@ -30,4 +30,6 @@ public class UserUpdateRequest {
     @NotBlank
     private String birthday;
 
+    @jakarta.validation.Valid
+    private AddressRequest address;
 }
