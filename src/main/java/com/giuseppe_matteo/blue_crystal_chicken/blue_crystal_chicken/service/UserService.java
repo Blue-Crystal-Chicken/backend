@@ -31,6 +31,7 @@ import java.time.LocalDate;
 import com.giuseppe_matteo.blue_crystal_chicken.blue_crystal_chicken.dto.mapper.AddressMapper;
 import com.giuseppe_matteo.blue_crystal_chicken.blue_crystal_chicken.dto.mapper.LocationMapper;
 import com.giuseppe_matteo.blue_crystal_chicken.blue_crystal_chicken.dto.response.LocationResponse;
+import com.giuseppe_matteo.blue_crystal_chicken.blue_crystal_chicken.dto.response.AddressResponse;
 import com.giuseppe_matteo.blue_crystal_chicken.blue_crystal_chicken.entity.address.Address;
 import com.giuseppe_matteo.blue_crystal_chicken.blue_crystal_chicken.entity.address.AddressType;
 import com.giuseppe_matteo.blue_crystal_chicken.blue_crystal_chicken.entity.location.LocationEntity;
@@ -78,6 +79,10 @@ public class UserService {
         if (user != null && user.getLocation() != null) {
             locationResponse = locationMapper.toResponse(user.getLocation());
         }
+        AddressResponse addressResponse = null;
+        if (user != null && user.getAddress() != null) {
+            addressResponse = addressMapper.toResponse(user.getAddress());
+        }
 
         return ResponseEntity.ok(new JwtResponse(jwt, 
                 userDetails.getId(), 
@@ -88,7 +93,8 @@ public class UserService {
                 userDetails.getGender(),
                 userDetails.getBirthday(),
                 roles,
-                locationResponse));
+                locationResponse,
+                addressResponse));
     }
 
     @Transactional(readOnly = true)
@@ -108,6 +114,10 @@ public class UserService {
         if (user != null && user.getLocation() != null) {
             locationResponse = locationMapper.toResponse(user.getLocation());
         }
+        AddressResponse addressResponse = null;
+        if (user != null && user.getAddress() != null) {
+            addressResponse = addressMapper.toResponse(user.getAddress());
+        }
 
         // Return user data without a new token (or we could generate a new one if needed, 
         // but for session restoration, the old token is still valid)
@@ -120,7 +130,8 @@ public class UserService {
                 userDetails.getGender(),
                 userDetails.getBirthday(),
                 roles,
-                locationResponse));
+                locationResponse,
+                addressResponse));
     }
 
 
