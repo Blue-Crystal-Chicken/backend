@@ -1,0 +1,4 @@
+$kind: http-request
+url: "{{baseUrl}}/api/orders/service-type/TABLE"
+method: GET
+order: 5000

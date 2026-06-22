@@ -1,0 +1,5 @@
+$kind: http-request
+description: Elimina una associazione utente-device tramite il suo ID.
+url: "{{baseUrl}}/user-devices/1"
+method: DELETE
+order: 6000

@@ -1,0 +1,19 @@
+$kind: http-request
+description: Crea una nuova notifica. Restituisce la notifica creata.
+url: "{{baseUrl}}/api/notification/create"
+method: POST
+headers:
+  Content-Type: application/json
+body:
+  type: json
+  content: |-
+    {
+      "title": "Richiesta ferie",
+      "body": "Giovanni Rossi ha richiesto ferie dal 01/01/2025 al 10/01/2025",
+      "type": "VACATION_REQUEST",
+      "payload": {
+        "startDate": "2025-01-01",
+        "endDate": "2025-01-10"
+      }
+    }
+order: 1000

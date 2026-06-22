@@ -1,0 +1,14 @@
+$kind: http-request
+url: "{{baseUrl}}/api/menus"
+method: POST
+headers:
+  Content-Type: application/json
+body:
+  type: text
+  content: |-
+    {
+      "name": "Menu Classic",
+      "price": 12.99,
+      "description": "Burger + patatine + bibita"
+    }
+order: 8000

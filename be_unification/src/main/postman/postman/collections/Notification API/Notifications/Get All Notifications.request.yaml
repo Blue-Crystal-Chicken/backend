@@ -1,0 +1,5 @@
+$kind: http-request
+description: Recupera la lista di tutte le notifiche.
+url: "{{baseUrl}}/api/notification"
+method: GET
+order: 2000

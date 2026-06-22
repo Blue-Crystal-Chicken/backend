@@ -1,0 +1,14 @@
+$kind: http-request
+description: Registra un nuovo device. Restituisce il device creato.
+url: "{{baseUrl}}/devices"
+method: POST
+headers:
+  Content-Type: application/json
+body:
+  type: json
+  content: |-
+    {
+      "token": "fcm-token-example",
+      "platform": "ANDROID"
+    }
+order: 1000

@@ -1,0 +1,5 @@
+$kind: http-request
+description: Recupera la lista di tutti i device registrati.
+url: "{{baseUrl}}/devices"
+method: GET
+order: 2000

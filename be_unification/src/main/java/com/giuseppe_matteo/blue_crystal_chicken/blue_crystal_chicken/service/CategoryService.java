@@ -1,0 +1,81 @@
+package com.giuseppe_matteo.blue_crystal_chicken.blue_crystal_chicken.service;
+
+
+import java.util.List;
+import java.util.stream.Collectors;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+
+import com.giuseppe_matteo.blue_crystal_chicken.blue_crystal_chicken.dto.request.CategoryRequest;
+import com.giuseppe_matteo.blue_crystal_chicken.blue_crystal_chicken.dto.response.CategoryResponse;
+import com.giuseppe_matteo.blue_crystal_chicken.blue_crystal_chicken.repository.CategoryRepository;
+import com.giuseppe_matteo.blue_crystal_chicken.blue_crystal_chicken.dto.projection.CategoryWithCount;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.transaction.annotation.Transactional;
+import org.springframework.http.ResponseEntity;
+import com.giuseppe_matteo.blue_crystal_chicken.blue_crystal_chicken.dto.mapper.CategoryMapper;
+import com.giuseppe_matteo.blue_crystal_chicken.blue_crystal_chicken.entity.category.Category;
+import com.giuseppe_matteo.blue_crystal_chicken.blue_crystal_chicken.entity.category.CategoryName;
+
+@Service
+@Transactional
+@Slf4j
+public class CategoryService {
+
+    @Autowired
+    private CategoryRepository categoryRepository;
+
+    @Autowired
+    private CategoryMapper categoryMapper;
+
+    @Transactional
+    public ResponseEntity<?> save(CategoryRequest request) {
+        try {
+            CategoryName categoryName = CategoryName.valueOf(request.getName().toUpperCase());
+            if (categoryRepository.existsByName(categoryName)) {
+                log.info("Category {} already exists, skipping...", request.getName());
+                return ResponseEntity.ok("Category already exists");
+            }
+
+            log.info("Creating category: {}", request);
+            Category category = categoryMapper.toCategory(request);
+            return ResponseEntity.ok(categoryRepository.save(category));
+        } catch (IllegalArgumentException e) {
+            log.error("Invalid category name: {}", request.getName());
+            return ResponseEntity.badRequest().body("Invalid category name: " + request.getName());
+        } catch (Exception e) {
+            log.error("Error creating category: {}", e.getMessage());
+            return ResponseEntity.badRequest().body(e.getMessage());
+        }
+    }
+
+    public List<CategoryResponse> findAll() {
+        log.info("Fetching all categories");
+        List<Category> categories = categoryRepository.findAll();
+        log.info("Found {} categories", categories.size());
+        return categories.stream().map(categoryMapper::toCategoryResponse).collect(Collectors.toList());
+    }
+
+    public ResponseEntity<CategoryResponse> findByName(String name) {
+        try {
+            CategoryName categoryName = CategoryName.valueOf(name.toUpperCase());
+            return categoryRepository.findByName(categoryName)
+                    .map(categoryMapper::toCategoryResponse)
+                    .map(ResponseEntity::ok)
+                    .orElseGet(() -> {
+                        log.info("Category {} not found", name);
+                        return ResponseEntity.notFound().build();
+                    });
+        } catch (IllegalArgumentException e) {
+            log.error("Invalid category name: {}", name);
+            return ResponseEntity.badRequest().build();
+        }
+    }
+
+    public List<CategoryWithCount> getCategoriesWithCount() {
+        log.info("Fetching categories with product count");
+        return categoryRepository.findAllCategoriesWithProductCount();
+    }
+
+}

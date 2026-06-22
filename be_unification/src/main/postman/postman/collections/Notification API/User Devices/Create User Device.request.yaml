@@ -1,0 +1,15 @@
+$kind: http-request
+description: Associa un utente ad un device. Restituisce il record creato.
+url: "{{baseUrl}}/user-devices"
+method: POST
+headers:
+  Content-Type: application/json
+body:
+  type: json
+  content: |-
+    {
+      "userId": "user-123",
+      "token": "fcm-token-example",
+      "platform": "ANDROID"
+    }
+order: 1000

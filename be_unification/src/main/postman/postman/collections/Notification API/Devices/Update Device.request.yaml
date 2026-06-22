@@ -1,0 +1,14 @@
+$kind: http-request
+description: Aggiorna un device esistente tramite il suo ID.
+url: "{{baseUrl}}/devices/1"
+method: PUT
+headers:
+  Content-Type: application/json
+body:
+  type: json
+  content: |-
+    {
+      "token": "fcm-token-updated",
+      "platform": "IOS"
+    }
+order: 4000

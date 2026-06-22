@@ -1,0 +1,18 @@
+$kind: http-request
+url: "{{baseUrl}}/api/locations"
+method: POST
+headers:
+  Content-Type: application/json
+body:
+  type: text
+  content: |-
+    {
+      "name": "Blue Crystal Torino Centro",
+      "address": "Via Roma 1",
+      "city": "Torino",
+      "phoneCode": "+39",
+      "phoneNumber": "0110000001",
+      "openingHours": "10:00-23:00",
+      "status": "OPEN"
+    }
+order: 6000

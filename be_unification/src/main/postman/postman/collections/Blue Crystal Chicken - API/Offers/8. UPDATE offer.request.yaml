@@ -1,0 +1,13 @@
+$kind: http-request
+url: "{{baseUrl}}/api/offers/1"
+method: PUT
+headers:
+  Content-Type: application/json
+body:
+  type: text
+  content: |-
+    {
+      "name": "Promo Pranzo Estiva",
+      "description": "Offerta speciale estiva dalle 12 alle 15"
+    }
+order: 8000

@@ -1,0 +1,6 @@
+$kind: http-request
+url: "{{baseUrl}}/api/locations/1/stock/low?threshold=10"
+method: GET
+queryParams:
+  threshold: "10"
+order: 2000

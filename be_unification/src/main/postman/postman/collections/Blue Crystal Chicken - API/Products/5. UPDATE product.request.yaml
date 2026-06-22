@@ -1,0 +1,14 @@
+$kind: http-request
+url: "{{baseUrl}}/api/products/v1/products/1"
+method: PUT
+headers:
+  Content-Type: application/json
+body:
+  type: text
+  content: |-
+    {
+      "name": "Chicken Burger XL",
+      "categoryName": "BURGER",
+      "price": 10.99
+    }
+order: 5000

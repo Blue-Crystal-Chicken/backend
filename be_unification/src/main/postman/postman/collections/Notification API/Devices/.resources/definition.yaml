@@ -1,0 +1,3 @@
+$kind: collection
+description: Endpoint per la gestione dei device (/devices)
+order: 2000

@@ -1,0 +1,17 @@
+$kind: http-request
+url: "{{baseUrl}}/api/orders/1"
+method: PUT
+headers:
+  Content-Type: application/json
+body:
+  type: text
+  content: |-
+    {
+      "serviceType": "TAKEAWAY",
+      "orderType": "STANDARD",
+      "tableNumber": null,
+      "paymentType": "CASH",
+      "paymentAmount": 25.98,
+      "totalAt": 25.98
+    }
+order: 11000

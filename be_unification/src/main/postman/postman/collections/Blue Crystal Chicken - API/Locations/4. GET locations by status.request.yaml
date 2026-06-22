@@ -1,0 +1,4 @@
+$kind: http-request
+url: "{{baseUrl}}/api/locations/status/OPEN"
+method: GET
+order: 5000

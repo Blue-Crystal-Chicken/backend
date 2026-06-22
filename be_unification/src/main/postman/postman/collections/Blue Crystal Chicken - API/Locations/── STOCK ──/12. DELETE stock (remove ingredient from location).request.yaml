@@ -1,0 +1,4 @@
+$kind: http-request
+url: "{{baseUrl}}/api/locations/1/stock/1"
+method: DELETE
+order: 5000

@@ -1,0 +1,12 @@
+$kind: http-request
+url: "{{baseUrl}}/api/locations/1/stock/1"
+method: PUT
+headers:
+  Content-Type: application/json
+body:
+  type: text
+  content: |-
+    {
+      "quantity": 30.0
+    }
+order: 4000

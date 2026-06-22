@@ -1,0 +1,409 @@
+package com.giuseppe_matteo.blue_crystal_chicken.blue_crystal_chicken.service;
+
+import java.util.ArrayList;
+import java.util.List;
+import java.util.stream.Collectors;
+
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.multipart.MultipartFile;
+
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.nio.file.StandardCopyOption;
+import java.util.UUID;
+
+import com.giuseppe_matteo.blue_crystal_chicken.blue_crystal_chicken.dto.mapper.ProductMapper;
+import com.giuseppe_matteo.blue_crystal_chicken.blue_crystal_chicken.dto.request.ProductRequest;
+import com.giuseppe_matteo.blue_crystal_chicken.blue_crystal_chicken.dto.response.ProductResponse;
+import com.giuseppe_matteo.blue_crystal_chicken.blue_crystal_chicken.entity.category.CategoryName;
+import com.giuseppe_matteo.blue_crystal_chicken.blue_crystal_chicken.entity.category.Category;
+import com.giuseppe_matteo.blue_crystal_chicken.blue_crystal_chicken.entity.ingredient.IngredientEntity;
+import com.giuseppe_matteo.blue_crystal_chicken.blue_crystal_chicken.entity.product.ProductEntity;
+import com.giuseppe_matteo.blue_crystal_chicken.blue_crystal_chicken.entity.join.UserFavoriteProduct;
+import com.giuseppe_matteo.blue_crystal_chicken.blue_crystal_chicken.entity.join.key.UserProductKey;
+import com.giuseppe_matteo.blue_crystal_chicken.blue_crystal_chicken.repository.IngredientRepository;
+import com.giuseppe_matteo.blue_crystal_chicken.blue_crystal_chicken.repository.CategoryRepository;
+import com.giuseppe_matteo.blue_crystal_chicken.blue_crystal_chicken.repository.ProductRepository;
+import com.giuseppe_matteo.blue_crystal_chicken.blue_crystal_chicken.repository.UserFavoriteProductRepository;
+import com.giuseppe_matteo.blue_crystal_chicken.blue_crystal_chicken.repository.UserRepository;
+import com.giuseppe_matteo.blue_crystal_chicken.blue_crystal_chicken.entity.user.UserEntity;
+import com.giuseppe_matteo.blue_crystal_chicken.blue_crystal_chicken.exception.ProductNotFoundException;
+import com.giuseppe_matteo.blue_crystal_chicken.blue_crystal_chicken.exception.ProductAlreadyExistsException;
+import org.springframework.data.domain.Pageable;
+import org.springframework.http.ResponseEntity;
+import org.springframework.data.domain.Page;
+import org.springframework.beans.factory.annotation.Value;
+import lombok.extern.slf4j.Slf4j;
+import lombok.RequiredArgsConstructor;
+
+@Service
+@Slf4j
+@RequiredArgsConstructor
+public class ProductService {
+
+    private final ProductRepository productRepository;
+    private final IngredientRepository ingredientRepository;
+    private final ProductMapper productMapper;
+    private final CategoryRepository categoryRepository;
+    private final UserFavoriteProductRepository userFavoriteProductRepository;
+    private final UserRepository userRepository;
+
+    @Value("${app.upload.dir}")
+    private String uploadDir;
+
+    // -------------------------------------------------------------------------
+    // GET ALL
+    // -------------------------------------------------------------------------
+
+    public List<ProductResponse> getAllProducts() {
+        log.info("Fetching all products");
+        List<ProductEntity> products = productRepository.findAll();
+        log.info("Found {} products", products.size());
+        return products.stream()
+                .map(productMapper::toResponse)
+                .collect(Collectors.toList());
+    }
+
+    public List<ProductResponse> getAllProducts(Pageable pageable) {
+        log.info("Fetching all products");
+        Page<ProductEntity> page = productRepository.findAll(pageable);
+        List<ProductEntity> products = page.getContent();
+        log.info("Found {} products", products.size());
+        return products.stream()
+                .map(productMapper::toResponse)
+                .collect(Collectors.toList());
+    }
+
+    public List<ProductResponse> getAllProductsByUser(Long userId) {
+        log.info("Fetching all products for user {}", userId);
+        List<ProductEntity> products = productRepository.findAll();
+        List<ProductResponse> productResponses = new ArrayList<>();
+        for (ProductEntity product : products) {
+            productResponses.add(productMapper.toResponse(product));
+        }
+        for (ProductResponse product : productResponses) {
+            product.setIsFavorite(isFavorite(userId, product.getId()));
+        }
+        log.info("Found {} products", products.size());
+        return productResponses;
+    }
+
+    public List<ProductResponse> getTopProduct(Pageable pageable) {
+        log.info("Fetching top products");
+        List<ProductEntity> products = productRepository.findTop5MostOrderedProducts(pageable);
+        log.info("Found {} products", products.size());
+        return products.stream()
+                .map(productMapper::toResponse)
+                .collect(Collectors.toList());
+    }
+
+    // -------------------------------------------------------------------------
+    // GET BY ID
+    // -------------------------------------------------------------------------
+
+    public ProductResponse getProductById(Long id) {
+        log.info("Fetching product with id: {}", id);
+        ProductEntity product = productRepository.findById(id)
+                .orElseThrow(() -> {
+                    log.warn("Product not found with id: {}", id);
+                    return new ProductNotFoundException("Prodotto non trovato con id: " + id);
+                });
+        
+        return productMapper.toResponse(product);
+    }
+
+    public ProductResponse getProductById(Long id, Long userId) {
+        log.info("Fetching product with id: {} for user: {}", id, userId);
+        ProductEntity product = productRepository.findById(id)
+                .orElseThrow(() -> {
+                    log.warn("Product not found with id: {}", id);
+                    return new ProductNotFoundException("Prodotto non trovato con id: " + id);
+                });
+        ProductResponse response = productMapper.toResponse(product);
+        response.setIsFavorite(isFavorite(userId, id));
+        return response;
+    }
+
+    // Add this method to ProductService.java
+    public ProductEntity findById(Long id) {
+        return productRepository.findById(id)
+                .orElseThrow(() -> new ProductNotFoundException("Prodotto non trovato con id: " + id));
+    }
+
+    // -------------------------------------------------------------------------
+    // GET BY CATEGORY ID
+    // -------------------------------------------------------------------------
+
+    public List<ProductResponse> getProductsByCategoryId(Long categoryId) {
+        log.info("Fetching products with category id: {}", categoryId);
+        if (categoryId == 0) {
+            return getAllProducts();
+        }
+        List<ProductEntity> products = productRepository.findByCategoryId(categoryId);
+        log.info("Found {} products", products.size());
+        return products.stream()
+                .map(productMapper::toResponse)
+                .collect(Collectors.toList());
+    }
+
+    // -------------------------------------------------------------------------
+    // GET BY CATEGORY NAME
+    // -------------------------------------------------------------------------
+
+    public List<ProductResponse> getProductsByCategoryName(String name, Long userId) {
+        log.info("Fetching products with category name: {} by user: {}",name, userId);
+        if(name.equals("ALL")){
+            log.info("Fetching all products");
+            if(userId != null){
+                log.info("Fetching all products for user: {}", userId);
+                return getAllProductsByUser(userId);
+            }else{
+                log.info("Fetching all products without user");
+                return getAllProducts();
+            }
+        }
+        if(name.equals("FAVORITES")){
+            log.info("Fetching favorite products for user: {}", userId);
+            if(userId == null){
+                log.info("Fetching favorite products without user");
+                return getAllProducts();
+            }else{
+                log.info("Fetching favorite products for user: {}", userId);
+                return getUserFavoriteProducts(userId).getBody();
+            }
+        }
+        log.info("Converting category name to enum");
+        CategoryName categoryName = CategoryName.valueOf(name);
+        log.info("Fetching products with category name: {}",categoryName);
+        List<ProductEntity> products = productRepository.findByCategoryName(categoryName);
+        List<ProductResponse> responses = products.stream()
+                .map(productMapper::toResponse)
+                .collect(Collectors.toList());
+        if(userId != null && !products.isEmpty()){
+            for(ProductResponse product : responses){
+                if(userFavoriteProductRepository.findById(new UserProductKey(userId, product.getId())).isPresent()){
+                    product.setIsFavorite(true);
+                }else{
+                    product.setIsFavorite(false);
+                }
+            }
+        }
+        log.info("Found {} products", responses.size());
+        return responses;
+    }
+
+
+    // -------------------------------------------------------------------------
+    // CREATE
+    // -------------------------------------------------------------------------
+
+    public ProductResponse createProduct(ProductRequest request) {
+        log.info("Creating new product with name: {}", request.getName());
+
+        if (productRepository.existsByName(request.getName())) {
+            log.warn("Product already exists with name: {}", request.getName());
+            throw new ProductAlreadyExistsException(
+                    "Prodotto già esistente con nome: " + request.getName());
+        }
+
+        ProductEntity entity = productMapper.toEntity(request);
+
+        // ------------------------
+        // CATEGORY
+        // ------------------------
+        if (request.getCategoryName() != null) {
+            CategoryName categoryName = CategoryName.valueOf(request.getCategoryName().toUpperCase());
+            Category category = categoryRepository.findByName(categoryName)
+                    .orElseThrow(() -> new RuntimeException("Categoria non trovata: " + categoryName));
+            entity.setCategory(category);
+        }
+
+        if (request.getIngredientIds() != null && !request.getIngredientIds().isEmpty()) {
+            List<IngredientEntity> ingredients = ingredientRepository.findAllById(request.getIngredientIds());
+            entity.setIngredients(ingredients);
+        }
+
+        // Gestione immagine: MultipartFile (API admin) oppure path diretto (DataLoader)
+        if (request.getImage() != null) {
+            try {
+                entity.setImgPath(saveImage(request.getImage()));
+            } catch (IOException e) {
+                log.error("Failed to save image for product: {}", request.getName(), e);
+                throw new RuntimeException("Errore nel salvataggio dell'immagine: " + e.getMessage(), e);
+            }
+        } else if (request.getImgPath() != null) {
+            entity.setImgPath(request.getImgPath());
+        } else {
+            log.warn("No image provided for product: {}", request.getName());
+            entity.setImgPath(null);
+        }
+
+        ProductEntity saved = productRepository.save(entity);
+        log.info("Product created with id: {}", saved.getId());
+        return productMapper.toResponse(saved);
+    }
+
+    private String saveImage(MultipartFile file) throws IOException {
+    // Crea la cartella se non esiste
+    Path uploadPath = Paths.get(uploadDir);
+    if (!Files.exists(uploadPath)) {
+        Files.createDirectories(uploadPath);
+    }
+
+    // Nome univoco per evitare conflitti
+    String filename = UUID.randomUUID() + "_" + file.getOriginalFilename();
+    Path filePath = uploadPath.resolve(filename);
+    Files.copy(file.getInputStream(), filePath, StandardCopyOption.REPLACE_EXISTING);
+
+    return filename;
+}
+
+    // -------------------------------------------------------------------------
+    // UPDATE
+    // -------------------------------------------------------------------------
+
+    public ProductResponse updateProduct(Long id, ProductRequest request) {
+        log.info("Updating product with id: {}", id);
+
+        ProductEntity product = productRepository.findById(id)
+                .orElseThrow(() -> {
+                    log.warn("Product not found with id: {}", id);
+                    return new ProductNotFoundException("Prodotto non trovato con id: " + id);
+                });
+
+        // ------------------------
+        // CATEGORY
+        // ------------------------
+        CategoryName categoryName = CategoryName.valueOf(request.getCategoryName().toUpperCase());
+        Category category = categoryRepository.findByName(categoryName)
+        .orElseThrow(() -> new RuntimeException("Categoria non trovata"));
+        product.setCategory(category);
+
+        // ------------------------
+        // BASIC INFO
+        // ------------------------
+        product.setName(request.getName());
+        product.setDescription(request.getDescription());
+
+        // ------------------------
+        // GENERIC ATTRIBUTES
+        // ------------------------
+        product.setSize(request.getSize());
+        product.setQuantity(request.getQuantity());
+        product.setWeight(request.getWeight());
+        product.setLiters(request.getLiters());
+
+        // ------------------------
+        // FOOD PROPERTIES
+        // ------------------------
+        product.setIsSpicy(request.getIsSpicy());
+        product.setFlavor(request.getFlavor());
+        product.setTemperature(request.getTemperature());
+        product.setIsCarbonated(request.getIsCarbonated());
+
+        // ------------------------
+        // NUTRITION
+        // ------------------------
+        product.setCalories(request.getCalories());
+        product.setIsVegetarian(request.getIsVegetarian());
+        product.setIsVegan(request.getIsVegan());
+        product.setIsGlutenFree(request.getIsGlutenFree());
+
+        // ------------------------
+        // PRICE
+        // ------------------------
+        product.setAdditions(request.getAdditions());
+        product.setPrice(request.getPrice());
+
+        // ------------------------
+        // MEDIA
+        // ------------------------
+        if (request.getImgPath() != null) {
+            product.setImgPath(request.getImgPath());
+        }
+
+        // ------------------------
+        // INGREDIENTS
+        // ------------------------
+        if (request.getIngredientIds() != null) {
+            List<IngredientEntity> ingredients = ingredientRepository.findAllById(request.getIngredientIds());
+            product.setIngredients(ingredients);
+        }
+
+        // ------------------------
+        // SAVE
+        // ------------------------
+        ProductEntity updated = productRepository.save(product);
+        log.info("Product updated with id: {}", updated.getId());
+
+        return productMapper.toResponse(updated);
+    }
+
+    // -------------------------------------------------------------------------
+    // DELETE
+    // -------------------------------------------------------------------------
+
+    public ProductResponse deleteProduct(Long id) {
+        log.info("Deleting product with id: {}", id);
+
+        ProductEntity product = productRepository.findById(id)
+                .orElseThrow(() -> {
+                    log.warn("Product not found with id: {}", id);
+                    return new ProductNotFoundException("Prodotto non trovato con id: " + id);
+                });
+
+        productRepository.delete(product);
+        log.info("Product deleted with id: {}", id);
+        return productMapper.toResponse(product);
+    }
+
+    //-------- FAVORITE --------
+
+    // CREATE
+    @Transactional
+    public ResponseEntity<?> addUserFavoriteProduct(Long userId, Long productId) {
+        UserEntity user = userRepository.findById(userId)
+                .orElseThrow(() -> new RuntimeException("Utente non trovato con id: " + userId));
+        ProductEntity product = productRepository.findById(productId)
+                .orElseThrow(() -> new ProductNotFoundException("Prodotto non trovato con id: " + productId));
+
+        UserFavoriteProduct userFavoriteProduct = new UserFavoriteProduct();
+        userFavoriteProduct.setId(new UserProductKey(userId, productId));
+        userFavoriteProduct.setUser(user);
+        userFavoriteProduct.setProduct(product);
+        userFavoriteProductRepository.save(userFavoriteProduct);
+        return ResponseEntity.ok("User favorite product added successfully");
+    }
+
+    // READ
+    @Transactional(readOnly = true)
+    public ResponseEntity<List<ProductResponse>> getUserFavoriteProducts(Long userId) {
+        List<UserFavoriteProduct> userFavoriteProducts = userFavoriteProductRepository.findByIdUserId(userId);
+        List<ProductResponse> productResponse = new ArrayList<>();
+        for (UserFavoriteProduct userFavoriteProduct : userFavoriteProducts) {
+            productResponse.add(productMapper.toResponse(userFavoriteProduct.getProduct()));
+        }
+        return ResponseEntity.ok(productResponse);
+    }
+
+    // DELETE
+    @Transactional
+    public ResponseEntity<?> deleteUserFavoriteProduct(Long userId, Long productId) {
+        UserFavoriteProduct userFavoriteProduct = userFavoriteProductRepository.findById(new UserProductKey(userId, productId)).orElseThrow(() -> {
+                    log.warn("Product not found with product id {} - user id {}", productId, userId);
+                    return new ProductNotFoundException("Prodotto favorito non trovato con id: " + productId);
+                });
+        userFavoriteProductRepository.delete(userFavoriteProduct);
+        log.info("Favorite product deleted with id {} - user id {}", productId, userId);
+        return ResponseEntity.ok("User favorite product deleted successfully");
+    }
+
+    // UTILITY
+    public boolean isFavorite(Long userId, Long productId) {
+        return userFavoriteProductRepository.findById(new UserProductKey(userId, productId)).isPresent();
+    }
+
+}

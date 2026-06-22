@@ -1,0 +1,14 @@
+$kind: http-request
+description: Invia la notifica specificata a tutti i device con isActive=true.
+url: "{{baseUrl}}/device-notifications/send-all"
+method: POST
+headers:
+  Content-Type: application/json
+body:
+  type: json
+  content: |-
+    {
+      "notificationId": 1,
+      "deviceTokenRequest": "fcm-token-example"
+    }
+order: 2000

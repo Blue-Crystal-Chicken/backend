@@ -1,0 +1,17 @@
+$kind: http-request
+url: "{{baseUrl}}/api/users/v1/users/1"
+method: PUT
+headers:
+  Content-Type: application/json
+  Authorization: Bearer {{token}}
+body:
+  type: text
+  content: |-
+    {
+      "name": "Mario",
+      "surname": "Rossi",
+      "birthday": "1990-05-15",
+      "gender": "M",
+      "phone": "3339876543"
+    }
+order: 3000

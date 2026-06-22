@@ -1,0 +1,4 @@
+$kind: http-request
+url: "{{baseUrl}}/api/locations/1/stock"
+method: GET
+order: 1000

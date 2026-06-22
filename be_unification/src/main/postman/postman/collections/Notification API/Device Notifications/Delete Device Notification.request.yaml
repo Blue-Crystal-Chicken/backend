@@ -1,0 +1,5 @@
+$kind: http-request
+description: Elimina una device-notification tramite il suo ID.
+url: "{{baseUrl}}/device-notifications/1"
+method: DELETE
+order: 6000

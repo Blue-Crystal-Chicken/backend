@@ -1,0 +1,3 @@
+$kind: collection
+description: Endpoint per la gestione delle associazioni utente-device (/user-devices)
+order: 4000

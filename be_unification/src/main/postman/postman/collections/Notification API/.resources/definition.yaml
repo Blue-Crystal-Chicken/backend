@@ -1,0 +1,5 @@
+$kind: collection
+name: Notification API
+description: Tutte le chiamate API del progetto Notification (porta 8082)
+variables:
+  baseUrl: http://localhost:8085
