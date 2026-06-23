@@ -401,9 +401,16 @@ public class DataLoader implements CommandLineRunner {
                 if (!locs.isEmpty()) {
                         UserEntity manager = userRepository.findByEmail("manager@bluecrystal.it").orElse(null);
                         if (manager != null) {
-                                manager.setLocation(locs.get(0));
+                                // L'unico manager è attribuito esplicitamente alla sede di Torino
+                                // (non dipende dall'ordine di findAll()). Fallback alla prima sede
+                                // se per qualche motivo Torino non fosse presente.
+                                var torino = locs.stream()
+                                        .filter(l -> l.getName() != null && l.getName().toLowerCase().contains("torino"))
+                                        .findFirst()
+                                        .orElse(locs.get(0));
+                                manager.setLocation(torino);
                                 userRepository.save(manager);
-                                log.info("MANAGER manager@bluecrystal.it / manager123 -> sede '{}'", locs.get(0).getName());
+                                log.info("MANAGER manager@bluecrystal.it / manager123 -> sede '{}'", torino.getName());
                         }
                 }
         }
