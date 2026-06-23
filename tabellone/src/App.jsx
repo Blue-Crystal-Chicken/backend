@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 import { useOrderBoard } from "./hooks/useOrderBoard";
-import { fetchStation } from "./api/orderApi";
+import { fetchSedi } from "./api/orderApi";
 import BoardColumn from "./components/BoardColumn";
 
 function useClock() {
@@ -12,17 +12,20 @@ function useClock() {
   return now;
 }
 
-// Sede a cui è collegato questo tabellone (dal token-stazione).
-function useStation() {
-  const [station, setStation] = useState(undefined); // undefined=loading, null=non configurata
-  useEffect(() => {
-    fetchStation().then((s) => setStation(s ?? null));
-  }, []);
-  return station;
+// Selettore sede: carica l'elenco e ricorda la scelta in localStorage.
+function useSedi() {
+  const [sedi, setSedi] = useState([]);
+  const [selected, setSelected] = useState(() => localStorage.getItem("tabellone_sede") || "");
+  useEffect(() => { fetchSedi().then(setSedi); }, []);
+  const select = (id) => {
+    setSelected(id);
+    if (id) localStorage.setItem("tabellone_sede", id); else localStorage.removeItem("tabellone_sede");
+  };
+  return { sedi, selected, select };
 }
 
 export default function App() {
-  const station = useStation();
+  const { sedi, selected, select } = useSedi();
   const {
     columns,
     loading,
@@ -33,7 +36,7 @@ export default function App() {
     refresh,
     toggleLive,
     advance,
-  } = useOrderBoard(station ? station.id : null);
+  } = useOrderBoard(selected ? Number(selected) : null);
   const now = useClock();
 
   if (loading) {
@@ -53,15 +56,19 @@ export default function App() {
             <h1 className="font-['Syne'] text-[28px] font-extrabold tracking-tight">
               Tabellone Ordini
             </h1>
-            {station === undefined ? null : station ? (
-              <span className="font-['Syne'] text-[14px] font-bold px-3 py-0.5 rounded-full bg-[#a78bfa]/10 text-[#a78bfa] border border-[#a78bfa]/20">
-                {station.name}{station.city ? ` · ${station.city}` : ""}
-              </span>
-            ) : (
-              <span className="font-['Syne'] text-[13px] font-bold px-3 py-0.5 rounded-full bg-[#ff5e5e]/10 text-[#ff5e5e] border border-[#ff5e5e]/20">
-                Sede non configurata — imposta VITE_STATION_TOKEN
-              </span>
-            )}
+            {/* Dropdown selezione sede: al cambio, filtra gli ordini di quella sede */}
+            <select
+              value={selected}
+              onChange={(e) => select(e.target.value)}
+              className="font-['Syne'] text-[14px] font-bold px-3 py-1 rounded-full bg-[#a78bfa]/10 text-[#a78bfa] border border-[#a78bfa]/30 focus:outline-none cursor-pointer"
+            >
+              <option value="">Tutte le sedi</option>
+              {sedi.map((s) => (
+                <option key={s.id} value={s.id}>
+                  {s.name}{s.city ? ` · ${s.city}` : ""}
+                </option>
+              ))}
+            </select>
           </div>
           <p className="text-[13px] text-[#8b92a8] uppercase tracking-wide">
             Blue Crystal Chicken — Cucina &amp; Ritiro

@@ -34,6 +34,8 @@ export const API_CONFIG = {
   // stato degli ordini di QUESTA sede. Copiala dal pannello Admin (Sedi →
   // token-stazione) e mettila in .env come VITE_STATION_TOKEN.
   stationToken: env.VITE_STATION_TOKEN || "",
+  // Id della sede di questa cucina (più semplice del token: niente segreti).
+  locationId: env.VITE_LOCATION_ID || "",
 };
 
 // host vuoto ⇒ origine relativa "" (nginx proxy instrada /api al backend).
@@ -47,8 +49,8 @@ export const ENDPOINTS = {
   list: () => `${host()}${API_CONFIG.basePath}`,
   updateStatus: (id) => `${host()}${API_CONFIG.basePath}/${id}/status`,
   products: () => `${host()}${API_CONFIG.productsPath}`,
-  // Risolve il token-stazione nella sede di appartenenza (per mostrare quale sede).
-  station: () => `${host()}/api/locations/by-station-token`,
+  // Elenco di tutte le sedi (per il dropdown di selezione).
+  locations: () => `${host()}/api/locations`,
 };
 
 // ── 3. Polling ───────────────────────────────────────────────────────────────

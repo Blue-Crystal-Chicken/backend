@@ -1,16 +1,19 @@
 import { useState, useEffect } from "react";
 import { useKitchen } from "./hooks/useKitchen";
-import { fetchStation } from "./api/kitchenApi";
+import { fetchSedi } from "./api/kitchenApi";
 import OrderCard from "./components/OrderCard";
 import { CATEGORY_COLORS, CATEGORY_LABELS } from "./config";
 
-// Badge che indica a quale SEDE è collegata questa cucina (dal token-stazione).
-function useStation() {
-  const [station, setStation] = useState(undefined); // undefined=loading, null=non configurata
-  useEffect(() => {
-    fetchStation().then((s) => setStation(s ?? null));
-  }, []);
-  return station;
+// Selettore sede: carica l'elenco e ricorda la scelta in localStorage.
+function useSedi() {
+  const [sedi, setSedi] = useState([]);
+  const [selected, setSelected] = useState(() => localStorage.getItem("cucina_sede") || "");
+  useEffect(() => { fetchSedi().then(setSedi); }, []);
+  const select = (id) => {
+    setSelected(id);
+    if (id) localStorage.setItem("cucina_sede", id); else localStorage.removeItem("cucina_sede");
+  };
+  return { sedi, selected, select };
 }
 
 function useClock() {
@@ -43,7 +46,7 @@ function Legend() {
 }
 
 export default function App() {
-  const station = useStation();
+  const { sedi, selected, select } = useSedi();
   const {
     orders,
     categoryMap,
@@ -58,7 +61,7 @@ export default function App() {
     toggleLive,
     act,
     clearActionError,
-  } = useKitchen(station ? station.id : null);
+  } = useKitchen(selected ? Number(selected) : null);
   const now = useClock();
 
   if (loading) {
@@ -76,18 +79,21 @@ export default function App() {
         <div>
           <div className="flex items-center gap-3 mb-1">
             <h1 className="font-['Syne'] text-[26px] font-extrabold tracking-tight">
-              Cucina{station && station.city ? ` · ${station.city}` : ""}
+              Cucina
             </h1>
-            {/* Sede a cui è collegata questa cucina (dal token-stazione) */}
-            {station === undefined ? null : station ? (
-              <span className="font-['Syne'] text-[14px] font-bold px-3 py-0.5 rounded-full bg-[#a78bfa]/10 text-[#a78bfa] border border-[#a78bfa]/20">
-                {station.name}{station.city ? ` · ${station.city}` : ""}
-              </span>
-            ) : (
-              <span className="font-['Syne'] text-[13px] font-bold px-3 py-0.5 rounded-full bg-[#ff5e5e]/10 text-[#ff5e5e] border border-[#ff5e5e]/20">
-                Sede non configurata — imposta VITE_STATION_TOKEN
-              </span>
-            )}
+            {/* Dropdown selezione sede: al cambio, filtra gli ordini di quella sede */}
+            <select
+              value={selected}
+              onChange={(e) => select(e.target.value)}
+              className="font-['Syne'] text-[13px] font-bold px-3 py-1 rounded-full bg-[#a78bfa]/10 text-[#a78bfa] border border-[#a78bfa]/30 focus:outline-none cursor-pointer"
+            >
+              <option value="">Tutte le sedi</option>
+              {sedi.map((s) => (
+                <option key={s.id} value={s.id}>
+                  {s.name}{s.city ? ` · ${s.city}` : ""}
+                </option>
+              ))}
+            </select>
             <span
               className="font-['Syne'] text-[14px] font-bold px-3 py-0.5 rounded-full bg-[#38b6ff]/10 text-[#38b6ff] border border-[#38b6ff]/20"
             >

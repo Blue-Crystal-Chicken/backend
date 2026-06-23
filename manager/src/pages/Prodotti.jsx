@@ -293,7 +293,7 @@ export default function ProductDashboard() {
                                     <td className="py-3 px-3 font-['Syne'] font-semibold text-[#f0f4ff] text-[13px]">{product.name}</td>
                                     <td className="py-3 px-3 text-[#8b92a8] text-[13px]">
                                         <span className="bg-[#181c23] px-2.5 py-1 rounded-md text-[11px] font-semibold border border-white/5 tracking-wider uppercase text-[#38b6ff]">
-                                            {product.category}
+                                            {product.category?.name ?? product.category}
                                         </span>
                                     </td>
                                     <td className="py-3 px-3 font-['Syne'] font-bold text-[#22d3a0] text-[13px]">{fmt(product.price)}</td>
@@ -643,7 +643,7 @@ export default function ProductDashboard() {
                                                 </button>
                                                 <div className="flex-1 min-w-0">
                                                     <div className="text-[13px] font-medium text-[#f0f4ff] truncate">{p.name}</div>
-                                                    <div className="text-[11px] text-[#4e5566]">{p.category} · {fmt(p.price)}</div>
+                                                    <div className="text-[11px] text-[#4e5566]">{(p.category?.name ?? p.category)} · {fmt(p.price)}</div>
                                                 </div>
                                                 {selected && (
                                                     <div className="flex items-center gap-3 shrink-0">

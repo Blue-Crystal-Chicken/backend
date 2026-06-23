@@ -10,6 +10,8 @@ import { CATEGORY_COLORS, CATEGORY_LABELS, RESPONSE_FIELDS as F } from "../confi
 // Normalizza una stringa categoria al formato enum (HAMBURGER, ICE_CREAM, …)
 export function normalizeCategory(raw) {
   if (!raw) return "DEFAULT";
+  // Il backend unificato (Giuseppe) può restituire la categoria come oggetto {id,name}
+  if (typeof raw === "object") raw = raw.name ?? raw.id ?? "";
   const key = String(raw).trim().toUpperCase().replace(/[\s-]+/g, "_");
   return key in CATEGORY_COLORS ? key : "DEFAULT";
 }

@@ -13,16 +13,17 @@ const authHeaders = () =>
 const stationHeaders = () =>
   API_CONFIG.stationToken ? { "X-Station-Token": API_CONFIG.stationToken } : {};
 
-// Scopre a quale SEDE appartiene il token-stazione configurato.
-// Ritorna { id, name, city } oppure null se manca/è errato (così la UI lo segnala).
-export async function fetchStation() {
-  if (!API_CONFIG.stationToken) return null;
+// Elenco sedi per il dropdown. Ritorna [{id,name,city}] (vuoto in caso di errore).
+export async function fetchSedi() {
   try {
-    const res = await fetch(ENDPOINTS.station(), { headers: { Accept: "application/json", ...stationHeaders() } });
-    if (!res.ok) return null;
-    return await res.json();
+    const res = await fetch(ENDPOINTS.locations(), { headers: { Accept: "application/json" } });
+    if (!res.ok) return [];
+    const list = await res.json();
+    return (Array.isArray(list) ? list : []).map((l) => ({
+      id: l.id, name: l.name, city: l.address?.city ?? l.city ?? "",
+    }));
   } catch {
-    return null;
+    return [];
   }
 }
 

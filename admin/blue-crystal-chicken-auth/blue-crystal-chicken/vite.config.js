@@ -8,4 +8,9 @@ export default defineConfig({
     react(),
     tailwindcss(),
   ],
+  // Porta del dev server admin (parametrica via VITE_PORT, default 5173).
+  server: {
+    port: Number(process.env.VITE_PORT) || 5173,
+    host: true,
+  },
 })

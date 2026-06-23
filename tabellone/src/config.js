@@ -23,6 +23,8 @@ export const API_CONFIG = {
   // Token-stazione della SEDE: autorizza il cambio stato degli ordini di QUESTA
   // sede (PUT .../status ora è protetto). Copialo dal pannello Admin → Sedi.
   stationToken: env.VITE_STATION_TOKEN || "",
+  // Id della sede di questo tabellone (più semplice del token).
+  locationId: env.VITE_LOCATION_ID || "",
 };
 
 // host vuoto ⇒ origine relativa (nginx proxy instrada /api al backend).
@@ -38,8 +40,8 @@ export const ENDPOINTS = {
   list: () => root(),
   // PUT cambio stato di un ordine
   updateStatus: (id) => `${root()}/${id}/status`,
-  // Risolve il token-stazione nella sede (per mostrare a quale sede è il tabellone)
-  station: () => `${origin()}/api/locations/by-station-token`,
+  // Elenco di tutte le sedi (per il dropdown di selezione).
+  locations: () => `${origin()}/api/locations`,
 };
 
 // ── 3. Polling ───────────────────────────────────────────────────────────────
