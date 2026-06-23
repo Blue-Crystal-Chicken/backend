@@ -33,9 +33,11 @@ pipeline {
 
         stage('Push GHCR') {
             steps {
-                withCredentials([usernamePassword(credentialsId: 'github-bcc', usernameVariable: 'USER', passwordVariable: 'PASS')]) {
-                    sh 'echo $PASS | docker login ghcr.io -u $USER --password-stdin'
-                    sh 'docker push ghcr.io/blue-crystal-chicken/bcc-backend:latest'
+                retry(3) {
+                    withCredentials([usernamePassword(credentialsId: 'github-bcc', usernameVariable: 'USER', passwordVariable: 'PASS')]) {
+                        sh 'echo $PASS | docker login ghcr.io -u $USER --password-stdin'
+                        sh 'docker push ghcr.io/blue-crystal-chicken/bcc-backend:latest'
+                    }
                 }
             }
         }
