@@ -104,6 +104,7 @@ public class DataLoader implements CommandLineRunner {
                 createProducts();
                 createLocations();
                 createUsers();
+                fixupSeedAccounts();
                 createMenus();
                 createOffers();
                 createOrders();
@@ -413,6 +414,38 @@ public class DataLoader implements CommandLineRunner {
                                 log.info("MANAGER manager@bluecrystal.it / manager123 -> sede '{}'", torino.getName());
                         }
                 }
+        }
+
+        /**
+         * Correzioni idempotenti per gli account di servizio, applicate a OGNI avvio —
+         * anche su DB già popolato, dove createUsers() non rigira (guard count() > 0).
+         * Risolve il caso in cui un deploy precedente abbia lasciato dati incoerenti:
+         *  - admin@bluecrystal.it deve avere ruolo ADMIN;
+         *  - manager@bluecrystal.it, SE senza sede, viene assegnato a Torino
+         *    (non sovrascrive un'assegnazione già impostata a mano).
+         */
+        private void fixupSeedAccounts() {
+                userRepository.findByEmail("admin@bluecrystal.it").ifPresent(admin -> {
+                        if (admin.getRole() != Role.ADMIN) {
+                                admin.setRole(Role.ADMIN);
+                                userRepository.save(admin);
+                                log.info("FIXUP: admin@bluecrystal.it -> ruolo ADMIN");
+                        }
+                });
+                userRepository.findByEmail("manager@bluecrystal.it").ifPresent(manager -> {
+                        if (manager.getLocation() == null) {
+                                var locs = locationRepository.findAll();
+                                if (!locs.isEmpty()) {
+                                        var torino = locs.stream()
+                                                .filter(l -> l.getName() != null && l.getName().toLowerCase().contains("torino"))
+                                                .findFirst()
+                                                .orElse(locs.get(0));
+                                        manager.setLocation(torino);
+                                        userRepository.save(manager);
+                                        log.info("FIXUP: manager@bluecrystal.it -> sede '{}'", torino.getName());
+                                }
+                        }
+                });
         }
 
         // -----------------------------------------------------------------------
