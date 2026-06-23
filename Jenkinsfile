@@ -26,7 +26,7 @@ pipeline {
         stage('Build Immagine Docker') {
             steps {
                 echo '=== Creazione immagine Docker ==='
-                sh 'docker build -t ghcr.io/blue-crystal-chicken/bcc-backend:latest .'
+                sh 'docker build --dns=8.8.8.8 --dns=8.8.4.4 -t ghcr.io/blue-crystal-chicken/bcc-backend:latest .'
             }
         }
 
