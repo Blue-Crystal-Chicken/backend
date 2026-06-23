@@ -3,6 +3,7 @@ package com.giuseppe_matteo.blue_crystal_chicken.blue_crystal_chicken.entity.loc
 import com.giuseppe_matteo.blue_crystal_chicken.blue_crystal_chicken.entity.AuditingField;
 import com.giuseppe_matteo.blue_crystal_chicken.blue_crystal_chicken.entity.join.LocationIngredient;
 import com.giuseppe_matteo.blue_crystal_chicken.blue_crystal_chicken.entity.address.Address;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.NotBlank;
@@ -59,7 +60,10 @@ public class LocationEntity extends AuditingField {
     @com.fasterxml.jackson.annotation.JsonProperty(access = com.fasterxml.jackson.annotation.JsonProperty.Access.WRITE_ONLY)
     private String stationToken;
 
-    // Bidirectional relationship with LocationIngredient
+    // Bidirectional relationship with LocationIngredient.
+    // @JsonIgnore: come per IngredientEntity, evita il ciclo
+    // Location -> locationIngredients -> LocationIngredient.location -> ...
     @OneToMany(mappedBy = "location", cascade = CascadeType.ALL)
+    @JsonIgnore
     private List<LocationIngredient> locationIngredients;
 }

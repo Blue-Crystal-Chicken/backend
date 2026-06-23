@@ -3,6 +3,7 @@ package com.giuseppe_matteo.blue_crystal_chicken.blue_crystal_chicken.entity.ing
 import com.giuseppe_matteo.blue_crystal_chicken.blue_crystal_chicken.entity.AuditingField;
 import com.giuseppe_matteo.blue_crystal_chicken.blue_crystal_chicken.entity.product.ProductEntity;
 import com.giuseppe_matteo.blue_crystal_chicken.blue_crystal_chicken.entity.join.LocationIngredient;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Size;
@@ -45,7 +46,11 @@ public class IngredientEntity extends AuditingField {
     @ManyToMany(mappedBy = "ingredients")
     private List<ProductEntity> products;
 
-    // Bidirectional with LocationIngredient
+    // Bidirectional with LocationIngredient.
+    // @JsonIgnore: rompe la ricorsione infinita Ingredient -> locationIngredients ->
+    // LocationIngredient.ingredient -> ... che mandava in loop la serializzazione
+    // (e quindi il backend) appena esisteva una riga di scorta.
     @OneToMany(mappedBy = "ingredient", cascade = CascadeType.ALL)
+    @JsonIgnore
     private List<LocationIngredient> locationIngredients;
 }
