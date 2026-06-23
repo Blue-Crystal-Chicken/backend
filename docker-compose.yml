@@ -1,0 +1,76 @@
+# =============================================================================
+#  Backend unificato Blue Crystal Chicken — stack self-contained
+#  Avvia: PostgreSQL + RabbitMQ + il backend (build dal Dockerfile di questa cartella).
+#
+#  Uso:
+#    cp .env.example .env        # opzionale (password, JWT secret)
+#    docker compose up -d --build
+#
+#  Backend → http://localhost:8080   ·   RabbitMQ UI → http://localhost:15672 (guest/guest)
+#  NB: se gira anche lo stack della root (porte 8080/5432/5672), fermalo prima per evitare conflitti.
+# =============================================================================
+
+services:
+  postgres:
+    image: postgres:16-alpine
+    container_name: beu-postgres
+    environment:
+      POSTGRES_USER: ${POSTGRES_USER:-bcc}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-bcc_password}
+      POSTGRES_DB: ${POSTGRES_DB:-blue_crystal_db}
+    ports:
+      - "${POSTGRES_PORT:-5432}:5432"
+    volumes:
+      - beu_postgres_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER:-bcc} -d ${POSTGRES_DB:-blue_crystal_db}"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  rabbitmq:
+    image: rabbitmq:3-management
+    container_name: beu-rabbitmq
+    environment:
+      RABBITMQ_DEFAULT_USER: ${RABBITMQ_USER:-guest}
+      RABBITMQ_DEFAULT_PASS: ${RABBITMQ_PASSWORD:-guest}
+    ports:
+      - "${RABBITMQ_AMQP_PORT:-5672}:5672"
+      - "${RABBITMQ_UI_PORT:-15672}:15672"
+    volumes:
+      - beu_rabbitmq_data:/var/lib/rabbitmq
+    healthcheck:
+      test: ["CMD", "rabbitmq-diagnostics", "ping"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  backend:
+    build:
+      context: .
+    container_name: beu-backend
+    environment:
+      SPRING_DATASOURCE_URL: jdbc:postgresql://postgres:5432/${POSTGRES_DB:-blue_crystal_db}
+      SPRING_DATASOURCE_USERNAME: ${POSTGRES_USER:-bcc}
+      SPRING_DATASOURCE_PASSWORD: ${POSTGRES_PASSWORD:-bcc_password}
+      SPRING_JPA_HIBERNATE_DDL_AUTO: update
+      SPRING_RABBITMQ_HOST: rabbitmq
+      SPRING_RABBITMQ_PORT: "5672"
+      SPRING_RABBITMQ_USERNAME: ${RABBITMQ_USER:-guest}
+      SPRING_RABBITMQ_PASSWORD: ${RABBITMQ_PASSWORD:-guest}
+      # JWT secret reale via .env; default fittizio per dev.
+      BE_APP_JWTSECRET: ${BE_APP_JWTSECRET:-ZGV2LXNlY3JldC1jaGFuZ2UtbWUtaW4tcHJvZHVjdGlvbi0wMDAwMDA=}
+    ports:
+      - "${BACKEND_PORT:-8080}:8080"
+    volumes:
+      - beu_uploads:/app/uploads
+    depends_on:
+      postgres:
+        condition: service_healthy
+      rabbitmq:
+        condition: service_healthy
+
+volumes:
+  beu_postgres_data:
+  beu_rabbitmq_data:
+  beu_uploads:

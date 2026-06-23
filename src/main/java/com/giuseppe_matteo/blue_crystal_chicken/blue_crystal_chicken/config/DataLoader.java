@@ -373,6 +373,18 @@ public class DataLoader implements CommandLineRunner {
                 userRequest.setRole(Role.ADMIN);
                 userService.registerUser(userRequest);
 
+                // Admin "di servizio" (stesse credenziali usate dai pannelli admin/cassa).
+                Register adminReq = new Register();
+                adminReq.setName("Admin");
+                adminReq.setSurname("Notifiche");
+                adminReq.setEmail("admin@bluecrystal.it");
+                adminReq.setPassword("admin123");
+                adminReq.setPhone("3290000000");
+                adminReq.setGender("Other");
+                adminReq.setBirthday("2000-01-01");
+                adminReq.setRole(Role.ADMIN);
+                userService.registerUser(adminReq);
+
                 // Manager di sede (per l'app manager :5185), assegnato alla 1ª sede.
                 Register managerReq = new Register();
                 managerReq.setName("Mario");

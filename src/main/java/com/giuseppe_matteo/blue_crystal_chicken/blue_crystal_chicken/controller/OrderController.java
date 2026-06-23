@@ -178,16 +178,10 @@ public class OrderController {
     }
 
     // PUT /api/orders/{id}/status?status=PREPARING
-    // Autorizzato a: ADMIN (JWT) OPPURE Cucina/Tabellone/Cassa con il token-stazione
-    // (header X-Station-Token) corrispondente alla SEDE dell'ordine.
+    // Cambio stato APERTO (nessun token richiesto): usato da Cucina/Tabellone/Cassa.
+    // (Scelta progetto: niente autorizzazione per-sede sul cambio stato.)
     @PutMapping("/{id}/status")
-    public ResponseEntity<?> updateStatus(@PathVariable Long id, @RequestParam String status,
-            @RequestHeader(value = "X-Station-Token", required = false) String stationToken) {
-        OrderEntity order = orderService.findById(id);
-        if (!isAdmin() && !stationMatches(order, stationToken)) {
-            return ResponseEntity.status(HttpStatus.FORBIDDEN)
-                    .body("Non autorizzato: serve un token-stazione valido per la sede dell'ordine.");
-        }
+    public ResponseEntity<?> updateStatus(@PathVariable Long id, @RequestParam String status) {
         OrderEntity updated = orderService.updateStatus(id, status);
         // Canale cucina → Manager/Tabellone: cambio stato
         String level = "CANCELLED".equalsIgnoreCase(status) ? "WARNING"
